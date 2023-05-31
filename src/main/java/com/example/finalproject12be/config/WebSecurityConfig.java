@@ -76,7 +76,7 @@ public class WebSecurityConfig {
 		// 이 설정을 통해서 브라우저에서 인증 관련 정보들을 요청 헤더에 담을 수 있도록 해줍니다.
 		config.setAllowCredentials(true);
 
-		// allowCredentials 를 true로 하였을 때,
+		// allowCredentials 를 true로 하였을 때
 		// allowedOrigin의 값이 * (즉, 모두 허용)이 설정될 수 없도록 검증합니다.
 		config.validateAllowCredentials();
 

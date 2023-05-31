@@ -19,8 +19,8 @@ public class OneStoreResponseDto {
     private final String holidayTime;
     private final String longitude;
     private final String latitude;
-    private boolean bookmark;
-    private long totalBookmark;
+    private boolean bookmark = false;
+    private long totalBookmark = 0;
     private List<Comment> comments = null; //comment 기능 구현 전으로 테스트를 위해 null로 하드코딩
 //TODO: comment 추가
 
