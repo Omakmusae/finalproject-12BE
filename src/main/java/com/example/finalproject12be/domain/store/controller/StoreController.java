@@ -37,7 +37,7 @@ public class StoreController {
 		return storeService.getStore(storeId);
 	}
 
-	@PostMapping("/api/store/search")
+	@GetMapping("/api/store/search")
 	public List<StoreResponseDto> searchStore(
 			@RequestParam("storeName") String storeName,
 			@RequestParam("gu") String gu,
