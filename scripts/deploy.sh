@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
+chmod +x deploy.sh
+
 REPOSITORY=/home/ubuntu/finalproject12Be
-#cd $REPOSITORY
+cd $REPOSITORY
 
 APP_NAME=finalproject12Be
 JAR_NAME=finalproject12Be-0.0.1-SNAPSHOT.jar
