@@ -41,14 +41,14 @@ public class StoreService {
 
 
 		//storeName
-		if(!storeName.equals("null")){// if(storeName != null){ TODO: 주석 풀기
+		if(storeName != null){
 			//findByStoreName
 			progress = 1;
 			stores = storeRepository.findAllByNameContaining(storeName);
 		}
 
 		//gu
-		if(!gu.equals("null")){//if(gu != null){ //구가 요청되었을 때 TODO: 주석 풀기
+		if(gu != null){
 
 			if(progress == 0){ //저장된 stores가 없을 때
 
