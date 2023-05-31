@@ -31,7 +31,7 @@ public class CommentResponseDto {
         this.createdAt = comment.getCreatedAt();
     }
 
-    public CommentResponseDto(Comment comment, Boolean check) {
+    public CommentResponseDto(Comment comment, boolean check) {
         this.commentId = comment.getId();
         this.memberId = comment.getMember().getId();
         this.storeId = comment.getStore().getId();
