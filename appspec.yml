@@ -5,7 +5,7 @@ files:
   - source: /
     destination: /home/ubuntu/finalproject12Be
     overwrite : yes
-
+    runas : ubuntu
 
 permissions:
   - object: /home/ubuntu/finalproject12Be
