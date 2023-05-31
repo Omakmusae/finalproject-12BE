@@ -21,6 +21,8 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
 
     List<Store> findAllBysundayTimeContaining(String time);
 
+    List<Store> findAllByNameContaining(String storeName);
+
     // @Query("SELECT s FROM Store s WHERE address LIKE '%{gu}%'")
     // List<Store> findAllByGu(String gu);
 }

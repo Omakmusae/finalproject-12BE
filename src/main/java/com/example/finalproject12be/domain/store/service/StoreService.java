@@ -41,14 +41,14 @@ public class StoreService {
 
 
 		//storeName
-		if(storeName != null){
+		if(!storeName.equals("null")){// if(storeName != null){ TODO: 주석 풀기
 			//findByStoreName
 			progress = 1;
-			stores = storeRepository.findAllByName(storeName);
+			stores = storeRepository.findAllByNameContaining(storeName);
 		}
 
 		//gu
-		if(gu != null){ //구가 요청되었을 때
+		if(!gu.equals("null")){//if(gu != null){ //구가 요청되었을 때 TODO: 주석 풀기
 
 			if(progress == 0){ //저장된 stores가 없을 때
 
@@ -57,9 +57,14 @@ public class StoreService {
 
 			}else{ //저장된 stores가 있을 때
 
-				for (Store store : stores) {
-					if (!store.getAddress().contains(gu)) {
-						stores.remove(store);
+				List<Store> testStores = new ArrayList<>();
+				for(Store store: stores){
+					testStores.add(store);
+				}
+
+				for(Store testStore : testStores){
+					if(!testStore.getAddress().contains(gu)){
+						stores.remove(testStore);
 					}
 				}
 			}
