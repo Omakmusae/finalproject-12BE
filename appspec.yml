@@ -8,7 +8,8 @@ files:
 
 
 permissions:
-  - object: /
+  - object: /home/ubuntu/finalproject12Be
+    pattern : "**"
     owner: ubuntu
     group: ubuntu
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-chmod +x deploy.sh
+
 
 REPOSITORY=/home/ubuntu/finalproject12Be
 cd $REPOSITORY
