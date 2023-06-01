@@ -26,14 +26,16 @@ public class OauthController {
 
 	@GetMapping("/user/signin/kakao")
 	public ResponseEntity<Void> kakaoLogin(@RequestParam("code") String code, HttpServletResponse response) throws JsonProcessingException {
-		log.info("컨트롤러야 들어오니?");
+
+		String[] tokenArray = oauthMemberService.kakaoLogin(code, response);
+
 		// code: 카카오 서버로부터 받은 인가 코드
-		String createToken = oauthMemberService.kakaoLogin(code, response);
-		System.out.println(code+"코드닷  !!!!!");
-		// Cookie 생성 및 직접 브라우저에 Set
-		Cookie cookie = new Cookie(JwtUtil.AUTHORIZATION_HEADER, createToken.substring(7));// 앞부분이 key, 뒷부분이 value
-		cookie.setPath("/");
-		response.addCookie(cookie);
+		String createAccessToken = tokenArray[0];
+		String createRefreshToken = tokenArray[1];
+
+		// 헤더로 바꿔야함! Cookie 생성 및 직접 브라우저에 Set
+		response.addHeader("ACCESS_KEY", createAccessToken);
+		response.addHeader("REFRESH_KEY", createRefreshToken);
 
 		return ResponseEntity.status(HttpStatus.OK).body(null);
 	}
