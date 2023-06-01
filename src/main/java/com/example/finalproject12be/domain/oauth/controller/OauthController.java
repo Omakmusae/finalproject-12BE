@@ -22,7 +22,7 @@ public class OauthController {
 
 	private final OauthMemberService oauthMemberService;
 
-	@GetMapping("/user/kakao/callback")
+	@GetMapping("/user/sigin/kakao")
 	public ResponseEntity<Void> kakaoLogin(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
 		// code: 카카오 서버로부터 받은 인가 코드
 		String createToken = oauthMemberService.kakaoLogin(code, response);
