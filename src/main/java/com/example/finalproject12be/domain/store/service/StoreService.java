@@ -80,9 +80,14 @@ public class StoreService {
 
 	public List<StoreResponseDto> searchStore(String storeName, String gu, boolean open, boolean holidayBusiness, boolean nightBusiness, UserDetailsImpl userDetails) {
 
+		// int memberCheck = 0; //userDetails가 null일 때 0, 반대는 1
 		int progress = 0; //stores 리스트가 null일 때 0, 반대는 1
 		List<StoreResponseDto> storeResponseDtos = new ArrayList<>();
 		List<Store> stores = new ArrayList<>();
+
+		// if(userDetails != null){
+		// 	memberCheck = 1;
+		// }
 
 
 		//storeName
@@ -355,8 +360,15 @@ public class StoreService {
 		}
 
 
-		for(Store store : stores){
-			storeResponseDtos.add(new StoreResponseDto(store));
+		if(userDetails != null){
+			Member member = userDetails.getMember();
+			storeResponseDtos = checkBookmark(stores, storeResponseDtos, member);
+		}else{
+
+			for(Store store : stores){
+				storeResponseDtos.add(new StoreResponseDto(store));
+			}
+
 		}
 
 		return storeResponseDtos;
