@@ -31,28 +31,30 @@ public class Bookmark {
 	@Column(name = "BOOKMARK_ID")
 	private Long id;
 
-	@OneToMany(mappedBy = "bookmark")
+	@ManyToOne
+	@JoinColumn(name = "MEMBER_ID")
 	@JsonBackReference
-	private List<Member> members = new ArrayList<Member>();
+	private Member member;
 
-	@OneToOne(mappedBy = "bookmark")
+	@ManyToOne
+	@JoinColumn(name = "STORE_ID")
 	@JsonBackReference
 	private Store store;
 
-	@Column
-	private long totalCount = 0;
+	// @Column
+	// private long totalCount = 0;
 
-	public void bookmarkStore(int isPresent){
-		this.totalCount += isPresent;
-	}
-
-	public void deleteBookmark(Member member){
-		this.members.remove(member);
-	}
-
+	// public void bookmarkStore(int isPresent){
+	// 	this.totalCount += isPresent;
+	// }
+	//
+	// public void deleteBookmark(Member member){
+	// 	this.members.remove(member);
+	// }
+	//
 	public Bookmark(Store store, Member member){
 		this.store = store;
-		this.members.add(member);
+		this.member = member;
 	}
 
 }

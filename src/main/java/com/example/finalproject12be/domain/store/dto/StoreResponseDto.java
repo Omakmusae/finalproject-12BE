@@ -34,4 +34,8 @@ public class StoreResponseDto {
 		this.longitude = store.getLongitude();
 		this.latitude = store.getLatitude();
 	}
+
+	public void setBookmark(boolean bookmark){
+		this.bookmark = bookmark;
+	}
 }

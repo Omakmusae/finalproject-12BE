@@ -1,17 +1,23 @@
 package com.example.finalproject12be.domain.store.service;
 
+import static java.util.Optional.*;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.example.finalproject12be.domain.bookmark.entity.Bookmark;
+import com.example.finalproject12be.domain.member.entity.Member;
 import com.example.finalproject12be.domain.store.dto.OneStoreResponseDto;
 import com.example.finalproject12be.domain.store.dto.StoreResponseDto;
 import com.example.finalproject12be.domain.store.entity.Store;
 import com.example.finalproject12be.domain.store.repository.StoreRepository;
+import com.example.finalproject12be.security.UserDetailsImpl;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,19 +27,58 @@ public class StoreService {
 
 	private final StoreRepository storeRepository;
 
-	public List<StoreResponseDto> getAllStores() {
+	public List<StoreResponseDto> getAllStores(UserDetailsImpl userDetails) {
 
 		List<Store> stores = storeRepository.findAll();
 		List<StoreResponseDto> storeResponseDtos = new ArrayList<>();
 
-		for(Store store : stores){
-			storeResponseDtos.add(new StoreResponseDto(store));
+		if(userDetails != null){
+			Member member = userDetails.getMember();
+			storeResponseDtos = checkBookmark(stores, storeResponseDtos, member);
+		}else{
+
+			for(Store store : stores){
+				storeResponseDtos.add(new StoreResponseDto(store));
+			}
+
 		}
 
 		return storeResponseDtos;
 	}
 
-	public List<StoreResponseDto> searchStore(String storeName, String gu, boolean open, boolean holidayBusiness, boolean nightBusiness) {
+	private List<StoreResponseDto> checkBookmark(List<Store> stores, List<StoreResponseDto> storeResponseDtos, Member member){
+
+		int check = 0;
+
+		for(Store store : stores){
+
+			if(store.getBookmarks().size() != 0){
+				List<Bookmark> bookmarks = store.getBookmarks();
+
+				for(Bookmark bookmark : bookmarks){
+					if(bookmark.getMember().getId() == member.getId()){
+						check = 1;
+					}
+
+				}
+			}
+
+			StoreResponseDto storeResponseDto = new StoreResponseDto(store);
+
+
+			if(check == 1){
+				storeResponseDto.setBookmark(true);
+			}
+
+			storeResponseDtos.add(storeResponseDto);
+
+		}
+
+		return storeResponseDtos;
+
+	}
+
+	public List<StoreResponseDto> searchStore(String storeName, String gu, boolean open, boolean holidayBusiness, boolean nightBusiness, UserDetailsImpl userDetails) {
 
 		int progress = 0; //stores 리스트가 null일 때 0, 반대는 1
 		List<StoreResponseDto> storeResponseDtos = new ArrayList<>();
@@ -317,10 +362,31 @@ public class StoreService {
 		return storeResponseDtos;
 	}
 
-	public OneStoreResponseDto getStore(Long storeId) {
+
+	public OneStoreResponseDto getStore(Long storeId, UserDetailsImpl userDetails) {
 		Store store = storeRepository.findById(storeId)
 				.orElseThrow(() -> new IllegalArgumentException("해당 약국은 존재하지 않습니다."));
 
+		if(userDetails != null){
+			Member member = userDetails.getMember();
+
+			if(store.getBookmarks().size() != 0){
+				List<Bookmark> bookmarks = store.getBookmarks();
+
+				for(Bookmark bookmark : bookmarks){
+					if(bookmark.getMember().getId() == member.getId()){
+
+						OneStoreResponseDto oneStoreResponseDto = new OneStoreResponseDto(store);
+						oneStoreResponseDto.setBookmark(true);
+						oneStoreResponseDto.setTotalBookmark(store.getBookmarks().size());
+						return oneStoreResponseDto;
+
+					}
+
+				}
+			}
+
+		}
 		return new OneStoreResponseDto(store);
 	}
 
