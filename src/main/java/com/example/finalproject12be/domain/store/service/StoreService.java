@@ -112,8 +112,6 @@ public class StoreService {
 
 			if(progress == 0){
 
-				//TODO: 현재 요일 정해서 if 추가
-
 				progress = 1;
 
 				List<Store> newStores = new ArrayList<>();
@@ -356,51 +354,96 @@ public class StoreService {
 
 
 		for (Store testStore : testStores) {
+
+			int status = 0;
+
 			if (dayOfWeek > 0 && dayOfWeek < 6) { //평일
 
 				String storeTime = testStore.getWeekdaysTime();
 
-				String[] storeTimes = storeTime.split("~");
+				if(storeTime != null){
+					String[] storeTimes = storeTime.split("~");
 
-				openHour = Integer.parseInt(storeTimes[0].substring(3, 5));
-				openMin = Integer.parseInt(storeTimes[0].substring(6));
+					// //test
+					// if(storeTimes[0].substring(3, 5).equals("nu")){
+					// 	System.out.println("원래 문자열: " + storeTimes[0]);
+					// 	System.out.println("두 번째 문자열: " + storeTimes[1]);
+					// 	stores.remove(testStore);
+					// 	status = 1;
+					// }
 
-				closeHour = Integer.parseInt(storeTimes[1].substring(0, 2));
-				closeMin = Integer.parseInt(storeTimes[1].substring(3));
+					openHour = Integer.parseInt(storeTimes[0].substring(3, 5));
+					openMin = Integer.parseInt(storeTimes[0].substring(6));
+
+					closeHour = Integer.parseInt(storeTimes[1].substring(0, 2));
+					closeMin = Integer.parseInt(storeTimes[1].substring(3));
+				}else {
+
+					status = 1;
+					stores.remove(testStore);
+
+				}
+
+
 
 			}else if (dayOfWeek == 6){ // 토요일 TODO: 일요일이랑 합치기
 
 				String storeTime = testStore.getWeekdaysTime();
 
-				String[] storeTimes = storeTime.split("~");
+				if (storeTime != null){
+					String[] storeTimes = storeTime.split("~");
 
-				openHour = Integer.parseInt(storeTimes[0].substring(2, 4));
-				openMin = Integer.parseInt(storeTimes[0].substring(5));
+					openHour = Integer.parseInt(storeTimes[0].substring(2, 4));
+					openMin = Integer.parseInt(storeTimes[0].substring(5));
 
-				closeHour = Integer.parseInt(storeTimes[1].substring(0, 2));
-				closeMin = Integer.parseInt(storeTimes[1].substring(3));
+					closeHour = Integer.parseInt(storeTimes[1].substring(0, 2));
+					closeMin = Integer.parseInt(storeTimes[1].substring(3));
+				}else{
+					status = 1;
+					stores.remove(testStore);
+				}
+
+
 
 			}else if( dayOfWeek == 7){ // 일요일
 
 				String storeTime = testStore.getWeekdaysTime();
 
-				String[] storeTimes = storeTime.split("~");
+				if(storeTime != null){
+					String[] storeTimes = storeTime.split("~");
 
-				openHour = Integer.parseInt(storeTimes[0].substring(2, 4));
-				openMin = Integer.parseInt(storeTimes[0].substring(5));
+					openHour = Integer.parseInt(storeTimes[0].substring(2, 4));
+					openMin = Integer.parseInt(storeTimes[0].substring(5));
 
-				closeHour = Integer.parseInt(storeTimes[1].substring(0, 2));
-				closeMin = Integer.parseInt(storeTimes[1].substring(3));
+					closeHour = Integer.parseInt(storeTimes[1].substring(0, 2));
+					closeMin = Integer.parseInt(storeTimes[1].substring(3));
+				}else {
+
+					status = 1;
+					stores.remove(testStore);
+				}
+
+
 
 			}
 
-			if((openHour > nowHour) || (closeHour < nowHour)){
-				stores.remove(testStore);
-			}else if(openHour == nowHour && openMin > nowMin){
-				stores.remove(testStore);
-			} else if(closeHour == nowHour && closeMin < nowMin){ //현재 시간이 영업 시간에 포함되지 않을 때
-				stores.remove(testStore);
+			if(status != 1){
+				if(nowHour < 5){
+					nowHour = nowHour + 24;
+				}
+
+				if((openHour > nowHour) || (closeHour < nowHour)){
+					stores.remove(testStore);
+				}else if(openHour == nowHour && openMin > nowMin){
+					stores.remove(testStore);
+				} else if(closeHour == nowHour && closeMin < nowMin){ //현재 시간이 영업 시간에 포함되지 않을 때
+					stores.remove(testStore);
+				}
 			}
+
+
+
+
 		}
 
 		return stores;
