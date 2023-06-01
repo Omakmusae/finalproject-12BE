@@ -49,12 +49,11 @@ public class Store {
 	@Column
 	private String latitude;
 
-	@OneToOne
-	@JoinColumn(name = "BOOKMARK_ID")
-	private Bookmark bookmark;
-
 	@OneToMany(mappedBy = "store", cascade = CascadeType.REMOVE)
 	private List<Comment> commentList = new ArrayList<>();
+
+	@OneToMany(mappedBy = "store", fetch = FetchType.LAZY)
+	private List<Bookmark> bookmarks;
 
 	public Store(String address, String name, String callNumber, String weekdaysTime, String saturdayTime, String sundayTime, String holidayTime, String longitude, String latitude){
 		this.address = address;
@@ -68,7 +67,11 @@ public class Store {
 		this.latitude = latitude;
 	}
 
-	public void setBookmark(Bookmark bookmark){
-		this.bookmark = bookmark;
+	public void deleteBookmark(Bookmark bookmark){
+		this.bookmarks.remove(bookmark);
+	}
+
+	public void addBookmark(Bookmark bookmark){
+		this.bookmarks.add(bookmark);
 	}
 }
