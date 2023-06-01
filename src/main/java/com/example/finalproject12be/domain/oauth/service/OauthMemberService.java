@@ -60,8 +60,8 @@ public class OauthMemberService {
 		// HTTP Body 생성
 		MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
 		body.add("grant_type", "authorization_code");
-		body.add("client_id", "048f9445160611c1cc986c481c2d6b94");
-		body.add("redirect_uri", "http://localhost:8080/user/kakao/callback");
+		body.add("client_id", "7463ed7e96bc168b9023480e535add90");
+		body.add("redirect_uri", "http://localhost:3000/user/signin/kakao");
 		body.add("code", code);
 
 		// HTTP 요청 보내기
