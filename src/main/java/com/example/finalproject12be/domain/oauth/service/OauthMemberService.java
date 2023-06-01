@@ -86,7 +86,7 @@ public class OauthMemberService {
 	private KakaoMemberInfoRequest getKakaoUserInfo(String accessToken) throws JsonProcessingException {
 		// HTTP Header 생성
 		HttpHeaders headers = new HttpHeaders();
-		headers.add("Authorization", "Bearer " + accessToken);
+		headers.add("ACCESS_KEY", "Bearer " + accessToken);
 		headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
 
 		// HTTP 요청 보내기
