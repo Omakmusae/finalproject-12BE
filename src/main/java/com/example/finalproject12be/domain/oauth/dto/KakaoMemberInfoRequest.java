@@ -11,8 +11,8 @@ public class KakaoMemberInfoRequest {
 	private String email;
 	private String nickname;
 
-	public KakaoMemberInfoRequest(String email, String nickname) {
-
+	public KakaoMemberInfoRequest(Long id, String email, String nickname) {
+		this.id =id;
 		this.email = email;
 		this.nickname = nickname;
 	}

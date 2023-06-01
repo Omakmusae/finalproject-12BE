@@ -46,6 +46,9 @@ public class WebSecurityConfig {
 		http.authorizeRequests()
 				.antMatchers("/user/**").permitAll()
 				.antMatchers("/api/store/**").permitAll()
+
+				.antMatchers("/user/signin/**").permitAll()
+				.antMatchers("/**").permitAll()
 				.antMatchers("/api/comment/{store-id}").permitAll()
 				.anyRequest().authenticated()
 				// JWT 인증/인가를 사용하기 위한 설정
@@ -61,9 +64,9 @@ public class WebSecurityConfig {
 
 		// 사전에 약속된 출처를 명시
 		config.addAllowedOrigin("http://localhost:3000");
-
+		config.addAllowedOrigin("http://localhost:8080");
 		// 특정 헤더를 클라이언트 측에서 사용할 수 있게 지정
-		// 만약 지정하지 않는다면, Authorization 헤더 내의 토큰 값을 사용할 수 없음
+		// 만약 지정하지 않는다면, 토큰 값을 사용할 수 없음
 		config.addExposedHeader(JwtUtil.ACCESS_KEY);
 		config.addExposedHeader(JwtUtil.REFRESH_KEY);
 		// 본 요청에 허용할 HTTP method(예비 요청에 대한 응답 헤더에 추가됨)
