@@ -1,19 +1,15 @@
 package com.example.finalproject12be.domain.store.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.*;
 
 import com.example.finalproject12be.domain.bookmark.entity.Bookmark;
 
+import com.example.finalproject12be.domain.comment.entity.Comment;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -56,6 +52,9 @@ public class Store {
 	@OneToOne
 	@JoinColumn(name = "BOOKMARK_ID")
 	private Bookmark bookmark;
+
+	@OneToMany(mappedBy = "store", cascade = CascadeType.REMOVE)
+	private List<Comment> commentList = new ArrayList<>();
 
 	public Store(String address, String name, String callNumber, String weekdaysTime, String saturdayTime, String sundayTime, String holidayTime, String longitude, String latitude){
 		this.address = address;
