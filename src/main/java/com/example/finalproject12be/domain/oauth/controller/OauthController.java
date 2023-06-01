@@ -15,18 +15,21 @@ import com.example.finalproject12be.security.jwt.JwtUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class OauthController {
 
 	private final OauthMemberService oauthMemberService;
 
-	@GetMapping("/user/sigin/kakao")
-	public ResponseEntity<Void> kakaoLogin(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
+	@GetMapping("/user/signin/kakao")
+	public ResponseEntity<Void> kakaoLogin(@RequestParam("code") String code, HttpServletResponse response) throws JsonProcessingException {
+		log.info("컨트롤러야 들어오니?");
 		// code: 카카오 서버로부터 받은 인가 코드
 		String createToken = oauthMemberService.kakaoLogin(code, response);
-
+		System.out.println(code+"코드닷  !!!!!");
 		// Cookie 생성 및 직접 브라우저에 Set
 		Cookie cookie = new Cookie(JwtUtil.AUTHORIZATION_HEADER, createToken.substring(7));// 앞부분이 key, 뒷부분이 value
 		cookie.setPath("/");
