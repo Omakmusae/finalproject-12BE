@@ -39,4 +39,12 @@ public class OneStoreResponseDto {
         this.longitude = store.getLongitude();
         this.latitude = store.getLatitude();
     }
+
+    public void setBookmark(boolean bookmark){
+        this.bookmark = bookmark;
+    }
+
+    public void setTotalBookmark(long totalBookmark){
+        this.totalBookmark = totalBookmark;
+    }
 }

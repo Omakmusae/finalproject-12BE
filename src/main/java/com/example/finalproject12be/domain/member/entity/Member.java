@@ -1,12 +1,16 @@
 package com.example.finalproject12be.domain.member.entity;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 import com.example.finalproject12be.domain.bookmark.entity.Bookmark;
 
@@ -32,9 +36,8 @@ public class Member {
 	@Column(nullable = false)
 	private String nickname;
 
-	@ManyToOne
-	@JoinColumn(name = "BOOKMARK_ID")
-	private Bookmark bookmark;
+	@OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
+	private List<Bookmark> bookmarks;
 
 	public Member(String email, String password, String nickname) {
 		this.email = email;
@@ -46,7 +49,11 @@ public class Member {
 		return new Member(email, password, nickname);
 	}
 
-	public void setBookmark(Bookmark bookmark){
-		this.bookmark = bookmark;
+	public void deleteBookmark(Bookmark bookmark){
+		this.bookmarks.remove(bookmark);
+	}
+
+	public void addBookmark(Bookmark bookmark){
+		this.bookmarks.add(bookmark);
 	}
 }
