@@ -23,7 +23,7 @@ public class StoreResponseDto {
 
 	//좋아요 기능이 없어서 하드코딩 해 둠
 	//TODO: 본인이 누른 좋아요인지 확인하는 기능 추가 후 수정
-	private boolean like = false;
+	private boolean bookmark = false;
 
 	public StoreResponseDto(Store store) {
 		this.storeId = store.getId();

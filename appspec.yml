@@ -1,17 +1,19 @@
 version: 0.0
 os: linux
 
+
 files:
   - source: /
-    destination: /home/ubuntu/finalproject-12BE
-    overwhite : yes
-file_exists_behavior: OVERWRITE
+    destination: /home/ubuntu/finalproject12Be
+    overwrite : yes
+    runas : ubuntu
 
 permissions:
-  - object: /home/ubuntu/finalproject-12BE
-
+  - object: /home/ubuntu/finalproject12Be
+    pattern : "**"
     owner: ubuntu
     group: ubuntu
+
 hooks:
   AfterInstall:
     - location: scripts/deploy.sh

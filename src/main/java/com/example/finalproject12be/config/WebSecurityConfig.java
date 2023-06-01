@@ -29,7 +29,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class WebSecurityConfig {
 
 	 private final JwtAuthFilter jwtAuthFilter;
-
+	 private final JwtUtil jwtUtil;
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
@@ -37,23 +37,21 @@ public class WebSecurityConfig {
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+		http.cors().and()
+				.csrf().disable();
 
-		return http
-			.csrf().disable()
-			.httpBasic().disable()
-			.formLogin().disable()
-			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-			.and()
-			.authorizeHttpRequests(auth -> auth
-				.requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+		// 기본 설정인 Session 방식은 사용하지 않고 JWT 방식을 사용하기 위한 설정
+		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
+		http.authorizeRequests()
 				.antMatchers("/user/**").permitAll()
 				.antMatchers("/api/store/**").permitAll()
 				.anyRequest().authenticated()
-				.and()
-				.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-			)
-			.anonymous().disable()
-			.build();
+				// JWT 인증/인가를 사용하기 위한 설정
+				.and().addFilterBefore(new JwtAuthFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
+
+		return http.build();
+
 	}
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource(){
@@ -62,6 +60,7 @@ public class WebSecurityConfig {
 
 		// 사전에 약속된 출처를 명시
 		config.addAllowedOrigin("http://localhost:3000");
+
 
 		// 특정 헤더를 클라이언트 측에서 사용할 수 있게 지정
 		// 만약 지정하지 않는다면, Authorization 헤더 내의 토큰 값을 사용할 수 없음
@@ -77,7 +76,7 @@ public class WebSecurityConfig {
 		// 이 설정을 통해서 브라우저에서 인증 관련 정보들을 요청 헤더에 담을 수 있도록 해줍니다.
 		config.setAllowCredentials(true);
 
-		// allowCredentials 를 true로 하였을 때,
+		// allowCredentials 를 true로 하였을 때
 		// allowedOrigin의 값이 * (즉, 모두 허용)이 설정될 수 없도록 검증합니다.
 		config.validateAllowCredentials();
 

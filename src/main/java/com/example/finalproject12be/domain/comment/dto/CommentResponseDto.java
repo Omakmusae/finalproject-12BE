@@ -1,10 +1,8 @@
 package com.example.finalproject12be.domain.comment.dto;
 
-
 import com.example.finalproject12be.domain.comment.entity.Comment;
 import com.example.finalproject12be.domain.member.entity.Member;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -31,7 +29,7 @@ public class CommentResponseDto {
         this.createdAt = comment.getCreatedAt();
     }
 
-    public CommentResponseDto(Comment comment, Boolean check) {
+    public CommentResponseDto(Comment comment, boolean check) {
         this.commentId = comment.getId();
         this.memberId = comment.getMember().getId();
         this.storeId = comment.getStore().getId();

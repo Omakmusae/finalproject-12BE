@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-REPOSITORY=/home/ubuntu/finalproject-12BE
+REPOSITORY=/home/ubuntu/finalproject12Be
 cd $REPOSITORY
 
-APP_NAME=finalproject-12BE
+APP_NAME=finalproject12Be
 JAR_NAME=$(ls $REPOSITORY/build/libs/ | grep 'SNAPSHOT.jar' | tail -n 1)
 JAR_PATH=$REPOSITORY/build/libs/$JAR_NAME
 
@@ -19,4 +19,6 @@ else
 fi
 
 echo "> Deploy - $JAR_PATH "
+
+export JASYPT_ENCRYPTOR_PASSWORD=finalPJ
 nohup java -jar $JAR_PATH > /dev/null 2> /dev/null < /dev/null &
