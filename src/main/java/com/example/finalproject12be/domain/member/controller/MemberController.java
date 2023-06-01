@@ -46,6 +46,7 @@ public class MemberController {
 		@AuthenticationPrincipal final UserDetailsImpl userDetails
 	) {
 		Member member = userDetails.getMember();
+		System.out.println(userDetails.getUsername());
 		System.out.println("테스트 통과");
 		return ResponseEntity.status(HttpStatus.OK).body(null);
 	}
