@@ -1,5 +1,6 @@
 package com.example.finalproject12be.domain.bookmark.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -94,8 +95,15 @@ public class BookmarkService {
 
 
 
-	//ing
+	//TODO n+1 잡기
+	// ing
+
 	// public List<BookmarkResponseDto> getBookmark(Member member) {
+	// 	List<Bookmark> bookmarks = bookmarkRepository.findAllByMember(member);
+	// 	List<BookmarkResponseDto> bookmarkResponseDtos = new ArrayList<>();
 	//
+	// 	for(Bookmark bookmark : bookmarks){
+	// 		BookmarkResponseDto bookmarkResponseDto = new BookmarkResponseDto(store); //Long storeId, String address, String name, String callNumber, String weekdaysTime, long totalBookmark
+	// 	}
 	// }
 }

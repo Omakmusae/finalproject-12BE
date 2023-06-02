@@ -71,13 +71,15 @@ public class StoreService {
 			}
 
 			storeResponseDtos.add(storeResponseDto);
-
+			check = 0;
 		}
 
 		return storeResponseDtos;
 
 	}
 
+
+	//검색
 	public List<StoreResponseDto> searchStore(String storeName, String gu, boolean open, boolean holidayBusiness, boolean nightBusiness, UserDetailsImpl userDetails) {
 
 		// int memberCheck = 0; //userDetails가 null일 때 0, 반대는 1
