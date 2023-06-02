@@ -29,13 +29,13 @@ public class CommentResponseDto {
         this.createdAt = comment.getCreatedAt();
     }
 
-    public CommentResponseDto(Comment comment, boolean check) {
+    public CommentResponseDto(Comment comment, boolean isCurrentUserComment) {
         this.commentId = comment.getId();
         this.memberId = comment.getMember().getId();
         this.storeId = comment.getStore().getId();
         this.nickname = comment.getNickname();
         this.contents = comment.getContents();
-        this.check = check;
+        this.check = isCurrentUserComment;
         this.createdAt = comment.getCreatedAt();
     }
 }
