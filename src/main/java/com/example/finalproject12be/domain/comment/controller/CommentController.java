@@ -50,6 +50,15 @@ public class CommentController {
         return commentService.getComments(storeId, userDetails);
     }
 
+    //마이페이지 댓글 조회
+    @GetMapping("/mypage/{member-id}")
+    public ResponseEntity<List<CommentResponseDto>> getUserComments(
+            @PathVariable("member-id") Long memberId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        List<CommentResponseDto> comments = commentService.getUserComments(memberId, userDetails);
+        return ResponseEntity.ok(comments);
+    }
+
     // 댓글 수정
     @PutMapping("/{store-id}/{comment-id}")
     public ResponseEntity<CommentResponseDto> updateComment(
