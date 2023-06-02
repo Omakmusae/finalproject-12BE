@@ -51,10 +51,10 @@ public class CommentController {
     }
 
     //마이페이지 댓글 조회
-    @GetMapping("/mypage/{member-id}")
+    @GetMapping("/myComment")
     public ResponseEntity<List<CommentResponseDto>> getUserComments(
-            @PathVariable("member-id") Long memberId,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        Long memberId = userDetails.getMember().getId();
         List<CommentResponseDto> comments = commentService.getUserComments(memberId, userDetails);
         return ResponseEntity.ok(comments);
     }
