@@ -7,7 +7,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.finalproject12be.domain.bookmark.dto.BookmarkResponseDto;
+// import com.example.finalproject12be.domain.bookmark.dto.BookmarkResponseDto;
 import com.example.finalproject12be.domain.bookmark.entity.Bookmark;
 import com.example.finalproject12be.domain.bookmark.repository.BookmarkRepository;
 import com.example.finalproject12be.domain.member.entity.Member;
