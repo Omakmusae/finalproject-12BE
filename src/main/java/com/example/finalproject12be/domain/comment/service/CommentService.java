@@ -75,13 +75,15 @@ public class CommentService {
         return ResponseEntity.ok(responseDtos);
     }
     // 마이페이지 댓글 조회
-    public List<CommentResponseDto> getUserComments(Long memberId, UserDetailsImpl userDetails) {
+    public List<CommentResponseDto> getUserComments(UserDetailsImpl userDetails) {
+        Long memberId = userDetails.getMember().getId();
         List<Comment> comments = commentRepository.findByMemberId(memberId);
         List<CommentResponseDto> responseDtos = new ArrayList<>();
 
         for (Comment comment : comments) {
             boolean isCurrentUserComment = comment.getMember().getId().equals(userDetails.getMember().getId());
-            CommentResponseDto responseDto = new CommentResponseDto(comment, isCurrentUserComment);
+            Store store = comment.getStore(); // 댓글이 속한 상점 객체 가져오기
+            CommentResponseDto responseDto = new CommentResponseDto(comment, isCurrentUserComment, store);
             responseDtos.add(responseDto);
         }
 
