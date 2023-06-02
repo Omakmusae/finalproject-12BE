@@ -1,5 +1,6 @@
 package com.example.finalproject12be.domain.bookmark.service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -7,7 +8,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-// import com.example.finalproject12be.domain.bookmark.dto.BookmarkResponseDto;
+import com.example.finalproject12be.domain.bookmark.dto.BookmarkResponseDto;
 import com.example.finalproject12be.domain.bookmark.entity.Bookmark;
 import com.example.finalproject12be.domain.bookmark.repository.BookmarkRepository;
 import com.example.finalproject12be.domain.member.entity.Member;
@@ -57,40 +58,6 @@ public class BookmarkService {
 			store.addBookmark(bookmark);
 		}
 
-		// if(bookmarkOptional.isPresent()) {
-		// 	Bookmark bookmark = bookmarkOptional.get();
-		// 	if(bookmark.getMembers().contains(member)){
-		// 		bookmarkRepository.delete(bookmark);
-		// 		isPresent = -1;
-		// 		bookmark.bookmarkStore(isPresent);
-		// 		bookmark.deleteBookmark(member);
-		// 		member.setBookmark(null);
-		// 		if(bookmark.getMembers().size() == 0){
-		// 			store.setBookmark(null);
-		// 		}else {
-		// 			store.setBookmark(bookmark);
-		// 			bookmarkRepository.saveAndFlush(bookmark);
-		// 		}
-		//
-		// 	}else{
-		// 		bookmarkRepository.delete(bookmark);
-		// 		isPresent = 1;
-		// 		Bookmark newBookmark = new Bookmark(store, member);
-		// 		bookmark.bookmarkStore(isPresent);
-		// 		store.setBookmark(bookmark);
-		// 		member.setBookmark(bookmark);
-		// 		bookmarkRepository.saveAndFlush(bookmark);
-		// 	}
-		// }else{
-		// 	isPresent = 1;
-		// 	Bookmark bookmark = new Bookmark(store, member);
-		// 	bookmark.bookmarkStore(isPresent);
-		// 	store.setBookmark(bookmark);
-		// 	member.setBookmark(bookmark);
-		// 	bookmarkRepository.saveAndFlush(bookmark);
-		// }
-
-		//TODO: user 다수에도 돌아가는 로직인지 테스트
 	}
 
 
@@ -98,12 +65,55 @@ public class BookmarkService {
 	//TODO n+1 잡기
 	// ing
 
-	// public List<BookmarkResponseDto> getBookmark(Member member) {
-	// 	List<Bookmark> bookmarks = bookmarkRepository.findAllByMember(member);
-	// 	List<BookmarkResponseDto> bookmarkResponseDtos = new ArrayList<>();
-	//
-	// 	for(Bookmark bookmark : bookmarks){
-	// 		BookmarkResponseDto bookmarkResponseDto = new BookmarkResponseDto(store); //Long storeId, String address, String name, String callNumber, String weekdaysTime, long totalBookmark
-	// 	}
-	// }
+	public List<BookmarkResponseDto> getBookmark(Member member) {
+		List<Bookmark> bookmarks = bookmarkRepository.findAllByMember(member);
+		List<BookmarkResponseDto> bookmarkResponseDtos = new ArrayList<>();
+
+		for (Bookmark bookmark : bookmarks) {
+			Long storeId = bookmark.getStore().getId();
+			Optional<Store> storeOptional = storeRepository.findById(storeId); //error
+			Store store = storeOptional.get();
+			BookmarkResponseDto bookmarkResponseDto = new BookmarkResponseDto(store);
+
+			if (store.getHolidayTime() != null) {
+				bookmarkResponseDto.setHolidayBusiness(true);
+			}
+
+
+
+
+
+			if(store.getWeekdaysTime() != null){
+				String weekTime = store.getWeekdaysTime();
+				if (weekTime.contains("24") || weekTime.contains("25") || weekTime.contains("26") || weekTime.contains("27")
+					|| weekTime.contains("28") || weekTime.contains("29")) {
+					bookmarkResponseDto.setNightBusiness(true);
+				}
+			}
+
+			if(store.getSaturdayTime() != null){
+				String saturdayTime = store.getSaturdayTime();
+				if (saturdayTime.contains("24") || saturdayTime.contains("25") || saturdayTime.contains("26")
+					|| saturdayTime.contains("27") || saturdayTime.contains("28") || saturdayTime.contains("29")) {
+					bookmarkResponseDto.setNightBusiness(true);
+				}
+			}
+
+			if(store.getSundayTime() != null){
+				String sundayTime = store.getSundayTime();
+				if (sundayTime.contains("24") || sundayTime.contains("25") || sundayTime.contains("26")
+					|| sundayTime.contains("27") || sundayTime.contains("28") || sundayTime.contains("29")) {
+					bookmarkResponseDto.setNightBusiness(true);
+				}
+			}
+
+			bookmarkResponseDtos.add(bookmarkResponseDto);
+		}
+
+		return bookmarkResponseDtos;
+	}
+
+
+
+
 }

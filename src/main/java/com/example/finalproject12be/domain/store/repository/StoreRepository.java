@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import com.example.finalproject12be.domain.bookmark.entity.Bookmark;
 import com.example.finalproject12be.domain.store.entity.Store;
 
 public interface StoreRepository extends JpaRepository<Store, Long> {
@@ -23,6 +24,8 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
 
     List<Store> findAllByNameContaining(String storeName);
 
-    // @Query("SELECT s FROM Store s WHERE address LIKE '%{gu}%'")
+	// Store findByBookmark(Bookmark bookmark);
+
+	// @Query("SELECT s FROM Store s WHERE address LIKE '%{gu}%'")
     // List<Store> findAllByGu(String gu);
 }
