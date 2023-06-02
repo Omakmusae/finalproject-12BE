@@ -1,10 +1,12 @@
 package com.example.finalproject12be.domain.bookmark.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.finalproject12be.domain.bookmark.dto.BookmarkResponseDto;
 import com.example.finalproject12be.domain.bookmark.entity.Bookmark;
 import com.example.finalproject12be.domain.bookmark.repository.BookmarkRepository;
 import com.example.finalproject12be.domain.member.entity.Member;
@@ -89,4 +91,11 @@ public class BookmarkService {
 
 		//TODO: user 다수에도 돌아가는 로직인지 테스트
 	}
+
+
+
+	//ing
+	// public List<BookmarkResponseDto> getBookmark(Member member) {
+	//
+	// }
 }
