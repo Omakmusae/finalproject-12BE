@@ -1,6 +1,7 @@
 package com.example.finalproject12be.domain.bookmark.repository;
 
 import java.awt.print.Book;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,4 +18,6 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
 	Optional<Bookmark> findByStoreId(Long storeId);
 
 	Optional<Bookmark> findByStoreAndMember(Store store, Member member);
+
+	List<Bookmark> findAllByMember(Member member);
 }
