@@ -50,12 +50,11 @@ public class CommentController {
         return commentService.getComments(storeId, userDetails);
     }
 
-    //마이페이지 댓글 조회
+    // 마이페이지 댓글 조회
     @GetMapping("/myComment")
     public ResponseEntity<List<CommentResponseDto>> getUserComments(
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        Long memberId = userDetails.getMember().getId();
-        List<CommentResponseDto> comments = commentService.getUserComments(memberId, userDetails);
+        List<CommentResponseDto> comments = commentService.getUserComments(userDetails);
         return ResponseEntity.ok(comments);
     }
 
