@@ -79,6 +79,7 @@ public class JwtUtil {
 		Date date = new Date();
 		String role = "USER";
 		long expireTime = tokentype.equals("Access") ? ACCESS_TIME : REFRESH_TIME;
+		log.info(username + "!!!!!username!!!!");
 
 		return BEARER_PREFIX +
 			Jwts.builder()

@@ -1,5 +1,7 @@
 package com.example.finalproject12be.domain.oauth.service;
 
+import java.util.UUID;
+
 import org.springframework.http.HttpHeaders;
 
 import javax.servlet.http.HttpServletResponse;
@@ -13,9 +15,10 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import com.example.finalproject12be.domain.member.entity.Member;
+import com.example.finalproject12be.domain.member.repository.MemberRepository;
 import com.example.finalproject12be.domain.oauth.dto.KakaoMemberInfoRequest;
-import com.example.finalproject12be.domain.oauth.entity.OauthMember;
-import com.example.finalproject12be.domain.oauth.repository.OauthMemberRepository;
+
 import com.example.finalproject12be.security.jwt.JwtUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -29,7 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class OauthMemberService {
 
-	private final OauthMemberRepository oauthMemberRepository;
+	private final MemberRepository memberRepository;
 	private final JwtUtil jwtUtil;
 	private final PasswordEncoder passwordEncoder;
 
@@ -44,7 +47,9 @@ public class OauthMemberService {
 		KakaoMemberInfoRequest kakaoMemberInfo = getKakaoUserInfo(accessToken);
 
 		// 3. 필요시에 회원가입
-		OauthMember kakaoMember = registerKakaoUserIfNeeded(kakaoMemberInfo);
+		Member kakaoMember = registerKakaoUserIfNeeded(kakaoMemberInfo);
+
+		log.info(kakaoMember.getEmail()+ "!!!email!!!!");
 
 		// 4. JWT 토큰 반환
 		String createAccessToken =  jwtUtil.createToken(kakaoMember.getEmail(),"Access");
@@ -69,6 +74,7 @@ public class OauthMemberService {
 		MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
 		body.add("grant_type", "authorization_code");
 		body.add("client_id", "7463ed7e96bc168b9023480e535add90");
+		//body.add("redirect_uri", "http://localhost:8080/user/signin/kakao");
 		body.add("redirect_uri", "https://finalproject-12-fe.vercel.app/user/signin/kakao");
 		body.add("code", code);
 
@@ -130,18 +136,31 @@ public class OauthMemberService {
 	}
 
 	// 3. 필요시에 회원가입
-	private OauthMember registerKakaoUserIfNeeded(KakaoMemberInfoRequest kakaoUserInfo) {
+	private Member registerKakaoUserIfNeeded(KakaoMemberInfoRequest kakaoUserInfo) {
 		// DB 에 중복된 Kakao email 가 있는지 확인
 		Long kakaoId = kakaoUserInfo.getId();
-		OauthMember kakaoUser = oauthMemberRepository.findById(kakaoId)
+		Member kakaoUser = memberRepository.findByKakaoId(kakaoId)
 			.orElse(null);
+
 		if (kakaoUser == null) {
-			// 신규 회원가입
-			String email = kakaoUserInfo.getEmail();
-			String nickname = kakaoUserInfo.getNickname();
-			kakaoUser = new OauthMember(kakaoId, email, nickname);
-			oauthMemberRepository.save(kakaoUser);
-		}
+			//카카오 사용자 email 동일한 email 가진 회원이 있는지 확인
+			String kakaoEmail = kakaoUserInfo.getEmail();
+			Member sameEmailUser = memberRepository.findByEmail(kakaoEmail).orElse(null);
+			if (sameEmailUser != null) {
+				kakaoUser = sameEmailUser;
+				// 기존 회원정보에 카카오 Id 추가
+				kakaoUser = kakaoUser.kakaoIdUpdate(kakaoId);
+			} else {
+
+				// 신규 회원가입
+				String email = kakaoUserInfo.getEmail();
+				String nickname = kakaoUserInfo.getNickname();
+				String password = UUID.randomUUID().toString();
+				String encodedPassword = passwordEncoder.encode(password);
+				kakaoUser = new Member(email, encodedPassword, nickname, kakaoId);
+				memberRepository.save(kakaoUser);
+				}
+			}
 		return kakaoUser;
 	}
 }

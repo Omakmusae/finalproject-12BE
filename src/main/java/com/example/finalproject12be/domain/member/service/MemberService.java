@@ -47,15 +47,13 @@ public class MemberService {
 		Member searchedMember = memberRepository.findByEmail(email).orElseThrow(
 			() -> new IllegalArgumentException("등록된 사용자가 없습니다.")
 		);
-		System.out.println("여기까지는 실행");
+
 		System.out.println(password);
 		System.out.println(searchedMember.getPassword());
 
 		if(!passwordEncoder.matches(password, searchedMember.getPassword())){
 			throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
 		}
-
-		System.out.println("!!!!!!!!!!!!!!");
 
 		TokenDto tokenDto = jwtUtil.createAllToken(email);
 		Optional<RefreshToken> refreshToken = refreshTokenRepository.findByEmail(email);
