@@ -34,6 +34,7 @@ public class OauthMemberService {
 	private final PasswordEncoder passwordEncoder;
 
 	public String[] kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
+
 		String[] tokenArray = getToken(code);
 		// 1. "인가 코드"로 "액세스, refresh 토큰" 요청
 		String accessToken = tokenArray[0];
@@ -68,7 +69,7 @@ public class OauthMemberService {
 		MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
 		body.add("grant_type", "authorization_code");
 		body.add("client_id", "7463ed7e96bc168b9023480e535add90");
-		body.add("redirect_uri", "http://localhost:3000/user/signin/kakao");
+		body.add("redirect_uri", "https://finalproject-12-fe.vercel.app/user/signin/kakao");
 		body.add("code", code);
 
 		// HTTP 요청 보내기

@@ -120,9 +120,6 @@ public class StoreService {
 			}
 		} //구가 요청되지 않았을 때는 progress가 0이고 저장될 사항이 없기 때문에 else 생략
 
-
-
-
 		//filter
 		if(open == true){ // open 필터
 
