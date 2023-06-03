@@ -418,7 +418,7 @@ public class StoreService {
 				}
 			}else if (dayOfWeek == 6){ // 토요일 TODO: 일요일이랑 합치기
 
-				String storeTime = testStore.getWeekdaysTime();
+				String storeTime = testStore.getSaturdayTime();
 
 				if (storeTime != null){
 					String[] storeTimes = storeTime.split("~");
@@ -437,7 +437,7 @@ public class StoreService {
 
 			}else if( dayOfWeek == 7){ // 일요일
 
-				String storeTime = testStore.getWeekdaysTime();
+				String storeTime = testStore.getSundayTime();
 
 				if(storeTime != null){
 					String[] storeTimes = storeTime.split("~");
