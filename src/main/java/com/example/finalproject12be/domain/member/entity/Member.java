@@ -36,6 +36,8 @@ public class Member {
 	@Column(nullable = false)
 	private String nickname;
 
+	private Long kakaoId;
+
 	@OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
 	private List<Bookmark> bookmarks;
 
@@ -45,9 +47,18 @@ public class Member {
 		this.nickname = nickname;
 	}
 
+	public Member(String email, String password, String nickname, Long kakaoId) {
+		this.email = email;
+		this.password = password;
+		this.nickname = nickname;
+		this.kakaoId = kakaoId;
+	}
+
 	public static Member of(String email, String password, String nickname) {
 		return new Member(email, password, nickname);
 	}
+
+
 
 	public void deleteBookmark(Bookmark bookmark){
 		this.bookmarks.remove(bookmark);
@@ -55,5 +66,10 @@ public class Member {
 
 	public void addBookmark(Bookmark bookmark){
 		this.bookmarks.add(bookmark);
+	}
+
+	public Member kakaoIdUpdate(Long kakaoId) {
+		this.kakaoId = kakaoId;
+		return this;
 	}
 }

@@ -25,6 +25,8 @@ public class StoreController {
 	//약국 전체보기
 	@GetMapping("/api/store")
 	public List<StoreResponseDto> getAllStores(@AuthenticationPrincipal UserDetailsImpl userDetails){
+		System.out.println(userDetails.getUsername());
+		System.out.println("테스트");
 		return storeService.getAllStores(userDetails);
 	}
 
@@ -33,6 +35,7 @@ public class StoreController {
 	public OneStoreResponseDto getStore(
 		@PathVariable(name = "id") Long storeId,
 		@AuthenticationPrincipal UserDetailsImpl userDetails){
+		System.out.println(userDetails.getUsername());
 		return storeService.getStore(storeId, userDetails);
 	}
 
