@@ -8,7 +8,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.example.finalproject12be.domain.member.entity.Member;
-import com.example.finalproject12be.domain.oauth.entity.OauthMember;
 
 public class UserDetailsImpl implements UserDetails {
 

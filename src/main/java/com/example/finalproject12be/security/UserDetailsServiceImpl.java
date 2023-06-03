@@ -7,8 +7,6 @@ import org.springframework.stereotype.Service;
 
 import com.example.finalproject12be.domain.member.entity.Member;
 import com.example.finalproject12be.domain.member.repository.MemberRepository;
-import com.example.finalproject12be.domain.oauth.entity.OauthMember;
-import com.example.finalproject12be.domain.oauth.repository.OauthMemberRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 public class UserDetailsServiceImpl implements UserDetailsService {
 
 	private final MemberRepository userRepository;
-	private final OauthMemberRepository oauthMemberRepository;
 
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
