@@ -386,7 +386,6 @@ public class StoreService {
 					}else{
 						stores.remove(testStore);
 					}
-
 				}
 
 				if (testStore.getSundayTime() != null){
@@ -421,8 +420,6 @@ public class StoreService {
 			}
 
 		}
-
-
 		if(userDetails != null){
 			Member member = userDetails.getMember();
 			storeResponseDtos = checkBookmark(stores, storeResponseDtos, member);
@@ -436,7 +433,6 @@ public class StoreService {
 
 		return storeResponseDtos;
 	}
-
 
 	public OneStoreResponseDto getStore(Long storeId, UserDetailsImpl userDetails) {
 		Store store = storeRepository.findById(storeId)
@@ -473,7 +469,6 @@ public class StoreService {
 			testStores.add(store);
 		}
 
-
 		LocalDate now = LocalDate.now();
 		int dayOfWeek = now.getDayOfWeek().getValue();
 
@@ -486,13 +481,10 @@ public class StoreService {
 		int nowHour = Integer.parseInt(formatedNow.substring(0, 2));
 		int nowMin = Integer.parseInt(formatedNow.substring(3, 5));
 
-
-
 		int openHour = 0;
 		int openMin = 0;
 		int closeHour = 0;
 		int closeMin = 0;
-
 
 		for (Store testStore : testStores) {
 
@@ -525,8 +517,6 @@ public class StoreService {
 
 				}
 
-
-
 			}else if (dayOfWeek == 6){ // 토요일 TODO: 일요일이랑 합치기
 
 				String storeTime = testStore.getSaturdayTime();
@@ -543,9 +533,6 @@ public class StoreService {
 					status = 1;
 					stores.remove(testStore);
 				}
-
-
-
 			}else if( dayOfWeek == 7){ // 일요일
 
 				String storeTime = testStore.getSundayTime();
@@ -563,16 +550,12 @@ public class StoreService {
 					status = 1;
 					stores.remove(testStore);
 				}
-
-
-
 			}
 
 			if(status != 1){
 				if(nowHour < 5){
 					nowHour = nowHour + 24;
 				}
-
 				if((openHour > nowHour) || (closeHour < nowHour)){
 					stores.remove(testStore);
 				}else if(openHour == nowHour && openMin > nowMin){
@@ -581,15 +564,13 @@ public class StoreService {
 					stores.remove(testStore);
 				}
 			}
-
-
-
-
 		}
-
 		return stores;
-
 	}
 
+	public void getLocation(Long storeId, UserDetailsImpl userDetails) {
+
+
+	}
 
 }

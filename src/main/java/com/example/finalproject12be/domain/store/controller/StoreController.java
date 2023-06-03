@@ -48,8 +48,6 @@ public class StoreController {
 		return storeService.searchStore(storeName, gu, open, holidayBusiness, nightBusiness, userDetails);
 	}
 
-
-
 	private final OpenApiManager openApiManager;
 
 	//!!사용하면 안됨!!
@@ -59,4 +57,16 @@ public class StoreController {
 		openApiManager.fetch();
 	}
 
+
+	@GetMapping("/api/store/location")
+	public void getLocation(
+		@RequestParam("latitude") String latitude, @RequestParam("longitude") String longitude,
+		@AuthenticationPrincipal UserDetailsImpl userDetails){
+
+		Double getLatitude = Double.parseDouble(latitude);
+		Double getLongitude = Double.parseDouble(longitude);
+
+		System.out.println(getLatitude);
+
+	}
 }
