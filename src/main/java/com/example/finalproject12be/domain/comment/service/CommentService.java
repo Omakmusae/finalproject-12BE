@@ -57,6 +57,7 @@ public class CommentService {
         return ResponseMsgDto.setSuccess(HttpStatus.CREATED.value(), "댓글이 등록되었습니다.", commentResponseDto);
     }
 
+    //댓글 조회
     public ResponseEntity<List<CommentResponseDto>> getComments(Long storeId, UserDetailsImpl userDetails) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new RuntimeException("Store not found"));
@@ -73,6 +74,22 @@ public class CommentService {
 
         return ResponseEntity.ok(responseDtos);
     }
+    // 마이페이지 댓글 조회
+    public List<CommentResponseDto> getUserComments(UserDetailsImpl userDetails) {
+        Long memberId = userDetails.getMember().getId();
+        List<Comment> comments = commentRepository.findByMemberId(memberId);
+        List<CommentResponseDto> responseDtos = new ArrayList<>();
+
+        for (Comment comment : comments) {
+            boolean isCurrentUserComment = comment.getMember().getId().equals(userDetails.getMember().getId());
+            Store store = comment.getStore(); // 댓글이 속한 상점 객체 가져오기
+            CommentResponseDto responseDto = new CommentResponseDto(comment, isCurrentUserComment, store);
+            responseDtos.add(responseDto);
+        }
+
+        return responseDtos;
+    }
+
     // 댓글 수정
     @Transactional
     public ResponseEntity<CommentResponseDto> updateComment(
