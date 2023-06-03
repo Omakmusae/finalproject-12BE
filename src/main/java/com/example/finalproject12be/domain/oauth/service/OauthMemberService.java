@@ -126,7 +126,7 @@ public class OauthMemberService {
 			.get("email").asText();
 
 		log.info("카카오 사용자 정보: " + id + ", " + nickname + ", " + email);
-		return new KakaoMemberInfoRequest(id,nickname, email);
+		return new KakaoMemberInfoRequest(id, email, nickname);
 	}
 
 	// 3. 필요시에 회원가입
