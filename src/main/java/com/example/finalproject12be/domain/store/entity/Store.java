@@ -44,10 +44,10 @@ public class Store {
 	private String holidayTime;
 
 	@Column
-	private String longitude;
+	private Double longitude;
 
 	@Column
-	private String latitude;
+	private Double latitude;
 
 	@OneToMany(mappedBy = "store", cascade = CascadeType.REMOVE)
 	private List<Comment> commentList = new ArrayList<>();
@@ -55,7 +55,7 @@ public class Store {
 	@OneToMany(mappedBy = "store", fetch = FetchType.LAZY)
 	private List<Bookmark> bookmarks;
 
-	public Store(String address, String name, String callNumber, String weekdaysTime, String saturdayTime, String sundayTime, String holidayTime, String longitude, String latitude){
+	public Store(String address, String name, String callNumber, String weekdaysTime, String saturdayTime, String sundayTime, String holidayTime, Double longitude, Double latitude){
 		this.address = address;
 		this.name = name;
 		this.callNumber = callNumber;

@@ -17,9 +17,9 @@ public class StoreResponseDto {
 
 	private String weekdaysTime;
 
-	private String longitude;
+	private Double longitude;
 
-	private String latitude;
+	private Double latitude;
 
 	private boolean bookmark = false;
 
