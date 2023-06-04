@@ -49,6 +49,20 @@ public class Store {
 	@Column
 	private Double latitude;
 
+	@Column
+	private Integer foreignLanguage;
+
+	@Column
+	private Integer english;
+
+	@Column
+	private Integer chinese;
+
+	@Column
+	private Integer japanese;
+
+
+
 	@OneToMany(mappedBy = "store", cascade = CascadeType.REMOVE)
 	private List<Comment> commentList = new ArrayList<>();
 
@@ -65,6 +79,13 @@ public class Store {
 		this.holidayTime = holidayTime;
 		this.longitude = longitude;
 		this.latitude = latitude;
+	}
+
+	public void setForeign(int foreignLanguage, int english, int chinese, int japanese){
+		this.foreignLanguage = foreignLanguage;
+		this.english = english;
+		this.japanese = japanese;
+		this.chinese = chinese;
 	}
 
 	public void deleteBookmark(Bookmark bookmark){
