@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.finalproject12be.domain.bookmark.entity.Bookmark;
 import com.example.finalproject12be.domain.member.entity.Member;
+import com.example.finalproject12be.domain.store.dto.ForeignOneStoreResponse;
 import com.example.finalproject12be.domain.store.dto.ForeignStoreResponse;
 import com.example.finalproject12be.domain.store.dto.OneStoreResponseDto;
 import com.example.finalproject12be.domain.store.dto.StoreResponseDto;
@@ -530,7 +531,7 @@ public class StoreService {
 		return result;
 	}
 
-	//ing
+
 	public List<ForeignStoreResponse> searchForeignStore(String storeName, String gu, boolean open, boolean holidayBusiness, boolean nightBusiness, boolean english, boolean chinese, boolean japanese, UserDetailsImpl userDetails) {
 
 		int progress = 0; //stores 리스트가 null일 때 0, 반대는 1
@@ -833,36 +834,52 @@ public class StoreService {
 	}
 
 	//ING
-	// public ForeignStoreResponse getForeignStore(Long storeId, UserDetailsImpl userDetails) {
-	// 	Store store = storeRepository.findById(storeId)
-	// 		.orElseThrow(() -> new IllegalArgumentException("해당 약국은 존재하지 않습니다."));
-	//
-	// 	if(userDetails != null){
-	// 		Member member = userDetails.getMember();
-	//
-	// 		if(store.getBookmarks().size() != 0){
-	// 			List<Bookmark> bookmarks = store.getBookmarks();
-	//
-	// 			for(Bookmark bookmark : bookmarks){
-	// 				if(bookmark.getMember().getId() == member.getId()){
-	//
-	// 					ForeignStoreResponse foreignStoreResponse = new ForeignStoreResponse(store);
-	// 					foreignStoreResponse.setBookmark(true);
-	// 					foreignStoreResponse.setTotalBookmark(store.getBookmarks().size());
-	// 					return foreignStoreResponse;
-	//
-	// 				}
-	//
-	// 			}
-	// 		}
-	//
-	// 	}
-	//
-	// 	if(store.getForeignLanguage() != null){
-	// 		if(store.getEnglish() != null){
-	// 			//set
-	// 		}
-	// 	}
-	// 	return new ForeignStoreResponse(store);
-	// }
+	//약국 상세보기
+	public ForeignOneStoreResponse getForeignStore(Long storeId, UserDetailsImpl userDetails) {
+
+		boolean english = false;
+		boolean chinese = false;
+		boolean japanese = false;
+
+		Store store = storeRepository.findById(storeId)
+			.orElseThrow(() -> new IllegalArgumentException("해당 약국은 존재하지 않습니다."));
+
+		ForeignOneStoreResponse foreignOneStoreResponse = new ForeignOneStoreResponse(store);
+
+		if(userDetails != null){
+			Member member = userDetails.getMember();
+
+			if(store.getBookmarks().size() != 0){
+				List<Bookmark> bookmarks = store.getBookmarks();
+
+				for(Bookmark bookmark : bookmarks){
+					if(bookmark.getMember().getId() == member.getId()){
+
+						foreignOneStoreResponse.setBookmark(true);
+						long totalBookmarks = store.getBookmarks().size();
+						foreignOneStoreResponse.setTotalBookmark(totalBookmarks);
+						// return foreignOneStoreResponse;
+
+					}
+
+				}
+			}
+
+		}
+
+		if(store.getForeignLanguage() != null){
+			if(store.getEnglish() == 1){
+				english = true;
+			}
+			if (store.getChinese() == 1){
+				chinese = true;
+			}
+			if(store.getJapanese() == 1){
+				japanese = true;
+			}
+
+			foreignOneStoreResponse.setLanguage(english, chinese, japanese);
+		}
+		return foreignOneStoreResponse;
+	}
 }
