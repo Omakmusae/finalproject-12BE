@@ -61,7 +61,8 @@ public class Store {
 	@Column
 	private Integer japanese;
 
-
+	@Column
+	private Integer nightPharmacy;
 
 	@OneToMany(mappedBy = "store", cascade = CascadeType.REMOVE)
 	private List<Comment> commentList = new ArrayList<>();
