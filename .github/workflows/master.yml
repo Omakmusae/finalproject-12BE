@@ -25,10 +25,10 @@ jobs:
           java-version: 17
           distribution: 'temurin'
       - name: Secret properties 파일 생성
-        run:
-          mkdir -p src/main/resources
-          echo "${{ secrets.SECRET_PROPERTIES }}" | base64 --decode > src/main/resources/application-aws.properties
-          find src
+        run: |
+           mkdir -p src/main/resources
+           echo "${{ secrets.SECRET_PROPERTIES }}" | base64 --decode > src/main/resources/application-aws.properties
+           find src
         shell: bash
 
       - name: Grant execute permission for gradlew
