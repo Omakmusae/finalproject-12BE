@@ -395,6 +395,8 @@ public class StoreService {
 		Store store = storeRepository.findById(storeId)
 				.orElseThrow(() -> new IllegalArgumentException("해당 약국은 존재하지 않습니다."));
 
+		OneStoreResponseDto oneStoreResponseDto = new OneStoreResponseDto(store);
+
 		if(userDetails != null){
 			Member member = userDetails.getMember();
 
@@ -404,18 +406,24 @@ public class StoreService {
 				for(Bookmark bookmark : bookmarks){
 					if(bookmark.getMember().getId() == member.getId()){
 
-						OneStoreResponseDto oneStoreResponseDto = new OneStoreResponseDto(store);
+
 						oneStoreResponseDto.setBookmark(true);
 						oneStoreResponseDto.setTotalBookmark(store.getBookmarks().size());
-						return oneStoreResponseDto;
+
 
 					}
 
 				}
+
 			}
 
 		}
-		return new OneStoreResponseDto(store);
+
+		if(store.getBookmarks().size() != 0){
+			oneStoreResponseDto.setTotalBookmark(store.getBookmarks().size());
+		}
+
+		return oneStoreResponseDto;
 	}
 
 	private List<Store> openCheck(List<Store> stores){
@@ -865,6 +873,10 @@ public class StoreService {
 				}
 			}
 
+		}
+
+		if(store.getBookmarks().size() != 0){
+			foreignOneStoreResponse.setTotalBookmark(store.getBookmarks().size());
 		}
 
 		if(store.getForeignLanguage() != null){
