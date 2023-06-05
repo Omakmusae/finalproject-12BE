@@ -546,6 +546,59 @@ public class StoreService {
 
 	public List<ForeignStoreResponse> searchForeignStore(String storeName, String gu, boolean open, boolean holidayBusiness, boolean nightBusiness, boolean english, boolean chinese, boolean japanese, UserDetailsImpl userDetails) {
 
+		if(gu.equals("gangnam-gu")){
+			gu = "강남구";
+		}else if(gu.equals("gangdong-gu")){
+			gu = "강동구";
+		}else if(gu.equals("gangbuk-gu")){
+			gu = "강북구";
+		}else if(gu.equals("gangseo-gu")){
+			gu = "강서구";
+		}else if(gu.equals("gwanak-gu")){
+			gu = "관악구";
+		}else if(gu.equals("gwangjin-gu")){
+			gu = "광진구";
+		}else if(gu.equals("guro-gu")){
+			gu = "구로구";
+		}else if(gu.equals("geumcheon-gu")){
+			gu = "금천구";
+		}else if(gu.equals("nowon-gu")){
+			gu = "노원구";
+		}else if(gu.equals("dobong-gu")){
+			gu = "도봉구";
+		}else if(gu.equals("dongdaemun-gu")){
+			gu = "동대문구";
+		}else if(gu.equals("dongjak-gu")){
+			gu = "동작구";
+		}else if(gu.equals("Mapo-gu")){
+			gu = "마포구";
+		}else if(gu.equals("seodaemun-gu")){
+			gu = "서대문구";
+		}else if(gu.equals("seocho-gu")){
+			gu = "서초구";
+		}else if(gu.equals("seongdong-gu")){
+			gu = "성동구";
+		}else if(gu.equals("seongbuk-gu")){
+			gu = "성북구";
+		}else if(gu.equals("songpa-gu")){
+			gu = "송파구";
+		}else if(gu.equals("yeongdeungpo-gu")){
+			gu = "영등포구";
+		}else if(gu.equals("yangcheon-gu")){
+			gu = "양천구";
+		}else if(gu.equals("yongsan-gu")){
+			gu = "용산구";
+		}else if(gu.equals("eunpyeong-gu")){
+			gu = "은평구";
+		}else if(gu.equals("jongno-gu")){
+			gu = "종로구";
+		}else if(gu.equals("jung-gu")){
+			gu = "중구";
+		}else if(gu.equals("jungnang-gu")){
+			gu = "중랑구";
+		}
+
+
 		int progress = 0; //stores 리스트가 null일 때 0, 반대는 1
 		List<ForeignStoreResponse> foreignStoreResponses = new ArrayList<>();
 		List<Store> stores = new ArrayList<>();
@@ -791,7 +844,7 @@ public class StoreService {
 
 				for(Store testStore : testStores){
 
-					if(testStore.getEnglish() == null || testStore.getEnglish() == 1){
+					if(testStore.getEnglish() == null || testStore.getEnglish() == 0){
 						stores.remove(testStore);
 					}
 				}
@@ -811,7 +864,7 @@ public class StoreService {
 
 				for(Store testStore : testStores){
 
-					if(testStore.getChinese() == null || testStore.getChinese() == 1){
+					if(testStore.getChinese() == null || testStore.getChinese() == 0){
 						stores.remove(testStore);
 					}
 				}
@@ -831,7 +884,7 @@ public class StoreService {
 
 				for(Store testStore : testStores){
 
-					if(testStore.getJapanese() == null || testStore.getJapanese() == 1){
+					if(testStore.getJapanese() == null || testStore.getJapanese() == 0){
 						stores.remove(testStore);
 					}
 				}
@@ -845,7 +898,7 @@ public class StoreService {
 		return foreignStoreResponses;
 	}
 
-	//ING
+
 	//외국어 약국 상세보기
 	public ForeignOneStoreResponse getForeignStore(Long storeId, UserDetailsImpl userDetails) {
 
