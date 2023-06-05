@@ -20,5 +20,5 @@ fi
 
 echo "> Deploy - $JAR_PATH "
 
-export JASYPT_ENCRYPTOR_PASSWORD=finalPJ
+
 nohup java -jar $JAR_PATH > /dev/null 2> /dev/null < /dev/null &
