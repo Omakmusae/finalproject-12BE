@@ -1,10 +1,10 @@
 name: Build and Deploy to EC2
 
 on:
-#  push:
-#    branches: [ "master" ]
-  pull_request:
+  push:
     branches: [ "master" ]
+#  pull_request:
+#    branches: [ "master" ]
 
 env:
   PROJECT_NAME: odimedi_project
