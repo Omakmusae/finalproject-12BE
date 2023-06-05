@@ -21,7 +21,7 @@ public class OneStoreResponseDto {
     private final Double latitude;
     private boolean bookmark = false;
     private long totalBookmark = 0;
-    private List<Comment> comments = null; //comment 기능 구현 전으로 테스트를 위해 null로 하드코딩
+    // private List<Comment> comments = null; //comment 기능 구현 전으로 테스트를 위해 null로 하드코딩
 //TODO: comment 추가
 
     public OneStoreResponseDto(Store store) {
