@@ -419,6 +419,10 @@ public class StoreService {
 
 		}
 
+		if(store.getNightPharmacy() == 1){
+			oneStoreResponseDto.setNightBusiness(true);
+		}
+
 		if(store.getBookmarks().size() != 0){
 			oneStoreResponseDto.setTotalBookmark(store.getBookmarks().size());
 		}
@@ -842,7 +846,7 @@ public class StoreService {
 	}
 
 	//ING
-	//약국 상세보기
+	//외국어 약국 상세보기
 	public ForeignOneStoreResponse getForeignStore(Long storeId, UserDetailsImpl userDetails) {
 
 		boolean english = false;
@@ -873,6 +877,10 @@ public class StoreService {
 				}
 			}
 
+		}
+
+		if(store.getNightPharmacy() == 1){
+			foreignOneStoreResponse.setNightBusiness(true);
 		}
 
 		if(store.getBookmarks().size() != 0){

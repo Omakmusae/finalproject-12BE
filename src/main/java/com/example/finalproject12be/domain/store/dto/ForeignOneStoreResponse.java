@@ -16,6 +16,7 @@ public class ForeignOneStoreResponse {
 	private final String holidayTime;
 	private final Double longitude;
 	private final Double latitude;
+	private boolean nightBusiness = false;
 	private boolean bookmark = false;
 	private long totalBookmark = 0;
 	private boolean english = false;
@@ -51,5 +52,9 @@ public class ForeignOneStoreResponse {
 		this.english = english;
 		this.chinese = chinese;
 		this.japanese = japanese;
+	}
+
+	public void setNightBusiness(boolean nightBusiness){
+		this.nightBusiness = nightBusiness;
 	}
 }
