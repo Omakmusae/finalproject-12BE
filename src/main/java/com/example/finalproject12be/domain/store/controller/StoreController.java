@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 //import com.example.finalproject12be.domain.store.OpenApiManager;
+import com.example.finalproject12be.domain.store.dto.ForeignOneStoreResponse;
 import com.example.finalproject12be.domain.store.dto.ForeignStoreResponse;
 import com.example.finalproject12be.domain.store.dto.OneStoreResponseDto;
 import com.example.finalproject12be.domain.store.dto.StoreResponseDto;
@@ -76,12 +77,12 @@ public class StoreController {
 
 	//ING
 	//외국어 가능 약국 상세보기
-	// @GetMapping("/api/store/foreign/{store-id}")
-	// public ForeignOneStoreResponse getForeignStore(
-	// 	@PathVariable(name = "store-id") Long storeId,
-	// 	@AuthenticationPrincipal UserDetailsImpl userDetails){
-	// 	return storeService.getForeignStore(storeId, userDetails);
-	// }
+	@GetMapping("/api/store/foreign/{store-id}")
+	public ForeignOneStoreResponse getForeignStore(
+		@PathVariable(name = "store-id") Long storeId,
+		@AuthenticationPrincipal UserDetailsImpl userDetails){
+		return storeService.getForeignStore(storeId, userDetails);
+	}
 
 	//외국어 가능 약국 검색하기
 	@GetMapping("/api/store/foreign/search")
