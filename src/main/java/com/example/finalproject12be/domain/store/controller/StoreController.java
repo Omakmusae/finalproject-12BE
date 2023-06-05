@@ -9,9 +9,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 //import com.example.finalproject12be.domain.store.OpenApiManager;
+import com.example.finalproject12be.domain.store.dto.ForeignStoreResponse;
 import com.example.finalproject12be.domain.store.dto.OneStoreResponseDto;
 import com.example.finalproject12be.domain.store.dto.StoreResponseDto;
 import com.example.finalproject12be.domain.store.entity.Store;
+import com.example.finalproject12be.domain.store.repository.StoreRepository;
 import com.example.finalproject12be.domain.store.service.StoreService;
 import com.example.finalproject12be.security.UserDetailsImpl;
 
@@ -71,4 +73,29 @@ public class StoreController {
 
 		return storeService.getLocation(baseRadius,baseLatitude, baseLongitude, address);
 	}
+
+	//ING
+	//외국어 가능 약국 상세보기
+	// @GetMapping("/api/store/foreign/{store-id}")
+	// public ForeignOneStoreResponse getForeignStore(
+	// 	@PathVariable(name = "store-id") Long storeId,
+	// 	@AuthenticationPrincipal UserDetailsImpl userDetails){
+	// 	return storeService.getForeignStore(storeId, userDetails);
+	// }
+
+	//외국어 가능 약국 검색하기
+	@GetMapping("/api/store/foreign/search")
+	public List<ForeignStoreResponse> searchForeignStore(
+		@RequestParam("storeName") String storeName,
+		@RequestParam("gu") String gu,
+		@RequestParam("open") boolean open,
+		@RequestParam("holidayBusiness") boolean holidayBusiness,
+		@RequestParam("nightBusiness") boolean nightBusiness,
+		@RequestParam("english") boolean english,
+		@RequestParam("chinese") boolean chinese,
+		@RequestParam("japanese") boolean japanese,
+		@AuthenticationPrincipal UserDetailsImpl userDetails){
+		return storeService.searchForeignStore(storeName, gu, open, holidayBusiness, nightBusiness, english, chinese, japanese, userDetails);
+	}
+
 }

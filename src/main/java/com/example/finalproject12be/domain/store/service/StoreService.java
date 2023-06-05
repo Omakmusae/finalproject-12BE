@@ -1,18 +1,16 @@
 package com.example.finalproject12be.domain.store.service;
 
-import static java.util.Optional.*;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
 import com.example.finalproject12be.domain.bookmark.entity.Bookmark;
 import com.example.finalproject12be.domain.member.entity.Member;
+import com.example.finalproject12be.domain.store.dto.ForeignStoreResponse;
 import com.example.finalproject12be.domain.store.dto.OneStoreResponseDto;
 import com.example.finalproject12be.domain.store.dto.StoreResponseDto;
 import com.example.finalproject12be.domain.store.entity.Store;
@@ -45,6 +43,71 @@ public class StoreService {
 		}
 
 		return storeResponseDtos;
+	}
+
+	private List<ForeignStoreResponse> checkForeignBookmark(List<Store> stores, List<ForeignStoreResponse> foreignStoreResponses, UserDetailsImpl userDetails){
+
+		int bookmarkCheck = 0;
+		boolean english = false;
+		boolean chinese = false;
+		boolean japanese = false;
+
+		for(Store store : stores){
+
+			if(userDetails != null){
+
+				Member member = userDetails.getMember();
+
+				if(store.getBookmarks().size() != 0){
+					List<Bookmark> bookmarks = store.getBookmarks();
+
+					for(Bookmark bookmark : bookmarks){
+						if(bookmark.getMember().getId() == member.getId()){
+							bookmarkCheck = 1;
+						}
+
+					}
+				}
+			}
+
+
+			if(store.getForeignLanguage() != null){
+
+				if(store.getEnglish() == 1){
+					english = true;
+				}
+
+				if(store.getChinese() == 1){
+					chinese = true;
+				}
+
+				if(store.getJapanese() == 1){
+					japanese = true;
+				}
+
+			}
+
+
+
+			ForeignStoreResponse foreignStoreResponse = new ForeignStoreResponse(store);
+
+
+			if(bookmarkCheck == 1){
+				foreignStoreResponse.setBookmark(true);
+			}
+
+			foreignStoreResponse.setLanguage(english, chinese, japanese);
+
+			foreignStoreResponses.add(foreignStoreResponse);
+			bookmarkCheck = 0;
+			english = false;
+			chinese = false;
+			japanese = false;
+
+		}
+
+		return foreignStoreResponses;
+
 	}
 
 	private List<StoreResponseDto> checkBookmark(List<Store> stores, List<StoreResponseDto> storeResponseDtos, Member member){
@@ -82,19 +145,12 @@ public class StoreService {
 
 	public List<StoreResponseDto> searchStore(String storeName, String gu, boolean open, boolean holidayBusiness, boolean nightBusiness, UserDetailsImpl userDetails) {
 
-		// int memberCheck = 0; //userDetails가 null일 때 0, 반대는 1
 		int progress = 0; //stores 리스트가 null일 때 0, 반대는 1
 		List<StoreResponseDto> storeResponseDtos = new ArrayList<>();
 		List<Store> stores = new ArrayList<>();
 
-		// if(userDetails != null){
-		// 	memberCheck = 1;
-		// }
-
-
 		//storeName
 		if(storeName != null){
-			//findByStoreName
 			progress = 1;
 			stores = storeRepository.findAllByNameContaining(storeName);
 		}
@@ -122,13 +178,8 @@ public class StoreService {
 			}
 		} //구가 요청되지 않았을 때는 progress가 0이고 저장될 사항이 없기 때문에 else 생략
 
-
-
-
 		//filter
-		if(open == true){ // open 필터
-
-
+		if(open == true){ // 영업중 필터
 
 			if(progress == 1){ //저장된 stores가 있을 때만 실행 가능함
 
@@ -234,95 +285,6 @@ public class StoreService {
 				for (Store store : newStores) {
 					stores.add(store);
 				}
-
-				// LocalDate now = LocalDate.now();
-				// int dayOfWeek = now.getDayOfWeek().getValue();
-				//
-				// //평일 검사
-				// if(dayOfWeek < 6){
-				// 	stores = storeRepository.findAllByWeekdaysTimeContaining("24");
-				// 	newStores = storeRepository.findAllByWeekdaysTimeContaining("25");
-				// 	for(Store store : newStores){
-				// 		stores.add(store);
-				// 	}
-				//
-				// 	newStores = storeRepository.findAllByWeekdaysTimeContaining("26");
-				// 	for(Store store : newStores){
-				// 		stores.add(store);
-				// 	}
-				//
-				// 	newStores = storeRepository.findAllByWeekdaysTimeContaining("27");
-				// 	for(Store store : newStores){
-				// 		stores.add(store);
-				// 	}
-				// }else if(dayOfWeek == 6){
-				//
-				// 	//토요일 검사
-				//
-				// 	newStores = storeRepository.findAllBysaturdayTimeContaining("24");
-				// 	for(Store store : newStores){
-				// 		stores.add(store);
-				// 	}
-				//
-				// 	newStores = storeRepository.findAllBysaturdayTimeContaining("25");
-				// 	for(Store store : newStores){
-				// 		stores.add(store);
-				// 	}
-				//
-				// 	newStores = storeRepository.findAllBysaturdayTimeContaining("26");
-				// 	for(Store store : newStores){
-				// 		stores.add(store);
-				// 	}
-				//
-				// 	newStores = storeRepository.findAllBysaturdayTimeContaining("27");
-				// 	for(Store store : newStores){
-				// 		stores.add(store);
-				// 	}
-				//
-				// }else if(dayOfWeek == 7){
-				//
-				// 	//일요일 검사
-				//
-				// 	newStores = storeRepository.findAllBysundayTimeContaining("24");
-				// 	for(Store store : newStores){
-				// 		stores.add(store);
-				// 	}
-				//
-				// 	newStores = storeRepository.findAllBysundayTimeContaining("25");
-				// 	for(Store store : newStores){
-				// 		stores.add(store);
-				// 	}
-				//
-				// 	newStores = storeRepository.findAllBysundayTimeContaining("26");
-				// 	for(Store store : newStores){
-				// 		stores.add(store);
-				// 	}
-				//
-				// 	newStores = storeRepository.findAllBysundayTimeContaining("27");
-				// 	for(Store store : newStores){
-				// 		stores.add(store);
-				// 	}
-				//
-				// 	newStores = storeRepository.findAllBysundayTimeContaining("28");
-				// 	for(Store store : newStores){
-				// 		stores.add(store);
-				// 	}
-				//
-				// 	newStores = storeRepository.findAllBysundayTimeContaining("29");
-				// 	for(Store store : newStores){
-				// 		stores.add(store);
-				// 	}
-				//
-				// 	// newStores = storeRepository.findAllBysundayTimeContaining("30");
-				// 	// for(Store store : newStores){
-				// 	// 	stores.add(store);
-				// 	// }
-				//
-				// 	//TODO: 얘 살리려면 영업중 필터와 같은 조건 필요
-
-				// }
-
-
 			}else if(progress == 1){
 
 				//test
@@ -330,9 +292,6 @@ public class StoreService {
 				for(Store store: stores){
 					testStores.add(store);
 				}
-
-				// LocalDate now = LocalDate.now();
-				// int dayOfWeek = now.getDayOfWeek().getValue();
 
 				for(Store testStore : testStores){
 
@@ -413,13 +372,9 @@ public class StoreService {
 						}else{
 							stores.remove(testStore);
 						}
-
 					}
-
 				}
-
 			}
-
 		}
 		if(userDetails != null){
 			Member member = userDetails.getMember();
@@ -575,4 +530,339 @@ public class StoreService {
 		return result;
 	}
 
+	//ing
+	public List<ForeignStoreResponse> searchForeignStore(String storeName, String gu, boolean open, boolean holidayBusiness, boolean nightBusiness, boolean english, boolean chinese, boolean japanese, UserDetailsImpl userDetails) {
+
+		int progress = 0; //stores 리스트가 null일 때 0, 반대는 1
+		List<ForeignStoreResponse> foreignStoreResponses = new ArrayList<>();
+		List<Store> stores = new ArrayList<>();
+
+		//storeName
+		if(!storeName.equals("")){//if(storeName != null){ //TODO: 주석 풀기
+			progress = 1;
+			stores = storeRepository.findAllByNameContaining(storeName);
+		}
+
+		//gu
+		if(!gu.equals("")){//if(gu != null){ //TODO: 주석 풀기
+
+			if(progress == 0){ //저장된 stores가 없을 때
+
+				progress = 1;
+				stores = storeRepository.findAllByAddressContaining(gu);
+
+			}else{ //저장된 stores가 있을 때
+
+				List<Store> testStores = new ArrayList<>();
+				for(Store store: stores){
+					testStores.add(store);
+				}
+
+				for(Store testStore : testStores){
+					if(!testStore.getAddress().contains(gu)){
+						stores.remove(testStore);
+					}
+				}
+			}
+		} //구가 요청되지 않았을 때는 progress가 0이고 저장될 사항이 없기 때문에 else 생략
+
+		//filter
+		if(open == true){ // 영업중 필터
+
+			if(progress == 1){ //저장된 stores가 있을 때만 실행 가능함
+
+				stores = openCheck(stores);
+
+			}
+
+		}else if(holidayBusiness == true){
+
+			if(progress == 0){
+				progress = 1;
+
+				stores = storeRepository.findAllByHolidayTimeIsNotNull();
+			}else{
+
+				//test
+				List<Store> testStores = new ArrayList<>();
+				for(Store store: stores){
+					testStores.add(store);
+				}
+
+				for(Store testStore : testStores){
+					if(testStore.getHolidayTime() == null){
+						stores.remove(testStore);
+					}
+				}
+
+			}
+
+		}else if (nightBusiness == true){
+
+			// nightBusinessCheck(stores);
+
+			if(progress == 0){
+
+				progress = 1;
+
+				List<Store> newStores = new ArrayList<>();
+
+				stores = storeRepository.findAllByWeekdaysTimeContaining("24");
+
+				newStores = storeRepository.findAllByWeekdaysTimeContaining("25");
+				for (Store store : newStores) {
+					stores.add(store);
+				}
+
+				newStores = storeRepository.findAllByWeekdaysTimeContaining("26");
+				for (Store store : newStores) {
+					stores.add(store);
+				}
+
+				newStores = storeRepository.findAllByWeekdaysTimeContaining("27");
+				for (Store store : newStores) {
+					stores.add(store);
+				}
+
+				newStores = storeRepository.findAllBysaturdayTimeContaining("24");
+				for (Store store : newStores) {
+					stores.add(store);
+				}
+
+				newStores = storeRepository.findAllBysaturdayTimeContaining("25");
+				for (Store store : newStores) {
+					stores.add(store);
+				}
+
+				newStores = storeRepository.findAllBysaturdayTimeContaining("26");
+				for (Store store : newStores) {
+					stores.add(store);
+				}
+
+				newStores = storeRepository.findAllBysaturdayTimeContaining("27");
+				for (Store store : newStores) {
+					stores.add(store);
+				}
+
+				newStores = storeRepository.findAllBysundayTimeContaining("24");
+				for (Store store : newStores) {
+					stores.add(store);
+				}
+
+				newStores = storeRepository.findAllBysundayTimeContaining("25");
+				for (Store store : newStores) {
+					stores.add(store);
+				}
+
+				newStores = storeRepository.findAllBysundayTimeContaining("26");
+				for (Store store : newStores) {
+					stores.add(store);
+				}
+
+				newStores = storeRepository.findAllBysundayTimeContaining("27");
+				for (Store store : newStores) {
+					stores.add(store);
+				}
+
+				newStores = storeRepository.findAllBysundayTimeContaining("28");
+				for (Store store : newStores) {
+					stores.add(store);
+				}
+
+				newStores = storeRepository.findAllBysundayTimeContaining("29");
+				for (Store store : newStores) {
+					stores.add(store);
+				}
+			}else if(progress == 1){
+
+				//test
+				List<Store> testStores = new ArrayList<>();
+				for(Store store: stores){
+					testStores.add(store);
+				}
+
+				for(Store testStore : testStores){
+
+					if(testStore.getWeekdaysTime() != null){
+
+						String storeTime = testStore.getWeekdaysTime();
+
+						String[] storeTimes = storeTime.split("~");
+						String closeHour = storeTimes[1].substring(0, 2);
+
+						if(closeHour.equals("24")) {
+							continue;
+						}else if(closeHour.equals("25")){
+							continue;
+						}else if(closeHour.equals("26")){
+							continue;
+						}else if(closeHour.equals("27")){
+							continue;
+						}else if(closeHour.equals("28")){
+							continue;
+						}else if(closeHour.equals("29")){
+							continue;
+						}else if(closeHour.equals("30")){
+							continue;
+						}else{
+							stores.remove(testStore);
+						}
+
+					}
+
+					if(testStore.getSaturdayTime() != null){
+
+						String storeTime = testStore.getSaturdayTime();
+
+						String[] storeTimes = storeTime.split("~");
+						String closeHour = storeTimes[1].substring(0, 2);
+
+						if(closeHour.equals("24")) {
+							continue;
+						}else if(closeHour.equals("25")){
+							continue;
+						}else if(closeHour.equals("26")){
+							continue;
+						}else if(closeHour.equals("27")){
+							continue;
+						}else if(closeHour.equals("28")){
+							continue;
+						}else if(closeHour.equals("29")){
+							continue;
+						}else if(closeHour.equals("30")){
+							continue;
+						}else{
+							stores.remove(testStore);
+						}
+					}
+
+					if (testStore.getSundayTime() != null){
+
+						String storeTime = testStore.getSundayTime();
+
+						String[] storeTimes = storeTime.split("~");
+						String closeHour = storeTimes[1].substring(0, 2);
+
+						if(closeHour.equals("24")) {
+							continue;
+						}else if(closeHour.equals("25")){
+							continue;
+						}else if(closeHour.equals("26")){
+							continue;
+						}else if(closeHour.equals("27")){
+							continue;
+						}else if(closeHour.equals("28")){
+							continue;
+						}else if(closeHour.equals("29")){
+							continue;
+						}else if(closeHour.equals("30")){
+							continue;
+						}else{
+							stores.remove(testStore);
+						}
+					}
+				}
+			}
+		}
+
+		if(english == true){
+			if(progress == 0){
+				progress = 1;
+				stores = storeRepository.findAllByEnglish(1);
+			} else{
+
+				List<Store> testStores = new ArrayList<>();
+				for(Store store: stores){
+					testStores.add(store);
+				}
+
+				for(Store testStore : testStores){
+
+					if(testStore.getEnglish() == null || testStore.getEnglish() == 1){
+						stores.remove(testStore);
+					}
+				}
+
+			}
+
+		}else if(chinese == true){
+			if(progress == 0){
+				progress = 1;
+				stores = storeRepository.findAllByChinese(1);
+			} else{
+
+				List<Store> testStores = new ArrayList<>();
+				for(Store store: stores){
+					testStores.add(store);
+				}
+
+				for(Store testStore : testStores){
+
+					if(testStore.getChinese() == null || testStore.getChinese() == 1){
+						stores.remove(testStore);
+					}
+				}
+
+			}
+
+		}else if(japanese == true){
+			if(progress == 0){
+				progress = 1;
+				stores = storeRepository.findAllByJapanese(1);
+			} else{
+
+				List<Store> testStores = new ArrayList<>();
+				for(Store store: stores){
+					testStores.add(store);
+				}
+
+				for(Store testStore : testStores){
+
+					if(testStore.getJapanese() == null || testStore.getJapanese() == 1){
+						stores.remove(testStore);
+					}
+				}
+
+			}
+
+		}
+
+		foreignStoreResponses = checkForeignBookmark(stores, foreignStoreResponses, userDetails);
+
+		return foreignStoreResponses;
+	}
+
+	//ING
+	// public ForeignStoreResponse getForeignStore(Long storeId, UserDetailsImpl userDetails) {
+	// 	Store store = storeRepository.findById(storeId)
+	// 		.orElseThrow(() -> new IllegalArgumentException("해당 약국은 존재하지 않습니다."));
+	//
+	// 	if(userDetails != null){
+	// 		Member member = userDetails.getMember();
+	//
+	// 		if(store.getBookmarks().size() != 0){
+	// 			List<Bookmark> bookmarks = store.getBookmarks();
+	//
+	// 			for(Bookmark bookmark : bookmarks){
+	// 				if(bookmark.getMember().getId() == member.getId()){
+	//
+	// 					ForeignStoreResponse foreignStoreResponse = new ForeignStoreResponse(store);
+	// 					foreignStoreResponse.setBookmark(true);
+	// 					foreignStoreResponse.setTotalBookmark(store.getBookmarks().size());
+	// 					return foreignStoreResponse;
+	//
+	// 				}
+	//
+	// 			}
+	// 		}
+	//
+	// 	}
+	//
+	// 	if(store.getForeignLanguage() != null){
+	// 		if(store.getEnglish() != null){
+	// 			//set
+	// 		}
+	// 	}
+	// 	return new ForeignStoreResponse(store);
+	// }
 }
