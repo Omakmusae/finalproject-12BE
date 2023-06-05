@@ -27,6 +27,7 @@ public class StoreService {
 
 	private final StoreRepository storeRepository;
 
+
 	public List<StoreResponseDto> getAllStores(UserDetailsImpl userDetails) {
 
 		List<Store> stores = storeRepository.findAll();
@@ -568,9 +569,10 @@ public class StoreService {
 		return stores;
 	}
 
-	public void getLocation(Long storeId, UserDetailsImpl userDetails) {
+	public List<Store> getLocation(Double baseRadius,Double baseLatitude, Double baseLongitude, String address) {
 
-
+		List<Store> result = storeRepository.findByDistanceWithinRadius(baseLatitude, baseLongitude, baseRadius, address);
+		return result;
 	}
 
 }

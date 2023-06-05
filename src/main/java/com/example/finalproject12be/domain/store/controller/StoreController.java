@@ -8,9 +8,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.finalproject12be.domain.store.OpenApiManager;
+//import com.example.finalproject12be.domain.store.OpenApiManager;
 import com.example.finalproject12be.domain.store.dto.OneStoreResponseDto;
 import com.example.finalproject12be.domain.store.dto.StoreResponseDto;
+import com.example.finalproject12be.domain.store.entity.Store;
 import com.example.finalproject12be.domain.store.service.StoreService;
 import com.example.finalproject12be.security.UserDetailsImpl;
 
@@ -48,25 +49,26 @@ public class StoreController {
 		return storeService.searchStore(storeName, gu, open, holidayBusiness, nightBusiness, userDetails);
 	}
 
-	private final OpenApiManager openApiManager;
-
-	//!!사용하면 안됨!!
-	//api db에 저장하기
-	@GetMapping("api/store/open-api")
-	public void fetch() {
-		openApiManager.fetch();
-	}
+	// private final OpenApiManager openApiManager;
+	//
+	// //!!사용하면 안됨!!
+	// //api db에 저장하기
+	// @GetMapping("api/store/open-api")
+	// public void fetch() {
+	// 	openApiManager.fetch();
+	// }
 
 
 	@GetMapping("/api/store/location")
-	public void getLocation(
+	public List<Store> getLocation(
+		@RequestParam("radius") String radius,
 		@RequestParam("latitude") String latitude, @RequestParam("longitude") String longitude,
+		@RequestParam("address") String address,
 		@AuthenticationPrincipal UserDetailsImpl userDetails){
+		Double baseRadius =  Double.parseDouble(radius);
+		Double baseLatitude = Double.parseDouble(latitude);
+		Double baseLongitude = Double.parseDouble(longitude);
 
-		Double getLatitude = Double.parseDouble(latitude);
-		Double getLongitude = Double.parseDouble(longitude);
-
-		System.out.println(getLatitude);
-
+		return storeService.getLocation(baseRadius,baseLatitude, baseLongitude, address);
 	}
 }
