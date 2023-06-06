@@ -4,6 +4,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,7 @@ public class MemberController {
 	private final MemberService memberService;
 
 	@PostMapping("/user/signup")
-	public ResponseEntity<Void> signup(@RequestBody final MemberSignupRequest memberSignupRequest) {
+	public ResponseEntity<Void> signup(@RequestBody @Valid final MemberSignupRequest memberSignupRequest) {
 
 		memberService.signup(memberSignupRequest);
 		return ResponseEntity.status(HttpStatus.OK).body(null);
