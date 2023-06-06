@@ -193,7 +193,11 @@ public class MemberService {
 
 				emailService.sendMail(newPassword, email);
 
+			}else {
+				throw new RestApiException(MemberErrorCode.INACTIVE_MEMBER);
 			}
+		}else{
+			throw new RestApiException(MemberErrorCode.DUPLICATED_EMAIL);
 		}
 	}
 
