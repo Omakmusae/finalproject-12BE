@@ -69,6 +69,9 @@ public class StoreController {
 		Double baseLatitude = Double.parseDouble(latitude);
 		Double baseLongitude = Double.parseDouble(longitude);
 
-		return storeService.getLocation(baseRadius,baseLatitude, baseLongitude, address);
+		return storeService.testLocation(baseRadius,baseLatitude, baseLongitude, address);
+		//return storeService.getLocation(baseRadius,baseLatitude, baseLongitude, address);
 	}
+
+
 }

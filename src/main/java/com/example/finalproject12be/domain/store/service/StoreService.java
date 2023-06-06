@@ -1,13 +1,10 @@
 package com.example.finalproject12be.domain.store.service;
 
-import static java.util.Optional.*;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -17,6 +14,7 @@ import com.example.finalproject12be.domain.store.dto.OneStoreResponseDto;
 import com.example.finalproject12be.domain.store.dto.StoreResponseDto;
 import com.example.finalproject12be.domain.store.entity.Store;
 import com.example.finalproject12be.domain.store.repository.StoreRepository;
+import com.example.finalproject12be.domain.store.repository.StoreRepositoryCustom;
 import com.example.finalproject12be.security.UserDetailsImpl;
 
 import lombok.RequiredArgsConstructor;
@@ -26,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 public class StoreService {
 
 	private final StoreRepository storeRepository;
-
+	private final StoreRepositoryCustom storeRepositoryCustom;
 
 	public List<StoreResponseDto> getAllStores(UserDetailsImpl userDetails) {
 
@@ -41,9 +39,7 @@ public class StoreService {
 			for(Store store : stores){
 				storeResponseDtos.add(new StoreResponseDto(store));
 			}
-
 		}
-
 		return storeResponseDtos;
 	}
 
@@ -127,8 +123,6 @@ public class StoreService {
 
 		//filter
 		if(open == true){ // open 필터
-
-
 
 			if(progress == 1){ //저장된 stores가 있을 때만 실행 가능함
 
@@ -235,93 +229,6 @@ public class StoreService {
 					stores.add(store);
 				}
 
-				// LocalDate now = LocalDate.now();
-				// int dayOfWeek = now.getDayOfWeek().getValue();
-				//
-				// //평일 검사
-				// if(dayOfWeek < 6){
-				// 	stores = storeRepository.findAllByWeekdaysTimeContaining("24");
-				// 	newStores = storeRepository.findAllByWeekdaysTimeContaining("25");
-				// 	for(Store store : newStores){
-				// 		stores.add(store);
-				// 	}
-				//
-				// 	newStores = storeRepository.findAllByWeekdaysTimeContaining("26");
-				// 	for(Store store : newStores){
-				// 		stores.add(store);
-				// 	}
-				//
-				// 	newStores = storeRepository.findAllByWeekdaysTimeContaining("27");
-				// 	for(Store store : newStores){
-				// 		stores.add(store);
-				// 	}
-				// }else if(dayOfWeek == 6){
-				//
-				// 	//토요일 검사
-				//
-				// 	newStores = storeRepository.findAllBysaturdayTimeContaining("24");
-				// 	for(Store store : newStores){
-				// 		stores.add(store);
-				// 	}
-				//
-				// 	newStores = storeRepository.findAllBysaturdayTimeContaining("25");
-				// 	for(Store store : newStores){
-				// 		stores.add(store);
-				// 	}
-				//
-				// 	newStores = storeRepository.findAllBysaturdayTimeContaining("26");
-				// 	for(Store store : newStores){
-				// 		stores.add(store);
-				// 	}
-				//
-				// 	newStores = storeRepository.findAllBysaturdayTimeContaining("27");
-				// 	for(Store store : newStores){
-				// 		stores.add(store);
-				// 	}
-				//
-				// }else if(dayOfWeek == 7){
-				//
-				// 	//일요일 검사
-				//
-				// 	newStores = storeRepository.findAllBysundayTimeContaining("24");
-				// 	for(Store store : newStores){
-				// 		stores.add(store);
-				// 	}
-				//
-				// 	newStores = storeRepository.findAllBysundayTimeContaining("25");
-				// 	for(Store store : newStores){
-				// 		stores.add(store);
-				// 	}
-				//
-				// 	newStores = storeRepository.findAllBysundayTimeContaining("26");
-				// 	for(Store store : newStores){
-				// 		stores.add(store);
-				// 	}
-				//
-				// 	newStores = storeRepository.findAllBysundayTimeContaining("27");
-				// 	for(Store store : newStores){
-				// 		stores.add(store);
-				// 	}
-				//
-				// 	newStores = storeRepository.findAllBysundayTimeContaining("28");
-				// 	for(Store store : newStores){
-				// 		stores.add(store);
-				// 	}
-				//
-				// 	newStores = storeRepository.findAllBysundayTimeContaining("29");
-				// 	for(Store store : newStores){
-				// 		stores.add(store);
-				// 	}
-				//
-				// 	// newStores = storeRepository.findAllBysundayTimeContaining("30");
-				// 	// for(Store store : newStores){
-				// 	// 	stores.add(store);
-				// 	// }
-				//
-				// 	//TODO: 얘 살리려면 영업중 필터와 같은 조건 필요
-
-				// }
-
 
 			}else if(progress == 1){
 
@@ -330,9 +237,6 @@ public class StoreService {
 				for(Store store: stores){
 					testStores.add(store);
 				}
-
-				// LocalDate now = LocalDate.now();
-				// int dayOfWeek = now.getDayOfWeek().getValue();
 
 				for(Store testStore : testStores){
 
@@ -360,7 +264,6 @@ public class StoreService {
 						}else{
 							stores.remove(testStore);
 						}
-
 					}
 
 				if(testStore.getSaturdayTime() != null){
@@ -413,13 +316,9 @@ public class StoreService {
 						}else{
 							stores.remove(testStore);
 						}
-
 					}
-
 				}
-
 			}
-
 		}
 		if(userDetails != null){
 			Member member = userDetails.getMember();
@@ -429,7 +328,6 @@ public class StoreService {
 			for(Store store : stores){
 				storeResponseDtos.add(new StoreResponseDto(store));
 			}
-
 		}
 
 		return storeResponseDtos;
@@ -454,10 +352,8 @@ public class StoreService {
 						return oneStoreResponseDto;
 
 					}
-
 				}
 			}
-
 		}
 		return new OneStoreResponseDto(store);
 	}
@@ -572,6 +468,13 @@ public class StoreService {
 	public List<Store> getLocation(Double baseRadius,Double baseLatitude, Double baseLongitude, String address) {
 
 		List<Store> result = storeRepository.findByDistanceWithinRadius(baseLatitude, baseLongitude, baseRadius, address);
+		return result;
+	}
+
+
+	public List<Store> testLocation(Double baseRadius,Double baseLatitude, Double baseLongitude, String address) {
+		List<Store> result = storeRepositoryCustom.searchTest(baseRadius, baseLatitude, baseLongitude, address);
+
 		return result;
 	}
 
