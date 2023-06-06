@@ -21,33 +21,20 @@ public class StoreRepositoryCustom {
 
 	private final JPAQueryFactory jpaQueryFactory;
 
-	public List<Store> searchTest(Double baseRadius, Double baseLatitude, Double baseLongitude, String address) {
-		if (baseLatitude == null) {
-			return jpaQueryFactory
-				.select(store)
-				.from(store)
-				.where(
-					eqAddress(address)
-				)
-				.limit(30)
-				.fetch();
-		}
-		else {
+	public List<Store> searchTest(Double baseRadius, Double baseLatitude, Double baseLongitude) {
+
 			NumberExpression<Double> distance = distance(baseLatitude, baseLongitude, store.latitude, store.longitude);
 
 			return jpaQueryFactory
 				.select(store)
 				.from(store)
 				.where(
-					eqAddress(address),
 					withinDistance(baseLatitude, baseLongitude, store.latitude, store.longitude)
 				)
 				.orderBy(distance.asc())
 				.limit(30)
 				.fetch();
 		}
-
-	}
 
 	private BooleanExpression eqAddress(String address) {
 		return address != null ? store.address.like("%" + address + "%") : null;

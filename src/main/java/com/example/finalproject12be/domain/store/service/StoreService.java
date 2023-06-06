@@ -23,12 +23,15 @@ import com.example.finalproject12be.domain.store.repository.StoreRepositoryCusto
 import com.example.finalproject12be.security.UserDetailsImpl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class StoreService {
 
 	private final StoreRepository storeRepository;
+	private final StoreRepositoryCustom storeRepositoryCustom;
 
 
 	public List<StoreResponseDto> getAllStores(UserDetailsImpl userDetails) {
@@ -148,20 +151,45 @@ public class StoreService {
 
 	}
 
-	public List<StoreResponseDto> searchStore(String storeName, String gu, boolean open, boolean holidayBusiness, boolean nightBusiness, UserDetailsImpl userDetails) {
+	public List<StoreResponseDto> searchStore(String storeName, String gu, boolean open, boolean holidayBusiness, boolean nightBusiness,
+		String radius, String latitude, String longitude,
+		UserDetailsImpl userDetails) {
 
 		int progress = 0; //stores 리스트가 null일 때 0, 반대는 1
 		List<StoreResponseDto> storeResponseDtos = new ArrayList<>();
 		List<Store> stores = new ArrayList<>();
 
-		//storeName
-		if(storeName != null){
+		//내 위치 기반 가까운 약국 검색
+		if (latitude != "") {
 			progress = 1;
-			stores = storeRepository.findAllByNameContaining(storeName);
+			Double baseRadius =  Double.parseDouble(radius);
+			Double baseLatitude = Double.parseDouble(latitude);
+			Double baseLongitude = Double.parseDouble(longitude);
+			stores = storeRepositoryCustom.searchTest(baseRadius, baseLatitude, baseLongitude);
+		}
+
+		//storeName
+		if(storeName != ""){
+			if(progress == 0){
+				progress = 1;
+				stores = storeRepository.findAllByNameContaining(storeName);
+			}else{
+
+				List<Store> testStores = new ArrayList<>();
+				for(Store store: stores){
+					testStores.add(store);
+				}
+
+				for(Store testStore : testStores){
+					if(!testStore.getName().contains(storeName)){
+						stores.remove(testStore);
+					}
+				}
+			}
 		}
 
 		//gu
-		if(gu != null){
+		if(gu != ""){
 
 			if(progress == 0){ //저장된 stores가 없을 때
 
@@ -544,11 +572,14 @@ public class StoreService {
 
 	public List<Store> getLocation(Double baseRadius,Double baseLatitude, Double baseLongitude, String address) {
 
-		List<Store> result = storeRepository.findByDistanceWithinRadius(baseLatitude, baseLongitude, baseRadius, address);
+		List<Store> result = storeRepository.findByDistanceWithinRadius(baseLatitude, baseLongitude, baseRadius);
 		return result;
 	}
 
-	public List<ForeignStoreResponse> searchForeignStore(String storeName, String gu, boolean open, boolean holidayBusiness, boolean nightBusiness, boolean english, boolean chinese, boolean japanese, UserDetailsImpl userDetails) {
+	public List<ForeignStoreResponse> searchForeignStore(String storeName, String gu, boolean open, boolean holidayBusiness, boolean nightBusiness,
+		boolean english, boolean chinese, boolean japanese,
+		String radius, String latitude, String longitude,
+		UserDetailsImpl userDetails) {
 
 		if(gu.equals("gangnam-gu")){
 			gu = "강남구";
@@ -602,15 +633,37 @@ public class StoreService {
 			gu = "중랑구";
 		}
 
-
 		int progress = 0; //stores 리스트가 null일 때 0, 반대는 1
 		List<ForeignStoreResponse> foreignStoreResponses = new ArrayList<>();
 		List<Store> stores = new ArrayList<>();
 
-		//storeName
-		if(!storeName.equals("")){//if(storeName != null){ //TODO: 주석 풀기
+		//내 위치 기반 가까운 약국 검색
+		if (latitude != "") {
 			progress = 1;
-			stores = storeRepository.findAllByNameContaining(storeName);
+			Double baseRadius =  Double.parseDouble(radius);
+			Double baseLatitude = Double.parseDouble(latitude);
+			Double baseLongitude = Double.parseDouble(longitude);
+			stores = storeRepositoryCustom.searchTest(baseRadius, baseLatitude, baseLongitude);
+		}
+
+		//storeName
+		if(storeName != ""){
+			if(progress == 0){
+				progress = 1;
+				stores = storeRepository.findAllByNameContaining(storeName);
+			}else{
+
+				List<Store> testStores = new ArrayList<>();
+				for(Store store: stores){
+					testStores.add(store);
+				}
+
+				for(Store testStore : testStores){
+					if(!testStore.getName().contains(storeName)){
+						stores.remove(testStore);
+					}
+				}
+			}
 		}
 
 		//gu
@@ -852,7 +905,6 @@ public class StoreService {
 						stores.remove(testStore);
 					}
 				}
-
 			}
 
 		}else if(chinese == true){
@@ -872,7 +924,6 @@ public class StoreService {
 						stores.remove(testStore);
 					}
 				}
-
 			}
 
 		}else if(japanese == true){
@@ -892,16 +943,12 @@ public class StoreService {
 						stores.remove(testStore);
 					}
 				}
-
 			}
-
 		}
-
 		foreignStoreResponses = checkForeignBookmark(stores, foreignStoreResponses, userDetails);
 
 		return foreignStoreResponses;
 	}
-
 
 	//외국어 약국 상세보기
 	public ForeignOneStoreResponse getForeignStore(Long storeId, UserDetailsImpl userDetails) {
@@ -930,10 +977,8 @@ public class StoreService {
 						// return foreignOneStoreResponse;
 
 					}
-
 				}
 			}
-
 		}
 
 		if(store.getNightPharmacy() == 1){
@@ -960,8 +1005,8 @@ public class StoreService {
 		return foreignOneStoreResponse;
 	}
 
-	public List<Store> testLocation(Double baseRadius,Double baseLatitude, Double baseLongitude, String address) {
-		List<Store> result = storeRepositoryCustom.searchTest(baseRadius, baseLatitude, baseLongitude, address);
+	public List<Store> testLocation(Double baseRadius,Double baseLatitude, Double baseLongitude) {
+		List<Store> result = storeRepositoryCustom.searchTest(baseRadius, baseLatitude, baseLongitude);
 
 		return result;
 	}
