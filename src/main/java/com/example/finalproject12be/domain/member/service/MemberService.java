@@ -14,12 +14,9 @@ import com.example.finalproject12be.exception.MemberErrorCode;
 import com.example.finalproject12be.exception.RestApiException;
 import com.example.finalproject12be.security.UserDetailsImpl;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.MailSender;
-import org.springframework.mail.SimpleMailMessage;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,13 +58,13 @@ public class MemberService {
 		String email = memberLoginRequest.getEmail();
 		String password = memberLoginRequest.getPassword();
 		Member searchedMember = memberRepository.findByEmail(email).orElseThrow(
-			() -> new RuntimeException("등록된 사용자가 없습니다."));
+			() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
 
 		System.out.println(password);
 		System.out.println(searchedMember.getPassword());
 
 		if(!passwordEncoder.matches(password, searchedMember.getPassword())){
-			throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+			throw new RestApiException(MemberErrorCode.INVALID_PASSWORD);
 		}
 
 		TokenDto tokenDto = jwtUtil.createAllToken(email);
@@ -124,7 +121,7 @@ public class MemberService {
 	@Transactional
 	public void signout(String email) {
 		Member member = memberRepository.findByEmail(email)
-				.orElseThrow(() -> new RuntimeException("회원을 찾을 수 없습니다."));
+				.orElseThrow(() ->  new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
 
 		if (member.getKakaoId() == null) {
 			// 카카오 소셜 로그인이 아닌 일반 가입 회원의 경우 직접 삭제
@@ -147,11 +144,11 @@ public class MemberService {
 		Optional<Member> searchedNickName = memberRepository.findByNickname(loginNickName);
 
 		if (searchedEmail.isPresent()) {
-			throw new IllegalArgumentException("가입된 이메일입니다.");
+			throw new RestApiException(MemberErrorCode.DUPLICATED_EMAIL);
 		}
 
 		if(searchedNickName.isPresent()){
-			throw new IllegalArgumentException("가입된 닉네임입니다.");
+			throw new RestApiException(MemberErrorCode.DUPLICATED_MEMBER);
 		}
 	}
 
