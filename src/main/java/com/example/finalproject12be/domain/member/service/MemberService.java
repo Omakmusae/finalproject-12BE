@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 //import org.springframework.security.crypto.password.PasswordEncoder;
 import com.example.finalproject12be.domain.member.dto.response.MemberLoginResponse;
+import com.example.finalproject12be.domain.member.dto.response.MemberNewNameResponse;
 import com.example.finalproject12be.exception.MemberErrorCode;
 import com.example.finalproject12be.exception.RestApiException;
 import com.example.finalproject12be.security.UserDetailsImpl;
@@ -156,7 +157,7 @@ public class MemberService {
 	}
 
 	// @Transactional
-	public void changeNickname(Map newName, Member member) {
+	public MemberNewNameResponse changeNickname(Map newName, Member member) {
 		String nickname = String.valueOf(newName.get("newName"));
 		Optional<Member> memberOptional = memberRepository.findByNickname(nickname);
 
@@ -166,6 +167,8 @@ public class MemberService {
 
 		member.updateName(nickname);
 		memberRepository.save(member);
+
+		return new MemberNewNameResponse(nickname);
 	}
 
 	//ing
