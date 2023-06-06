@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServletResponse;
 
 //import org.springframework.security.crypto.password.PasswordEncoder;
 import com.example.finalproject12be.domain.member.dto.response.MemberLoginResponse;
+import com.example.finalproject12be.exception.MemberErrorCode;
+import com.example.finalproject12be.exception.RestApiException;
 import com.example.finalproject12be.security.UserDetailsImpl;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -130,10 +132,29 @@ public class MemberService {
 	// @Transactional
 	public void changeNickname(Map newName, Member member) {
 		String nickname = String.valueOf(newName.get("newName"));
+		Optional<Member> memberOptional = memberRepository.findByNickname(nickname);
+
+		if(memberOptional.isPresent()){
+			throw new RestApiException(MemberErrorCode.DUPLICATED_MEMBER);
+		}
 
 		member.updateName(nickname);
 		memberRepository.save(member);
 	}
 
-
+	//ing
+	// public void findPassword(String email, Member member) {
+	//
+	// 	Optional<Member> memberOptional = memberRepository.findByEmail(email);
+	//
+	// 	//로그인 한 유저의 이메일과 요청받은 이메일이 같은가?
+	// 	//TODO: 예외 던지기
+	// 	if(memberOptional.isPresent()){
+	// 		if(memberOptional.get().equals(member)){
+	//
+	//
+	//
+	// 		}
+	// 	}
+	// }
 }
