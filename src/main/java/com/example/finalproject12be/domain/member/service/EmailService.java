@@ -43,7 +43,7 @@ public class EmailService {
 	public void sendMail(String newPassword, String email){
 		SimpleMailMessage message = new SimpleMailMessage();
 		message.setTo(email); //수신자 설정
-		message.setSubject("오디약! 비밀번호 변경"); //메일 제목
+		message.setSubject("오디약! 임시 비밀번호 발급"); //메일 제목
 		message.setText("임시 비밀번호: " + newPassword); //메일 내용 설정
 		message.setFrom("kmskes0917@naver.com"); //발신자 설정
 		// message.setReplyTo("보낸이@naver.com");
