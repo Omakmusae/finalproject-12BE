@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.finalproject12be.domain.member.dto.request.MemberLoginRequest;
 import com.example.finalproject12be.domain.member.dto.request.MemberSignupRequest;
+import com.example.finalproject12be.domain.member.dto.response.MemberLoginResponse;
 import com.example.finalproject12be.domain.member.entity.Member;
 import com.example.finalproject12be.domain.member.service.MemberService;
 import com.example.finalproject12be.security.UserDetailsImpl;
@@ -36,12 +37,12 @@ public class MemberController {
 	}
 
 	@PostMapping("/user/login")
-	public ResponseEntity<Void> login(
+	public ResponseEntity<MemberLoginResponse> login(
 		@RequestBody final MemberLoginRequest memberLoginRequest,
 		final HttpServletResponse response) {
 
-		memberService.login(memberLoginRequest, response);
-		return ResponseEntity.status(HttpStatus.OK).body(null);
+		MemberLoginResponse loginResult = memberService.login(memberLoginRequest, response);
+		return ResponseEntity.status(HttpStatus.OK).body(loginResult);
 	}
 
 	@GetMapping("user/test")
