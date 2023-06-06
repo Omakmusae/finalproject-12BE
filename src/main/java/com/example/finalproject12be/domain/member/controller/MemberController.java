@@ -69,6 +69,7 @@ public class MemberController {
 		return ResponseEntity.status(HttpStatus.OK).body(changeResult);
 	}
 
+
 	@DeleteMapping("/user/signout/{email}")
 	public ResponseEntity<String> signout(@PathVariable String email) {
 		memberService.signout(email);
