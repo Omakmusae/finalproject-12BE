@@ -6,6 +6,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 //import org.springframework.security.crypto.password.PasswordEncoder;
+import com.example.finalproject12be.security.UserDetailsImpl;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,29 +75,30 @@ public class MemberService {
 		response.addHeader(jwtUtil.REFRESH_KEY, tokenDto.getRefreshToken());
 	}
 
-	@Transactional
-	public void logout(final HttpServletRequest request, final HttpServletResponse response) {
+	public void logout(HttpServletRequest request, HttpServletResponse response) {
 		String accessToken = jwtUtil.resolveToken(request, JwtUtil.ACCESS_KEY);
-		if (accessToken == null) {
-			throw new IllegalStateException("로그인 상태가 아닙니다.");
-		}
-		String refreshToken = jwtUtil.resolveToken(request, JwtUtil.REFRESH_KEY);
-
 		if (accessToken != null) {
 			boolean isAccessTokenExpired = jwtUtil.validateToken(accessToken);
 			if (!isAccessTokenExpired) {
-//				String username = jwtUtil.getUserInfoFromToken(accessToken);
+				String username = jwtUtil.getUserInfoFromToken(accessToken);
 				// 액세스 토큰을 무효화하는 작업 수행
-
+				Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+				if (authentication != null && authentication.getPrincipal() instanceof UserDetailsImpl) {
+					UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+					if (username.equals(userDetails.getUsername())) {
+						SecurityContextHolder.clearContext();
+					}
+				}
 			}
 		}
 
+		String refreshToken = jwtUtil.resolveToken(request, JwtUtil.REFRESH_KEY);
 		if (refreshToken != null) {
 			boolean isRefreshTokenValid = jwtUtil.refreshTokenValidation(refreshToken);
 			if (isRefreshTokenValid) {
-//				String username = jwtUtil.getUserInfoFromToken(refreshToken);
+				String username = jwtUtil.getUserInfoFromToken(refreshToken);
 				// 리프레시 토큰을 무효화하는 작업 수행
-
+				// 여기에 리프레시 토큰을 저장하는 로직 또는 DB에서 삭제하는 로직을 추가해야 합니다.
 			}
 		}
 
