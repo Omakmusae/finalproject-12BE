@@ -15,6 +15,7 @@ import com.example.finalproject12be.domain.member.dto.request.MemberEmailRequest
 import com.example.finalproject12be.domain.member.dto.request.MemberLoginRequest;
 import com.example.finalproject12be.domain.member.dto.request.MemberSignupRequest;
 import com.example.finalproject12be.domain.member.dto.response.MemberLoginResponse;
+import com.example.finalproject12be.domain.member.dto.response.MemberNewNameResponse;
 import com.example.finalproject12be.domain.member.entity.Member;
 import com.example.finalproject12be.domain.member.service.MemberService;
 import com.example.finalproject12be.security.UserDetailsImpl;
@@ -60,12 +61,12 @@ public class MemberController {
 	}
 
 	@PostMapping("/user/change/nickname")
-	public ResponseEntity<Void> changeNickname(
+	public ResponseEntity<MemberNewNameResponse> changeNickname(
 		@RequestBody Map<String, String> newName,
 		@AuthenticationPrincipal UserDetailsImpl userDetails
 	){
-		memberService.changeNickname(newName, userDetails.getMember());
-		return ResponseEntity.status(HttpStatus.OK).body(null);
+		MemberNewNameResponse changeResult = memberService.changeNickname(newName, userDetails.getMember());
+		return ResponseEntity.status(HttpStatus.OK).body(changeResult);
 	}
 
 	@DeleteMapping("/user/signout/{email}")
