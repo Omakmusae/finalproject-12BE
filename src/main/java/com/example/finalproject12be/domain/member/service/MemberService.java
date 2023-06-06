@@ -172,13 +172,14 @@ public class MemberService {
 	}
 
 	//ing
-	public void findPassword(String email, Member member) {
+	public void findPassword(String email) {
 
 		Optional<Member> memberOptional = memberRepository.findByEmail(email);
 
 		//로그인 한 유저의 이메일과 요청받은 이메일이 같은가?
 		//TODO: 예외 던지기
 		if(memberOptional.isPresent()){
+			Member member = memberOptional.get();
 			if(memberOptional.get().getId().equals(member.getId())){
 
 				int leftLimit = 97; // letter 'a'
