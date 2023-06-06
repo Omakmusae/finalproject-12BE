@@ -70,10 +70,11 @@ public class OauthMemberService {
 
 		//        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, createToken);
 
-		String[] tokenArrayResult = new String[2];
+		String[] tokenArrayResult = new String[4];
 		tokenArrayResult[0] = tokenDto.getAccessToken();
 		tokenArrayResult[1] = tokenDto.getRefreshToken();
-
+		tokenArrayResult[2] = kakaoMemberInfo.getEmail();
+		tokenArrayResult[3]	=  kakaoMemberInfo.getNickname();
 		return tokenArrayResult;
 	}
 
