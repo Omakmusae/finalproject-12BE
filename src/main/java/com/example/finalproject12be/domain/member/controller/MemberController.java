@@ -81,7 +81,7 @@ public class MemberController {
 	//ing
 	@PostMapping("/user/find/password")
 	public ResponseEntity<Void> findPassword(
-		@RequestBody MemberEmailRequest memberEmailRequest
+		@RequestBody @Valid MemberEmailRequest memberEmailRequest
 	){
 		memberService.findPassword(memberEmailRequest.getEmail());
 		return ResponseEntity.status(HttpStatus.OK).body(null);
@@ -89,7 +89,7 @@ public class MemberController {
 
 	@PostMapping("/user/change/password")
 	public ResponseEntity<Void> changePassword(
-		@RequestBody MemberPasswordRequest memberPasswordRequest,
+		@RequestBody @Valid MemberPasswordRequest memberPasswordRequest,
 		@AuthenticationPrincipal UserDetailsImpl userDetails
 	){
 		memberService.changePassword(memberPasswordRequest.getNewPassword(), userDetails.getMember());
