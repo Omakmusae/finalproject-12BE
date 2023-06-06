@@ -2,6 +2,7 @@ package com.example.finalproject12be.domain.member.service;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -11,6 +12,10 @@ import com.example.finalproject12be.domain.member.dto.response.MemberLoginRespon
 import com.example.finalproject12be.exception.MemberErrorCode;
 import com.example.finalproject12be.exception.RestApiException;
 import com.example.finalproject12be.security.UserDetailsImpl;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -38,6 +43,7 @@ public class MemberService {
 	private final JwtUtil jwtUtil;
 	private final PasswordEncoder passwordEncoder;
 	private final RefreshTokenRepository refreshTokenRepository;
+	private final EmailService emailService;
 
 	@Transactional
 	public void signup(final MemberSignupRequest memberSignupRequest) {
@@ -115,6 +121,26 @@ public class MemberService {
 		response.setHeader(jwtUtil.REFRESH_KEY, null);
 	}
 
+	@Transactional
+	public void signout(String email) {
+		Member member = memberRepository.findByEmail(email)
+				.orElseThrow(() -> new RuntimeException("회원을 찾을 수 없습니다."));
+
+		if (member.getKakaoId() == null) {
+			// 카카오 소셜 로그인이 아닌 일반 가입 회원의 경우 직접 삭제
+			memberRepository.delete(member);
+		} else {
+			// 카카오 소셜 로그인 회원의 경우 카카오 계정 연결 해제 후 삭제
+			disconnectKakaoAccount(member);
+			memberRepository.delete(member);
+		}
+	}
+
+	private void disconnectKakaoAccount(Member member) {
+		// *** 카카오 API를 사용하여 카카오 계정 연결 해제 로직 구현해주셔야합니다 ***
+		// *** 카카오 계정 연결 해제 작업 수행 ***
+	}
+
 	private void throwIfExistOwner(String loginEmail, String loginNickName) {
 
 		Optional<Member> searchedEmail = memberRepository.findByEmail(loginEmail);
@@ -143,18 +169,55 @@ public class MemberService {
 	}
 
 	//ing
-	// public void findPassword(String email, Member member) {
+	public void findPassword(String email, Member member) {
+
+		Optional<Member> memberOptional = memberRepository.findByEmail(email);
+
+		//로그인 한 유저의 이메일과 요청받은 이메일이 같은가?
+		//TODO: 예외 던지기
+		if(memberOptional.isPresent()){
+			if(memberOptional.get().getId().equals(member.getId())){
+
+				int leftLimit = 97; // letter 'a'
+				int rightLimit = 122; // letter 'z'
+				int targetStringLength = 10;
+				Random random = new Random();
+				String newPassword = random.ints(leftLimit, rightLimit + 1)
+					.limit(targetStringLength)
+					.collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+					.toString();
+
+				String encodePw = passwordEncoder.encode(newPassword);
+				member.updatePassword(encodePw);
+				memberRepository.save(member);
+
+				emailService.sendMail(newPassword, email);
+
+			}else {
+				throw new RestApiException(MemberErrorCode.INACTIVE_MEMBER);
+			}
+		}else{
+			throw new RestApiException(MemberErrorCode.DUPLICATED_EMAIL);
+		}
+	}
+
+	// @Override
+
+	// public void mailSend() {
 	//
-	// 	Optional<Member> memberOptional = memberRepository.findByEmail(email);
-	//
-	// 	//로그인 한 유저의 이메일과 요청받은 이메일이 같은가?
-	// 	//TODO: 예외 던지기
-	// 	if(memberOptional.isPresent()){
-	// 		if(memberOptional.get().equals(member)){
+	// 	@Autowired
+	// 	MailSender mailSender;
 	//
 	//
 	//
-	// 		}
-	// 	}
+	// 	// System.out.println("전송 완료!");
+	// 	SimpleMailMessage message = new SimpleMailMessage();
+	// 	message.setTo("kmskes1125@gmail.com"); //수신자 설정
+	// 	message.setSubject("오디약! 비밀번호 변경"); //메일 제목
+	// 	message.setText("이건 메일 내용이고 임시 비밀번호를 보낼 예정입니다."); //메일 내용 설정
+	// 	message.setFrom("kmskes0917@naver.com"); //발신자 설정
+	// 	// message.setReplyTo("보낸이@naver.com");
+	// 	// System.out.println("message"+message);
+	// 	mailSender.send(message);
 	// }
 }

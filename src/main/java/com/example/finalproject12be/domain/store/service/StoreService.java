@@ -165,6 +165,7 @@ public class StoreService {
 			Double baseRadius =  Double.parseDouble(radius);
 			Double baseLatitude = Double.parseDouble(latitude);
 			Double baseLongitude = Double.parseDouble(longitude);
+			// stores = storeRepository.findByDistanceWithinRadius(baseRadius, baseLatitude, baseLongitude);
 			stores = storeRepositoryCustom.searchTest(baseRadius, baseLatitude, baseLongitude);
 		}
 
@@ -643,7 +644,8 @@ public class StoreService {
 			Double baseRadius =  Double.parseDouble(radius);
 			Double baseLatitude = Double.parseDouble(latitude);
 			Double baseLongitude = Double.parseDouble(longitude);
-			stores = storeRepositoryCustom.searchTest(baseRadius, baseLatitude, baseLongitude);
+			stores = storeRepository.findByDistanceWithinRadius(baseRadius, baseLatitude, baseLongitude);
+			// stores = storeRepositoryCustom.searchTest(baseRadius, baseLatitude, baseLongitude);
 		}
 
 		//storeName
@@ -1007,6 +1009,7 @@ public class StoreService {
 
 	public List<Store> testLocation(Double baseRadius,Double baseLatitude, Double baseLongitude) {
 		List<Store> result = storeRepositoryCustom.searchTest(baseRadius, baseLatitude, baseLongitude);
+		// List<Store> result = storeRepository.findByDistanceWithinRadius(baseRadius, baseLatitude, baseLongitude);
 
 		return result;
 	}
