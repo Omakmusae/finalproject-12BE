@@ -28,9 +28,14 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
     @Query(value = "SELECT *, "
         + "(6371 * acos(cos(radians(:baseLatitude)) * cos(radians(s.latitude)) * cos(radians(s.longitude) - radians(:baseLongitude)) + sin(radians(:baseLatitude)) * sin(radians(s.latitude)))) AS distance "
         + "FROM store s "
-        + "WHERE s.address LIKE %:address% "
+        //+ "WHERE s.address LIKE %:address% "
         + "HAVING distance <= :radius "
         + "ORDER BY distance ASC", nativeQuery = true)
-    List<Store> findByDistanceWithinRadius(@Param("baseLatitude") Double baseLatitude, @Param("baseLongitude") Double baseLongitude, @Param("radius") Double radius, @Param("address") String address);
+    List<Store> findByDistanceWithinRadius(@Param("baseLatitude") Double baseLatitude, @Param("baseLongitude") Double baseLongitude, @Param("radius") Double radius);
 
+	List<Store> findAllByEnglish(int english);
+
+    List<Store> findAllByChinese(int chinese);
+
+    List<Store> findAllByJapanese(int japanese);
 }

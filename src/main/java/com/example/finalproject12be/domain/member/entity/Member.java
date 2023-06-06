@@ -72,4 +72,12 @@ public class Member {
 		this.kakaoId = kakaoId;
 		return this;
 	}
+
+	public void updateName(String newName){
+		this.nickname = newName;
+	}
+
+	public void updatePassword(String newPassword) {
+		this.password = newPassword;
+	}
 }
