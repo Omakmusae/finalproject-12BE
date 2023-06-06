@@ -69,6 +69,7 @@ public class MemberController {
 		return ResponseEntity.status(HttpStatus.OK).body(changeResult);
 	}
 
+
 	@DeleteMapping("/user/signout/{email}")
 	public ResponseEntity<String> signout(@PathVariable String email) {
 		memberService.signout(email);
@@ -78,10 +79,9 @@ public class MemberController {
 	//ing
 	@PostMapping("/user/find/password")
 	public ResponseEntity<Void> findPassword(
-		@RequestBody MemberEmailRequest memberEmailRequest,
-		@AuthenticationPrincipal UserDetailsImpl userDetails
+		@RequestBody MemberEmailRequest memberEmailRequest
 	){
-		memberService.findPassword(memberEmailRequest.getEmail(), userDetails.getMember());
+		memberService.findPassword(memberEmailRequest.getEmail());
 		return ResponseEntity.status(HttpStatus.OK).body(null);
 	}
 }
