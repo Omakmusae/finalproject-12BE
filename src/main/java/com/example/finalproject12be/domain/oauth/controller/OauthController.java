@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.finalproject12be.domain.member.dto.response.MemberLoginResponse;
 import com.example.finalproject12be.domain.oauth.service.OauthMemberService;
 import com.example.finalproject12be.security.jwt.JwtUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -25,7 +26,7 @@ public class OauthController {
 	private final OauthMemberService oauthMemberService;
 
 	@GetMapping("/user/signin/kakao")
-	public ResponseEntity<Void> kakaoLogin(@RequestParam("code") String code, HttpServletResponse response) throws JsonProcessingException {
+	public ResponseEntity<MemberLoginResponse> kakaoLogin(@RequestParam("code") String code, HttpServletResponse response) throws JsonProcessingException {
 
 		String[] tokenArray = oauthMemberService.kakaoLogin(code, response);
 
@@ -36,7 +37,7 @@ public class OauthController {
 		// 헤더로 바꿔야함! Cookie 생성 및 직접 브라우저에 Set
 		response.addHeader("ACCESS_KEY", createAccessToken);
 		response.addHeader("REFRESH_KEY", createRefreshToken);
-
-		return ResponseEntity.status(HttpStatus.OK).body(null);
+		MemberLoginResponse loginResult = new MemberLoginResponse(tokenArray[2],tokenArray[3]);
+		return ResponseEntity.status(HttpStatus.OK).body(loginResult);
 	}
 }
