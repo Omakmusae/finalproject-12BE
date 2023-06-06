@@ -5,10 +5,10 @@ import lombok.Getter;
 @Getter
 public class MemberLoginResponse {
 	private String email;
-	private String password;
+	private String nickname;
 
-	public MemberLoginResponse(String email, String password) {
+	public MemberLoginResponse(String email, String nickname) {
 		this.email = email;
-		this.password = password;
+		this.nickname = nickname;
 	}
 }

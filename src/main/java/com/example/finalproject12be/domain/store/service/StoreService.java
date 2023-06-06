@@ -571,7 +571,7 @@ public class StoreService {
 		return stores;
 	}
 
-	public List<Store> getLocation(Double baseRadius,Double baseLatitude, Double baseLongitude, String address) {
+	public List<Store> getLocation(Double baseRadius,Double baseLatitude, Double baseLongitude) {
 
 		List<Store> result = storeRepository.findByDistanceWithinRadius(baseLatitude, baseLongitude, baseRadius);
 		return result;
