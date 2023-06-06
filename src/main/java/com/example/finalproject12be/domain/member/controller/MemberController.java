@@ -1,5 +1,8 @@
 package com.example.finalproject12be.domain.member.controller;
 
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.http.HttpStatus;
@@ -51,4 +54,18 @@ public class MemberController {
 		return ResponseEntity.status(HttpStatus.OK).body(null);
 	}
 
+	@PostMapping("/user/logout")
+	public ResponseEntity<String> logout(HttpServletRequest request, final HttpServletResponse response) {
+		memberService.logout(request, response);
+		return ResponseEntity.ok("로그아웃되었습니다.");
+	}
+
+	@PostMapping("/user/change/nickname")
+	public ResponseEntity<Void> changeNickname(
+		@RequestBody Map<String, String> newName,
+		@AuthenticationPrincipal UserDetailsImpl userDetails
+	){
+		memberService.changeNickname(newName, userDetails.getMember());
+		return ResponseEntity.status(HttpStatus.OK).body(null);
+	}
 }

@@ -1,10 +1,16 @@
 package com.example.finalproject12be.domain.member.service;
 
+import java.util.Map;
 import java.util.Optional;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 //import org.springframework.security.crypto.password.PasswordEncoder;
+import com.example.finalproject12be.security.UserDetailsImpl;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,6 +76,38 @@ public class MemberService {
 		response.addHeader(jwtUtil.REFRESH_KEY, tokenDto.getRefreshToken());
 	}
 
+	public void logout(HttpServletRequest request, HttpServletResponse response) {
+		String accessToken = jwtUtil.resolveToken(request, JwtUtil.ACCESS_KEY);
+		if (accessToken != null) {
+			boolean isAccessTokenExpired = jwtUtil.validateToken(accessToken);
+			if (!isAccessTokenExpired) {
+				String username = jwtUtil.getUserInfoFromToken(accessToken);
+				// 액세스 토큰을 무효화하는 작업 수행
+				Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+				if (authentication != null && authentication.getPrincipal() instanceof UserDetailsImpl) {
+					UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+					if (username.equals(userDetails.getUsername())) {
+						SecurityContextHolder.clearContext();
+					}
+				}
+			}
+		}
+
+		String refreshToken = jwtUtil.resolveToken(request, JwtUtil.REFRESH_KEY);
+		if (refreshToken != null) {
+			boolean isRefreshTokenValid = jwtUtil.refreshTokenValidation(refreshToken);
+			if (isRefreshTokenValid) {
+				String username = jwtUtil.getUserInfoFromToken(refreshToken);
+				// 리프레시 토큰을 무효화하는 작업 수행
+				// 여기에 리프레시 토큰을 저장하는 로직 또는 DB에서 삭제하는 로직을 추가해야 합니다.
+			}
+		}
+
+		// 로그아웃 후 필요한 작업 수행
+		response.setHeader(jwtUtil.ACCESS_KEY, null);
+		response.setHeader(jwtUtil.REFRESH_KEY, null);
+	}
+
 	private void throwIfExistOwner(String loginEmail, String loginNickName) {
 
 		Optional<Member> searchedEmail = memberRepository.findByEmail(loginEmail);
@@ -83,4 +121,14 @@ public class MemberService {
 			throw new IllegalArgumentException("가입된 닉네임입니다.");
 		}
 	}
+
+	// @Transactional
+	public void changeNickname(Map newName, Member member) {
+		String nickname = String.valueOf(newName.get("newName"));
+
+		member.updateName(nickname);
+		memberRepository.save(member);
+	}
+
+
 }

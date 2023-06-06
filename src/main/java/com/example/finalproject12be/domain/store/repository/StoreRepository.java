@@ -33,4 +33,9 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
         + "ORDER BY distance ASC", nativeQuery = true)
     List<Store> findByDistanceWithinRadius(@Param("baseLatitude") Double baseLatitude, @Param("baseLongitude") Double baseLongitude, @Param("radius") Double radius, @Param("address") String address);
 
+	List<Store> findAllByEnglish(int english);
+
+    List<Store> findAllByChinese(int chinese);
+
+    List<Store> findAllByJapanese(int japanese);
 }
