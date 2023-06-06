@@ -2,6 +2,7 @@ package com.example.finalproject12be.domain.member.service;
 
 import java.util.Optional;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 //import org.springframework.security.crypto.password.PasswordEncoder;
@@ -70,6 +71,37 @@ public class MemberService {
 		response.addHeader(jwtUtil.REFRESH_KEY, tokenDto.getRefreshToken());
 	}
 
+	@Transactional
+	public void logout(final HttpServletRequest request, final HttpServletResponse response) {
+		String accessToken = jwtUtil.resolveToken(request, JwtUtil.ACCESS_KEY);
+		if (accessToken == null) {
+			throw new IllegalStateException("로그인 상태가 아닙니다.");
+		}
+		String refreshToken = jwtUtil.resolveToken(request, JwtUtil.REFRESH_KEY);
+
+		if (accessToken != null) {
+			boolean isAccessTokenExpired = jwtUtil.validateToken(accessToken);
+			if (!isAccessTokenExpired) {
+//				String username = jwtUtil.getUserInfoFromToken(accessToken);
+				// 액세스 토큰을 무효화하는 작업 수행
+
+			}
+		}
+
+		if (refreshToken != null) {
+			boolean isRefreshTokenValid = jwtUtil.refreshTokenValidation(refreshToken);
+			if (isRefreshTokenValid) {
+//				String username = jwtUtil.getUserInfoFromToken(refreshToken);
+				// 리프레시 토큰을 무효화하는 작업 수행
+
+			}
+		}
+
+		// 로그아웃 후 필요한 작업 수행
+		response.setHeader(jwtUtil.ACCESS_KEY, null);
+		response.setHeader(jwtUtil.REFRESH_KEY, null);
+	}
+
 	private void throwIfExistOwner(String loginEmail, String loginNickName) {
 
 		Optional<Member> searchedEmail = memberRepository.findByEmail(loginEmail);
@@ -83,4 +115,7 @@ public class MemberService {
 			throw new IllegalArgumentException("가입된 닉네임입니다.");
 		}
 	}
+
+
+
 }

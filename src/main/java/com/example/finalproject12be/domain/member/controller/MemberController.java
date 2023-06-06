@@ -1,5 +1,6 @@
 package com.example.finalproject12be.domain.member.controller;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.http.HttpStatus;
@@ -51,4 +52,9 @@ public class MemberController {
 		return ResponseEntity.status(HttpStatus.OK).body(null);
 	}
 
+	@PostMapping("/user/logout")
+	public ResponseEntity<String> logout(HttpServletRequest request, final HttpServletResponse response) {
+		memberService.logout(request, response);
+		return ResponseEntity.ok("로그아웃되었습니다.");
+	}
 }
