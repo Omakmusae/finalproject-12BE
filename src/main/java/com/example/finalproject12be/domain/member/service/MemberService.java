@@ -1,5 +1,6 @@
 package com.example.finalproject12be.domain.member.service;
 
+import java.util.Map;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
@@ -121,6 +122,13 @@ public class MemberService {
 		}
 	}
 
+	// @Transactional
+	public void changeNickname(Map newName, Member member) {
+		String nickname = String.valueOf(newName.get("newName"));
+
+		member.updateName(nickname);
+		memberRepository.save(member);
+	}
 
 
 }
