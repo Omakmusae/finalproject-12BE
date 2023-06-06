@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import com.example.finalproject12be.domain.member.dto.request.MemberEmailRequest;
 import com.example.finalproject12be.domain.member.dto.request.MemberLoginRequest;
 import com.example.finalproject12be.domain.member.dto.request.MemberSignupRequest;
 import com.example.finalproject12be.domain.member.dto.response.MemberLoginResponse;
@@ -71,5 +72,15 @@ public class MemberController {
 	public ResponseEntity<String> signout(@PathVariable String email) {
 		memberService.signout(email);
 		return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
+	}
+
+	//ing
+	@PostMapping("/user/find/password")
+	public ResponseEntity<Void> findPassword(
+		@RequestBody MemberEmailRequest memberEmailRequest,
+		@AuthenticationPrincipal UserDetailsImpl userDetails
+	){
+		memberService.findPassword(memberEmailRequest.getEmail(), userDetails.getMember());
+		return ResponseEntity.status(HttpStatus.OK).body(null);
 	}
 }
