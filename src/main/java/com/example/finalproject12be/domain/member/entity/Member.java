@@ -76,4 +76,8 @@ public class Member {
 	public void updateName(String newName){
 		this.nickname = newName;
 	}
+
+	public void updatePassword(String newPassword) {
+		this.password = newPassword;
+	}
 }
