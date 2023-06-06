@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 //import org.springframework.security.crypto.password.PasswordEncoder;
+import com.example.finalproject12be.domain.member.dto.response.MemberLoginResponse;
 import com.example.finalproject12be.exception.MemberErrorCode;
 import com.example.finalproject12be.exception.RestApiException;
 import com.example.finalproject12be.security.UserDetailsImpl;
@@ -48,7 +49,7 @@ public class MemberService {
 	}
 
 	@Transactional
-	public void login(final MemberLoginRequest memberLoginRequest, final HttpServletResponse response) {
+	public MemberLoginResponse login(final MemberLoginRequest memberLoginRequest, final HttpServletResponse response) {
 
 		String email = memberLoginRequest.getEmail();
 		String password = memberLoginRequest.getPassword();
@@ -76,6 +77,10 @@ public class MemberService {
 
 		response.addHeader(jwtUtil.ACCESS_KEY, tokenDto.getAccessToken());
 		response.addHeader(jwtUtil.REFRESH_KEY, tokenDto.getRefreshToken());
+
+		MemberLoginResponse loginResult = new MemberLoginResponse(searchedMember.getEmail(), searchedMember.getNickname());
+		return loginResult;
+
 	}
 
 	public void logout(HttpServletRequest request, HttpServletResponse response) {

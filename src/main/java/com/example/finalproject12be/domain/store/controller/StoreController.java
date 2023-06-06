@@ -19,7 +19,9 @@ import com.example.finalproject12be.domain.store.service.StoreService;
 import com.example.finalproject12be.security.UserDetailsImpl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class StoreController {
@@ -48,8 +50,12 @@ public class StoreController {
 		@RequestParam("open") boolean open,
 		@RequestParam("holidayBusiness") boolean holidayBusiness,
 		@RequestParam("nightBusiness") boolean nightBusiness,
+		@RequestParam("radius") String radius,//위치 필터
+		@RequestParam("latitude") String latitude, @RequestParam("longitude") String longitude,
+
 		@AuthenticationPrincipal UserDetailsImpl userDetails){
-		return storeService.searchStore(storeName, gu, open, holidayBusiness, nightBusiness, userDetails);
+
+		return storeService.searchStore(storeName, gu, open, holidayBusiness, nightBusiness, radius, latitude, longitude,userDetails);
 	}
 
 	// private final OpenApiManager openApiManager;
@@ -60,20 +66,6 @@ public class StoreController {
 	// public void fetch() {
 	// 	openApiManager.fetch();
 	// }
-
-
-	@GetMapping("/api/store/location")
-	public List<Store> getLocation(
-		@RequestParam("radius") String radius,
-		@RequestParam("latitude") String latitude, @RequestParam("longitude") String longitude,
-		@RequestParam("address") String address,
-		@AuthenticationPrincipal UserDetailsImpl userDetails){
-		Double baseRadius =  Double.parseDouble(radius);
-		Double baseLatitude = Double.parseDouble(latitude);
-		Double baseLongitude = Double.parseDouble(longitude);
-
-		return storeService.getLocation(baseRadius,baseLatitude, baseLongitude, address);
-	}
 
 	//ING
 	//외국어 가능 약국 상세보기
@@ -95,8 +87,27 @@ public class StoreController {
 		@RequestParam("english") boolean english,
 		@RequestParam("chinese") boolean chinese,
 		@RequestParam("japanese") boolean japanese,
+		@RequestParam("radius") String radius,//위치 필터
+		@RequestParam("latitude") String latitude, @RequestParam("longitude") String longitude,
 		@AuthenticationPrincipal UserDetailsImpl userDetails){
-		return storeService.searchForeignStore(storeName, gu, open, holidayBusiness, nightBusiness, english, chinese, japanese, userDetails);
+		return storeService.searchForeignStore(storeName, gu, open, holidayBusiness, nightBusiness, english, chinese, japanese, radius, latitude, longitude, userDetails);
+	}
+
+
+	@GetMapping("/api/store/location")
+	public List<Store> getLocation(
+		@RequestParam("radius") String radius,
+		@RequestParam("latitude") String latitude, @RequestParam("longitude") String longitude,
+		@RequestParam("address") String address,
+		@AuthenticationPrincipal UserDetailsImpl userDetails){
+		Double baseRadius =  Double.parseDouble(radius);
+		Double baseLatitude = Double.parseDouble(latitude);
+		Double baseLongitude = Double.parseDouble(longitude);
+
+		return storeService.testLocation(baseRadius,baseLatitude, baseLongitude);
+		//return storeService.getLocation(baseRadius,baseLatitude, baseLongitude, address);
 	}
 
 }
+
+//
