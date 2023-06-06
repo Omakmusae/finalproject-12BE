@@ -9,10 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.finalproject12be.domain.member.dto.request.MemberLoginRequest;
 import com.example.finalproject12be.domain.member.dto.request.MemberSignupRequest;
@@ -68,5 +65,11 @@ public class MemberController {
 	){
 		memberService.changeNickname(newName, userDetails.getMember());
 		return ResponseEntity.status(HttpStatus.OK).body(null);
+	}
+
+	@DeleteMapping("/user/signout/{email}")
+	public ResponseEntity<String> signout(@PathVariable String email) {
+		memberService.signout(email);
+		return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
 	}
 }
