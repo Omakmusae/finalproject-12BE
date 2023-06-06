@@ -115,6 +115,26 @@ public class MemberService {
 		response.setHeader(jwtUtil.REFRESH_KEY, null);
 	}
 
+	@Transactional
+	public void signout(String email) {
+		Member member = memberRepository.findByEmail(email)
+				.orElseThrow(() -> new RuntimeException("회원을 찾을 수 없습니다."));
+
+		if (member.getKakaoId() == null) {
+			// 카카오 소셜 로그인이 아닌 일반 가입 회원의 경우 직접 삭제
+			memberRepository.delete(member);
+		} else {
+			// 카카오 소셜 로그인 회원의 경우 카카오 계정 연결 해제 후 삭제
+			disconnectKakaoAccount(member);
+			memberRepository.delete(member);
+		}
+	}
+
+	private void disconnectKakaoAccount(Member member) {
+		// *** 카카오 API를 사용하여 카카오 계정 연결 해제 로직 구현해주셔야합니다 ***
+		// *** 카카오 계정 연결 해제 작업 수행 ***
+	}
+
 	private void throwIfExistOwner(String loginEmail, String loginNickName) {
 
 		Optional<Member> searchedEmail = memberRepository.findByEmail(loginEmail);
