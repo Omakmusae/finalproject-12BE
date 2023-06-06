@@ -174,21 +174,16 @@ public class OauthMemberService {
 
 				// 신규 회원가입
 				String email = kakaoUserInfo.getEmail();
-				String nickname;
-				if (memberRepository.findByEmail(kakaoEmail).equals(null)) {
-					nickname = kakaoUserInfo.getNickname();
 
-				} else  {
-					int leftLimit = 97; // letter 'a'
-					int rightLimit = 122; // letter 'z'
-					int targetStringLength = 10;
-					Random random = new Random();
-					nickname = random.ints(leftLimit, rightLimit + 1)
-						.limit(targetStringLength)
-						.collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
-						.toString();
-				}
-
+				int leftLimit = 97; // letter 'a'
+				int rightLimit = 122; // letter 'z'
+				int targetStringLength = 10;
+				Random random = new Random();
+				String nickname = random.ints(leftLimit, rightLimit + 1)
+					.limit(targetStringLength)
+					.collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+					.toString();
+				
 				String password = UUID.randomUUID().toString();
 				String encodedPassword = passwordEncoder.encode(password);
 				kakaoUser = new Member(email, encodedPassword, nickname, kakaoId);
