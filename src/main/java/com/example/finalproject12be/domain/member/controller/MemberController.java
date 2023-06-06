@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.example.finalproject12be.domain.member.dto.request.MemberEmailRequest;
 import com.example.finalproject12be.domain.member.dto.request.MemberLoginRequest;
+import com.example.finalproject12be.domain.member.dto.request.MemberPasswordRequest;
 import com.example.finalproject12be.domain.member.dto.request.MemberSignupRequest;
 import com.example.finalproject12be.domain.member.dto.response.MemberLoginResponse;
 import com.example.finalproject12be.domain.member.dto.response.MemberNewNameResponse;
@@ -83,6 +84,15 @@ public class MemberController {
 		@RequestBody MemberEmailRequest memberEmailRequest
 	){
 		memberService.findPassword(memberEmailRequest.getEmail());
+		return ResponseEntity.status(HttpStatus.OK).body(null);
+	}
+
+	@PostMapping("/user/change/password")
+	public ResponseEntity<Void> changePassword(
+		@RequestBody MemberPasswordRequest memberPasswordRequest,
+		@AuthenticationPrincipal UserDetailsImpl userDetails
+	){
+		memberService.changePassword(memberPasswordRequest.getNewPassword(), userDetails.getMember());
 		return ResponseEntity.status(HttpStatus.OK).body(null);
 	}
 }

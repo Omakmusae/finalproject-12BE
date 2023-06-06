@@ -205,6 +205,14 @@ public class MemberService {
 		}
 	}
 
+	public void changePassword(String password, Member member) {
+
+		String encodePw = passwordEncoder.encode(password);
+		member.updatePassword(encodePw);
+		memberRepository.save(member);
+
+	}
+
 	// @Override
 
 	// public void mailSend() {
