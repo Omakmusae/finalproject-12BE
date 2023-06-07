@@ -499,7 +499,7 @@ public class StoreService {
 
 				String storeTime = testStore.getWeekdaysTime();
 
-				if(storeTime != null){
+				if(storeTime != null && !storeTime.contains("nu")){ //TODO: nu:ll 로 시간 들어가 있는 객체 골라서 작업하기
 					String[] storeTimes = storeTime.split("~");
 
 					// //test
@@ -511,10 +511,10 @@ public class StoreService {
 					// }
 
 					openHour = Integer.parseInt(storeTimes[0].substring(3, 5));
-					openMin = Integer.parseInt(storeTimes[0].substring(6));
+					openMin = Integer.parseInt(storeTimes[0].substring(6, 8)); //원래: 6
 
-					closeHour = Integer.parseInt(storeTimes[1].substring(0, 2));
-					closeMin = Integer.parseInt(storeTimes[1].substring(3));
+					closeHour = Integer.parseInt(storeTimes[1].substring(1, 3));
+					closeMin = Integer.parseInt(storeTimes[1].substring(4, 6));
 				}else {
 
 					status = 1;
