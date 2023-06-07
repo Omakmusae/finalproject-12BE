@@ -29,9 +29,9 @@ public class ForeignOneStoreResponse {
 		this.name = store.getName();
 		this.callNumber = store.getCallNumber();
 		this.weekdaysTime = store.getWeekdaysTime();
-		this.saturdayTime = store.getSaturdayTime();
-		this.sundayTime = store.getSundayTime();
-		this.holidayTime = store.getHolidayTime();
+		this.saturdayTime = store.getSaturdayTime().substring(2, 15);
+		this.sundayTime = store.getSundayTime().substring(2, 15);
+		this.holidayTime = store.getHolidayTime().substring(4, 17);
 		this.longitude = store.getLongitude();
 		this.latitude = store.getLatitude();
 		// this.totalBookmark = store.getBookmarks().size();
