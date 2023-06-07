@@ -68,11 +68,15 @@ public class OauthMemberService {
 		}
 		//        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, createToken);
 
-		String[] tokenArrayResult = new String[4];
+		String[] tokenArrayResult = new String[5];
 		tokenArrayResult[0] = tokenDto.getAccessToken();
 		tokenArrayResult[1] = tokenDto.getRefreshToken();
 		tokenArrayResult[2] = kakaoMemberInfo.getEmail();
 		tokenArrayResult[3]	=  kakaoMemberInfo.getNickname();
+
+		tokenArrayResult[4] = "Bearer " + kakaoAccessToken;
+		System.out.println(kakaoAccessToken + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
 		return tokenArrayResult;
 	}
 
@@ -87,13 +91,13 @@ public class OauthMemberService {
 		MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
 		body.add("grant_type", "authorization_code");
 
-		//body.add("client_id", "048f9445160611c1cc986c481c2d6b94");//내 앱 rest api 키
-		//body.add("redirect_uri", "http://localhost:8080/user/signin/kakao");
+		// body.add("client_id", "048f9445160611c1cc986c481c2d6b94");//내 앱 rest api 키
+		// body.add("redirect_uri", "http://localhost:8080/user/signin/kakao");
 
 		body.add("client_id", "7463ed7e96bc168b9023480e535add90");//오디약 rest api 키
 
 		//body.add("redirect_uri", "https://finalproject-12-fe.vercel.app/user/signin/kakao");//오디약 redirect url
-		body.add("redirect_uri", "http://localhost:3000/user/signin/kakao");// 프런트 로컬 오디약 redirect url
+		body.add("redirect_uri", "http://localhost:3000/user/signin/kakao");// 프런트 로컬 redirect url
 		body.add("code", code);
 
 		// HTTP 요청 보내기
