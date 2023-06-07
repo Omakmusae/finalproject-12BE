@@ -72,7 +72,7 @@ public class OauthMemberService {
 		tokenArrayResult[0] = tokenDto.getAccessToken();
 		tokenArrayResult[1] = tokenDto.getRefreshToken();
 		tokenArrayResult[2] = kakaoMemberInfo.getEmail();
-		tokenArrayResult[3]	=  kakaoMemberInfo.getNickname();
+		tokenArrayResult[3]	=  kakaoMember.getNickname();//
 
 		tokenArrayResult[4] = "Bearer " + kakaoAccessToken;
 		System.out.println(kakaoAccessToken + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
