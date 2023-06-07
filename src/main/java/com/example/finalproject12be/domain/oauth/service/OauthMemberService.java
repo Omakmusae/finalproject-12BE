@@ -91,7 +91,7 @@ public class OauthMemberService {
 		body.add("grant_type", "authorization_code");
 
 		//body.add("client_id", "048f9445160611c1cc986c481c2d6b94");//내 앱 rest api 키
-		//body.add("redirect_uri", "http://localhost:8080/user/signin/kakao");
+		//body.add("redirect_uri", "http://localhost:8080/user/signin/kakao");ㅇ
 
 		body.add("client_id", "7463ed7e96bc168b9023480e535add90");//오디약 rest api 키
 		//body.add("redirect_uri", "https://finalproject-12-fe.vercel.app/user/signin/kakao");//오디약 redirect url
