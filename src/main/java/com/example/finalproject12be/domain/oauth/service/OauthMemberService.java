@@ -97,7 +97,7 @@ public class OauthMemberService {
 		body.add("client_id", "7463ed7e96bc168b9023480e535add90");//오디약 rest api 키
 
 		//body.add("redirect_uri", "https://finalproject-12-fe.vercel.app/user/signin/kakao");//오디약 redirect url
-		body.add("redirect_uri", "http://localhost:3000/user/signin/kakao");// 프런트 로컬 오디약 redirect url
+		body.add("redirect_uri", "http://localhost:3000/user/signin/kakao");// 프런트 로컬 redirect url
 		body.add("code", code);
 
 		// HTTP 요청 보내기
