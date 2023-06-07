@@ -56,9 +56,7 @@ public class OauthMemberService {
 		Member kakaoMember = registerKakaoUserIfNeeded(kakaoMemberInfo);
 
 		// 4. JWT 토큰 반환
-		TokenDto tokenDto = jwtUtil.createAllToken(kakaoMember.getEmail());
-		// String createAccessToken =  jwtUtil.createToken(kakaoMember.getEmail(),"Access");
-		// String createRefreshToken =  jwtUtil.createToken(kakaoMember.getEmail(),"Refresh");
+		TokenDto tokenDto = jwtUtil.createAllToken(kakaoMember.getEmail()); // Access, Refresh 토큰 생성
 
 		Optional<RefreshToken> refreshToken = refreshTokenRepository.findByEmail(kakaoMember.getEmail());
 		if(refreshToken.isPresent()) {
@@ -68,10 +66,7 @@ public class OauthMemberService {
 			RefreshToken newToken =  new RefreshToken(tokenDto.getRefreshToken().substring(7), kakaoMember.getEmail());
 			refreshTokenRepository.save(newToken);
 		}
-
 		//        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, createToken);
-
-
 
 		String[] tokenArrayResult = new String[4];
 		tokenArrayResult[0] = tokenDto.getAccessToken();
@@ -91,10 +86,10 @@ public class OauthMemberService {
 		// HTTP Body 생성
 		MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
 		body.add("grant_type", "authorization_code");
-		body.add("client_id", "048f9445160611c1cc986c481c2d6b94");//내 앱 rest api 키
-		//body.add("client_id", "7463ed7e96bc168b9023480e535add90");//오디약 rest api 키
-		body.add("redirect_uri", "http://localhost:8080/user/signin/kakao");
-		//body.add("redirect_uri", "https://finalproject-12-fe.vercel.app/user/signin/kakao");//오디약 redirect url
+		//body.add("client_id", "048f9445160611c1cc986c481c2d6b94");//내 앱 rest api 키
+		body.add("client_id", "7463ed7e96bc168b9023480e535add90");//오디약 rest api 키
+		//body.add("redirect_uri", "http://localhost:8080/user/signin/kakao");
+		body.add("redirect_uri", "https://finalproject-12-fe.vercel.app/user/signin/kakao");//오디약 redirect url
 		//body.add("redirect_uri", "http://localhost:3000/user/signin/kakao");// 프런트 로컬 오디약 redirect url
 		body.add("code", code);
 
@@ -120,6 +115,8 @@ public class OauthMemberService {
 
 		return tokenArray;
 	}
+
+
 
 	// 2. 토큰으로 카카오 API 호출 : "액세스 토큰"으로 "카카오 사용자 정보" 가져오기
 	private KakaoMemberInfoRequest getKakaoUserInfo(String accessToken) throws JsonProcessingException {
@@ -192,5 +189,10 @@ public class OauthMemberService {
 		}
 
 		return kakaoUser;
+	}
+
+	private void disconnectKakaoAccount(Member member) {
+		// *** 카카오 API를 사용하여 카카오 계정 연결 해제 로직 구현해주셔야합니다 ***
+		// *** 카카오 계정 연결 해제 작업 수행 ***
 	}
 }

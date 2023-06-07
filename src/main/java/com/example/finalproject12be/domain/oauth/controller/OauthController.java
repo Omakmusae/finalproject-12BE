@@ -34,7 +34,7 @@ public class OauthController {
 		String createAccessToken = tokenArray[0];
 		String createRefreshToken = tokenArray[1];
 
-		// 헤더로 바꿔야함! Cookie 생성 및 직접 브라우저에 Set
+		// 헤더로 바꿔야함!
 		response.addHeader("ACCESS_KEY", createAccessToken);
 		response.addHeader("REFRESH_KEY", createRefreshToken);
 		MemberLoginResponse loginResult = new MemberLoginResponse(tokenArray[2],tokenArray[3]);

@@ -14,12 +14,20 @@ import com.example.finalproject12be.exception.MemberErrorCode;
 import com.example.finalproject12be.exception.RestApiException;
 import com.example.finalproject12be.security.UserDetailsImpl;
 
+import org.apache.poi.ss.formula.functions.T;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 import com.example.finalproject12be.domain.member.dto.request.MemberLoginRequest;
 import com.example.finalproject12be.domain.member.dto.request.MemberSignupRequest;
@@ -87,7 +95,9 @@ public class MemberService {
 	}
 
 	public void logout(HttpServletRequest request, HttpServletResponse response) {
+
 		String accessToken = jwtUtil.resolveToken(request, JwtUtil.ACCESS_KEY);
+
 		if (accessToken != null) {
 			boolean isAccessTokenExpired = jwtUtil.validateToken(accessToken);
 			if (!isAccessTokenExpired) {
@@ -119,10 +129,12 @@ public class MemberService {
 	}
 
 	@Transactional
-	public void signout(String email) {
+	public void signout(String email, final HttpServletRequest request) {
 		Member member = memberRepository.findByEmail(email)
 				.orElseThrow(() ->  new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
-
+		System.out.println();
+		//String accessToken = request.getHeader("ACCESS_KEY");
+		//String accessToken = jwtUtil.resolveToken(request, JwtUtil.ACCESS_KEY);
 		if (member.getKakaoId() == null) {
 			// 카카오 소셜 로그인이 아닌 일반 가입 회원의 경우 직접 삭제
 			memberRepository.delete(member);
@@ -136,6 +148,26 @@ public class MemberService {
 	private void disconnectKakaoAccount(Member member) {
 		// *** 카카오 API를 사용하여 카카오 계정 연결 해제 로직 구현해주셔야합니다 ***
 		// *** 카카오 계정 연결 해제 작업 수행 ***
+		// HTTP Header 생성
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
+		headers.add("Authorization", "KakaoAK f53119291f2ee3abe3793cee6d1f637f");
+
+		// HTTP Body 생성
+		MultiValueMap<String,String> body = new LinkedMultiValueMap<>();
+		body.add("target_id_type", "user_id");
+		body.add("target_id", String.valueOf(member.getKakaoId()));
+
+		HttpEntity<MultiValueMap<String, String>> kakaoTokenForDisconnect =
+			new HttpEntity<>(body, headers);
+		RestTemplate rt = new RestTemplate();
+		ResponseEntity<String> response = rt.exchange(
+			"https://kapi.kakao.com/v1/user/unlink",
+			HttpMethod.POST,
+			kakaoTokenForDisconnect,
+			String.class
+		);
 	}
 
 	private void throwIfExistOwner(String loginEmail, String loginNickName) {

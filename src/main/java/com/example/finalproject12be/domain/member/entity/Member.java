@@ -36,6 +36,7 @@ public class Member {
 	@Column(nullable = false)
 	private String nickname;
 
+	@Column(nullable = true)
 	private Long kakaoId;
 
 	@OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
