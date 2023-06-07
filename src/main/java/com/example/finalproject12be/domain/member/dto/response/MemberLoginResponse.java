@@ -6,12 +6,12 @@ import lombok.Getter;
 public class MemberLoginResponse {
 	private String email;
 	private String nickname;
-	private String kakaoAccessToken;
+	private String Authorization;
 
-	public MemberLoginResponse(String email, String nickname, String kakaoAccessToken) {
+	public MemberLoginResponse(String email, String nickname, String Authorization) {
 		this.email = email;
 		this.nickname = nickname;
-		this.kakaoAccessToken = kakaoAccessToken;
+		this.Authorization = Authorization;
 	}
 	public MemberLoginResponse(String email, String nickname) {
 		this.email = email;
