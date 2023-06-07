@@ -188,6 +188,7 @@ public class MemberService {
 				.orElseThrow(() ->  new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
 
 		String kakaoAccessToken = request.getHeader("authorization");
+		System.out.println(kakaoAccessToken + "!!!!!!!!!!!!!!!!!!!kakao 토큰!!!!!!!!!!!!!!!!!!!");
 		System.out.println("토큰토큰 확인확인" + kakaoAccessToken);
 		if (member.getKakaoId() == null) {
 			// 카카오 소셜 로그인이 아닌 일반 가입 회원의 경우 직접 삭제
@@ -203,8 +204,9 @@ public class MemberService {
 		// *** 카카오 API를 사용하여 카카오 계정 연결 해제 로직 구현해주셔야합니다 ***
 		// *** 카카오 계정 연결 해제 작업 수행 ***
 		// HTTP Header 생성
+
 		String reqURL = "https://kapi.kakao.com/v1/user/unlink";
-		System.out.println(kakaoAccessToken + "토큰토큰");
+		System.out.println(kakaoAccessToken + "탈퇴 시작 로직 시작 !!!!!!!!! ");
 		try {
 			URL url = new URL(reqURL);
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -215,7 +217,7 @@ public class MemberService {
 			System.out.println("responseCode : " + responseCode);
 
 			BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-
+		
 			String result = "";
 			String line = "";
 
@@ -226,7 +228,7 @@ public class MemberService {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
+		System.out.println(kakaoAccessToken + "탈퇴 시작 로직 마무리 !!!!!!!!! ");
 		// HttpHeaders headers = new HttpHeaders();
 		// headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
 		// headers.add("Authorization", kakaoAccessToken);
