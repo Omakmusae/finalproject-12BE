@@ -12,7 +12,4 @@ public class MemberPasswordRequest {
 	@Pattern(regexp = "^(?=.*[0-9])(?=.*[a-zA-Z]).{8,15}$", message = "비밀번호는 8~15자 알파벳 대소문자, 숫자로 작성해주세요.")
 	private String newPassword;
 
-	// public MemberPasswordRequest(String newPassword){
-	// 	this.newPassword = newPassword;
-	// }
 }

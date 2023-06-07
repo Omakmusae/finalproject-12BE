@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.example.finalproject12be.domain.member.dto.request.MemberEmailRequest;
 import com.example.finalproject12be.domain.member.dto.request.MemberLoginRequest;
+import com.example.finalproject12be.domain.member.dto.request.MemberNameRequest;
 import com.example.finalproject12be.domain.member.dto.request.MemberPasswordRequest;
 import com.example.finalproject12be.domain.member.dto.request.MemberSignupRequest;
 import com.example.finalproject12be.domain.member.dto.response.MemberLoginResponse;
@@ -54,10 +55,10 @@ public class MemberController {
 
 	@PostMapping("/user/change/nickname")
 	public ResponseEntity<MemberNewNameResponse> changeNickname(
-		@RequestBody Map<String, String> newName,
+		@RequestBody @Valid MemberNameRequest memberNameRequest,
 		@AuthenticationPrincipal UserDetailsImpl userDetails
 	){
-		MemberNewNameResponse changeResult = memberService.changeNickname(newName, userDetails.getMember());
+		MemberNewNameResponse changeResult = memberService.changeNickname(memberNameRequest.getNewName(), userDetails.getMember());
 		return ResponseEntity.status(HttpStatus.OK).body(changeResult);
 	}
 
@@ -69,7 +70,6 @@ public class MemberController {
 		return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
 	}
 
-	//ing
 	@PostMapping("/user/find/password")
 	public ResponseEntity<Void> findPassword(
 		@RequestBody @Valid MemberEmailRequest memberEmailRequest

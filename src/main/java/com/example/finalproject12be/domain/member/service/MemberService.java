@@ -185,18 +185,17 @@ public class MemberService {
 	}
 
 	// @Transactional
-	public MemberNewNameResponse changeNickname(Map newName, Member member) {
-		String nickname = String.valueOf(newName.get("newName"));
-		Optional<Member> memberOptional = memberRepository.findByNickname(nickname);
+	public MemberNewNameResponse changeNickname(String newName, Member member) {
+		Optional<Member> memberOptional = memberRepository.findByNickname(newName);
 
 		if(memberOptional.isPresent()){
 			throw new RestApiException(MemberErrorCode.DUPLICATED_MEMBER);
 		}
 
-		member.updateName(nickname);
+		member.updateName(newName);
 		memberRepository.save(member);
 
-		return new MemberNewNameResponse(nickname);
+		return new MemberNewNameResponse(newName);
 	}
 
 	//ing
