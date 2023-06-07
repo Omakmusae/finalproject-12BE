@@ -97,72 +97,97 @@ public class MemberService {
 	public void logout(HttpServletRequest request, HttpServletResponse response) {
 
 		String accessToken = jwtUtil.resolveToken(request, JwtUtil.ACCESS_KEY);
+		String kakaoAccessToken = request.getHeader("Authorization");
 
-		if (accessToken != null) {
-			boolean isAccessTokenExpired = jwtUtil.validateToken(accessToken);
-			if (!isAccessTokenExpired) {
-				String username = jwtUtil.getUserInfoFromToken(accessToken);
-				// 액세스 토큰을 무효화하는 작업 수행
-				Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-				if (authentication != null && authentication.getPrincipal() instanceof UserDetailsImpl) {
-					UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-					if (username.equals(userDetails.getUsername())) {
-						SecurityContextHolder.clearContext();
+		if (kakaoAccessToken == null){
+			System.out.println("일반 로그아웃 실행 시작");
+			if (accessToken != null) {
+				boolean isAccessTokenExpired = jwtUtil.validateToken(accessToken);
+				if (!isAccessTokenExpired) {
+					String username = jwtUtil.getUserInfoFromToken(accessToken);
+					// 액세스 토큰을 무효화하는 작업 수행
+					Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+					if (authentication != null && authentication.getPrincipal() instanceof UserDetailsImpl) {
+						UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+						if (username.equals(userDetails.getUsername())) {
+							SecurityContextHolder.clearContext();
+						}
 					}
 				}
 			}
-		}
 
-		String refreshToken = jwtUtil.resolveToken(request, JwtUtil.REFRESH_KEY);
-		if (refreshToken != null) {
-			boolean isRefreshTokenValid = jwtUtil.refreshTokenValidation(refreshToken);
-			if (isRefreshTokenValid) {
-				String username = jwtUtil.getUserInfoFromToken(refreshToken);
-				// 리프레시 토큰을 무효화하는 작업 수행
-				// 여기에 리프레시 토큰을 저장하는 로직 또는 DB에서 삭제하는 로직을 추가해야 합니다.
+			String refreshToken = jwtUtil.resolveToken(request, JwtUtil.REFRESH_KEY);
+			if (refreshToken != null) {
+				boolean isRefreshTokenValid = jwtUtil.refreshTokenValidation(refreshToken);
+				if (isRefreshTokenValid) {
+					String username = jwtUtil.getUserInfoFromToken(refreshToken);
+					// 리프레시 토큰을 무효화하는 작업 수행
+					// 여기에 리프레시 토큰을 저장하는 로직 또는 DB에서 삭제하는 로직을 추가해야 합니다.
+				}
 			}
+
+			// 로그아웃 후 필요한 작업 수행
+			response.setHeader(jwtUtil.ACCESS_KEY, null);
+			response.setHeader(jwtUtil.REFRESH_KEY, null);
+		}
+		else { //소셜 회원 로그아웃 로직
+			System.out.println("소셜 로그아웃 실행 시작~~~~~~~~~~");
+			HttpHeaders headers = new HttpHeaders();
+			headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
+			headers.add("Authorization", kakaoAccessToken);
+
+			// HTTP Body 생성
+			MultiValueMap<String,String> body = new LinkedMultiValueMap<>();
+
+			HttpEntity<MultiValueMap<String, String>> kakaoTokenForDisconnect =
+				new HttpEntity<>(body, headers);
+			RestTemplate rt = new RestTemplate();
+			ResponseEntity<String> responseLogout = rt.exchange(
+				"https://kapi.kakao.com/v1/user/logout",
+				HttpMethod.POST,
+				kakaoTokenForDisconnect,
+				String.class
+			);
+			System.out.println("소셜 로그아웃 실행 성공!!!!!!!!!!!!!!!!!!!");
 		}
 
-		// 로그아웃 후 필요한 작업 수행
-		response.setHeader(jwtUtil.ACCESS_KEY, null);
-		response.setHeader(jwtUtil.REFRESH_KEY, null);
 	}
 
 	@Transactional
 	public void signout(String email, final HttpServletRequest request) {
 		Member member = memberRepository.findByEmail(email)
 				.orElseThrow(() ->  new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
-		System.out.println();
-		//String accessToken = request.getHeader("ACCESS_KEY");
-		//String accessToken = jwtUtil.resolveToken(request, JwtUtil.ACCESS_KEY);
+
+		String kakaoAccessToken = request.getHeader("Authorization");
+
 		if (member.getKakaoId() == null) {
 			// 카카오 소셜 로그인이 아닌 일반 가입 회원의 경우 직접 삭제
 			memberRepository.delete(member);
 		} else {
 			// 카카오 소셜 로그인 회원의 경우 카카오 계정 연결 해제 후 삭제
-			disconnectKakaoAccount(member);
+			disconnectKakaoAccount(member, kakaoAccessToken);
 			memberRepository.delete(member);
 		}
 	}
 
-	private void disconnectKakaoAccount(Member member) {
+	private void disconnectKakaoAccount(Member member, String kakaoAccessToken) {
 		// *** 카카오 API를 사용하여 카카오 계정 연결 해제 로직 구현해주셔야합니다 ***
 		// *** 카카오 계정 연결 해제 작업 수행 ***
 		// HTTP Header 생성
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
-		headers.add("Authorization", "KakaoAK f53119291f2ee3abe3793cee6d1f637f");
+		headers.add("Authorization", kakaoAccessToken);
 
 		// HTTP Body 생성
 		MultiValueMap<String,String> body = new LinkedMultiValueMap<>();
-		body.add("target_id_type", "user_id");
-		body.add("target_id", String.valueOf(member.getKakaoId()));
+		// body.add("target_id_type", "user_id");
+		// body.add("target_id", String.valueOf(member.getKakaoId()));
 
 		HttpEntity<MultiValueMap<String, String>> kakaoTokenForDisconnect =
 			new HttpEntity<>(body, headers);
 		RestTemplate rt = new RestTemplate();
-		ResponseEntity<String> response = rt.exchange(
+		ResponseEntity<String> responseSignOut = rt.exchange(
 			"https://kapi.kakao.com/v1/user/unlink",
 			HttpMethod.POST,
 			kakaoTokenForDisconnect,
