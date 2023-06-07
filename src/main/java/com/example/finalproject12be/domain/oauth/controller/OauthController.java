@@ -38,7 +38,7 @@ public class OauthController {
 		// 헤더로 바꿔야함!
 		response.addHeader("ACCESS_KEY", createAccessToken);
 		response.addHeader("REFRESH_KEY", createRefreshToken);
-		response.addHeader("Authorization", Authorization);
+		response.addHeader("kakaoAccess", Authorization);
 
 		MemberLoginResponse loginResult = new MemberLoginResponse(tokenArray[2],tokenArray[3]);
 		return ResponseEntity.status(HttpStatus.OK).body(loginResult);
