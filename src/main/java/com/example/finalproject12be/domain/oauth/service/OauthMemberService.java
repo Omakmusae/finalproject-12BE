@@ -52,7 +52,7 @@ public class OauthMemberService {
 		// 2. 토큰으로 카카오 API 호출 : "액세스 토큰"으로 "카카오 사용자 정보" 가져오기
 		KakaoMemberInfoRequest kakaoMemberInfo = getKakaoUserInfo(kakaoAccessToken);
 
-		// 3. 필요시에 회원가입
+		// 3. 필요시에 회원 가입
 		Member kakaoMember = registerKakaoUserIfNeeded(kakaoMemberInfo);
 
 		// 4. JWT 토큰 반환
