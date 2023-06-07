@@ -197,9 +197,4 @@ public class OauthMemberService {
 
 		return kakaoUser;
 	}
-
-	private void disconnectKakaoAccount(Member member) {
-		// *** 카카오 API를 사용하여 카카오 계정 연결 해제 로직 구현해주셔야합니다 ***
-		// *** 카카오 계정 연결 해제 작업 수행 ***
-	}
 }

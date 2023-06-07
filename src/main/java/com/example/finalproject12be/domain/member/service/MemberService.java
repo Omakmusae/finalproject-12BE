@@ -158,14 +158,14 @@ public class MemberService {
 		Member member = memberRepository.findByEmail(email)
 				.orElseThrow(() ->  new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
 
-		String kakaoAccessToken = request.getHeader("Authorization");
+		String kakaoAccessToken = request.getHeader("authorization");
 
 		if (member.getKakaoId() == null) {
 			// 카카오 소셜 로그인이 아닌 일반 가입 회원의 경우 직접 삭제
 			memberRepository.delete(member);
 		} else {
 			// 카카오 소셜 로그인 회원의 경우 카카오 계정 연결 해제 후 삭제
-			//disconnectKakaoAccount(member, kakaoAccessToken);
+			disconnectKakaoAccount(member, kakaoAccessToken);
 			memberRepository.delete(member);
 		}
 	}
