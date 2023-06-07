@@ -433,6 +433,20 @@ public class StoreService {
 
 		OneStoreResponseDto oneStoreResponseDto = new OneStoreResponseDto(store);
 
+		if(store.getSaturdayTime() != null){
+			oneStoreResponseDto.setSaturdayTime(store.getSaturdayTime());
+		}
+
+		if(store.getSundayTime() != null){
+			oneStoreResponseDto.setSundayTime(store.getSundayTime());
+		}
+
+		if(store.getHolidayTime() != null){
+			oneStoreResponseDto.setHolidayTime(store.getHolidayTime());
+		}
+
+
+
 		if(userDetails != null){
 			Member member = userDetails.getMember();
 
