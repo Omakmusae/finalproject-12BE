@@ -46,16 +46,6 @@ public class MemberController {
 		return ResponseEntity.status(HttpStatus.OK).body(loginResult);
 	}
 
-	@GetMapping("user/test")
-	public ResponseEntity<Void> test(
-		@AuthenticationPrincipal final UserDetailsImpl userDetails
-	) {
-		Member member = userDetails.getMember();
-		System.out.println(userDetails.getUsername());
-		System.out.println("테스트 통과");
-		return ResponseEntity.status(HttpStatus.OK).body(null);
-	}
-
 	@PostMapping("/user/logout")
 	public ResponseEntity<String> logout(HttpServletRequest request, final HttpServletResponse response) {
 		memberService.logout(request, response);
@@ -71,10 +61,11 @@ public class MemberController {
 		return ResponseEntity.status(HttpStatus.OK).body(changeResult);
 	}
 
-
-	@DeleteMapping("/user/signout/{email}")
-	public ResponseEntity<String> signout(@PathVariable String email) {
-		memberService.signout(email);
+	@DeleteMapping("/user/signout")
+	public ResponseEntity<String> signout(
+		@AuthenticationPrincipal UserDetailsImpl userDetails,
+		final HttpServletRequest request) {
+		memberService.signout(userDetails.getUsername(), request);
 		return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
 	}
 
@@ -95,4 +86,9 @@ public class MemberController {
 		memberService.changePassword(memberPasswordRequest.getNewPassword(), userDetails.getMember());
 		return ResponseEntity.status(HttpStatus.OK).body(null);
 	}
+
+
+
+
+
 }
