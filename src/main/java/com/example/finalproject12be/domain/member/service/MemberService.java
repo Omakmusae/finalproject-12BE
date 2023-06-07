@@ -176,28 +176,23 @@ public class MemberService {
 		//TODO: 예외 던지기
 		if(memberOptional.isPresent()){
 			Member member = memberOptional.get();
-			if(memberOptional.get().getId().equals(member.getId())){
 
-				int leftLimit = 97; // letter 'a'
-				int rightLimit = 122; // letter 'z'
-				int targetStringLength = 10;
-				Random random = new Random();
-				String newPassword = random.ints(leftLimit, rightLimit + 1)
-					.limit(targetStringLength)
-					.collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
-					.toString();
+			int leftLimit = 97; // letter 'a'
+			int rightLimit = 122; // letter 'z'
+			int targetStringLength = 10;
+			Random random = new Random();
+			String newPassword = random.ints(leftLimit, rightLimit + 1)
+				.limit(targetStringLength)
+				.collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+				.toString();
 
-				String encodePw = passwordEncoder.encode(newPassword);
-				member.updatePassword(encodePw);
-				memberRepository.save(member);
+			String encodePw = passwordEncoder.encode(newPassword);
+			member.updatePassword(encodePw);
+			memberRepository.save(member);
 
-				emailService.sendMail(newPassword, email);
-
-			}else {
-				throw new RestApiException(MemberErrorCode.INACTIVE_MEMBER);
-			}
+			emailService.sendMail(newPassword, email);
 		}else{
-			throw new RestApiException(MemberErrorCode.DUPLICATED_EMAIL);
+			throw new RestApiException(MemberErrorCode.INACTIVE_MEMBER);
 		}
 	}
 
