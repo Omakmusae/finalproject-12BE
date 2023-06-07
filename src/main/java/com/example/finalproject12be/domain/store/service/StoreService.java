@@ -251,74 +251,72 @@ public class StoreService {
 
 				progress = 1;
 
-				List<Store> newStores = new ArrayList<>();
+				stores = storeRepository.findAllByNightPharmacy(1);
 
-				stores = storeRepository.findAllByWeekdaysTimeContaining("24");
-
-				newStores = storeRepository.findAllByWeekdaysTimeContaining("25");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllByWeekdaysTimeContaining("26");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllByWeekdaysTimeContaining("27");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllBysaturdayTimeContaining("24");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllBysaturdayTimeContaining("25");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllBysaturdayTimeContaining("26");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllBysaturdayTimeContaining("27");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllBysundayTimeContaining("24");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllBysundayTimeContaining("25");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllBysundayTimeContaining("26");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllBysundayTimeContaining("27");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllBysundayTimeContaining("28");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllBysundayTimeContaining("29");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
+				// newStores = storeRepository.findAllByWeekdaysTimeContaining("25");
+				// for (Store store : newStores) {
+				// 	stores.add(store);
+				// }
+				//
+				// newStores = storeRepository.findAllByWeekdaysTimeContaining("26");
+				// for (Store store : newStores) {
+				// 	stores.add(store);
+				// }
+				//
+				// newStores = storeRepository.findAllByWeekdaysTimeContaining("27");
+				// for (Store store : newStores) {
+				// 	stores.add(store);
+				// }
+				//
+				// newStores = storeRepository.findAllBysaturdayTimeContaining("24");
+				// for (Store store : newStores) {
+				// 	stores.add(store);
+				// }
+				//
+				// newStores = storeRepository.findAllBysaturdayTimeContaining("25");
+				// for (Store store : newStores) {
+				// 	stores.add(store);
+				// }
+				//
+				// newStores = storeRepository.findAllBysaturdayTimeContaining("26");
+				// for (Store store : newStores) {
+				// 	stores.add(store);
+				// }
+				//
+				// newStores = storeRepository.findAllBysaturdayTimeContaining("27");
+				// for (Store store : newStores) {
+				// 	stores.add(store);
+				// }
+				//
+				// newStores = storeRepository.findAllBysundayTimeContaining("24");
+				// for (Store store : newStores) {
+				// 	stores.add(store);
+				// }
+				//
+				// newStores = storeRepository.findAllBysundayTimeContaining("25");
+				// for (Store store : newStores) {
+				// 	stores.add(store);
+				// }
+				//
+				// newStores = storeRepository.findAllBysundayTimeContaining("26");
+				// for (Store store : newStores) {
+				// 	stores.add(store);
+				// }
+				//
+				// newStores = storeRepository.findAllBysundayTimeContaining("27");
+				// for (Store store : newStores) {
+				// 	stores.add(store);
+				// }
+				//
+				// newStores = storeRepository.findAllBysundayTimeContaining("28");
+				// for (Store store : newStores) {
+				// 	stores.add(store);
+				// }
+				//
+				// newStores = storeRepository.findAllBysundayTimeContaining("29");
+				// for (Store store : newStores) {
+				// 	stores.add(store);
+				// }
 
 
 			}else if(progress == 1){
@@ -331,83 +329,87 @@ public class StoreService {
 
 				for(Store testStore : testStores){
 
-					if(testStore.getWeekdaysTime() != null){
-
-						String storeTime = testStore.getWeekdaysTime();
-
-						String[] storeTimes = storeTime.split("~");
-						String closeHour = storeTimes[1].substring(0, 2);
-
-						if(closeHour.equals("24")) {
-							continue;
-						}else if(closeHour.equals("25")){
-							continue;
-						}else if(closeHour.equals("26")){
-							continue;
-						}else if(closeHour.equals("27")){
-							continue;
-						}else if(closeHour.equals("28")){
-							continue;
-						}else if(closeHour.equals("29")){
-							continue;
-						}else if(closeHour.equals("30")){
-							continue;
-						}else{
-							stores.remove(testStore);
-						}
-					}
-
-				if(testStore.getSaturdayTime() != null){
-
-					String storeTime = testStore.getSaturdayTime();
-
-					String[] storeTimes = storeTime.split("~");
-					String closeHour = storeTimes[1].substring(0, 2);
-
-					if(closeHour.equals("24")) {
-						continue;
-					}else if(closeHour.equals("25")){
-						continue;
-					}else if(closeHour.equals("26")){
-						continue;
-					}else if(closeHour.equals("27")){
-						continue;
-					}else if(closeHour.equals("28")){
-						continue;
-					}else if(closeHour.equals("29")){
-						continue;
-					}else if(closeHour.equals("30")){
-						continue;
-					}else{
+					if(testStore.getNightPharmacy() != 1){
 						stores.remove(testStore);
 					}
-				}
 
-				if (testStore.getSundayTime() != null){
-
-						String storeTime = testStore.getSundayTime();
-
-						String[] storeTimes = storeTime.split("~");
-						String closeHour = storeTimes[1].substring(0, 2);
-
-						if(closeHour.equals("24")) {
-							continue;
-						}else if(closeHour.equals("25")){
-							continue;
-						}else if(closeHour.equals("26")){
-							continue;
-						}else if(closeHour.equals("27")){
-							continue;
-						}else if(closeHour.equals("28")){
-							continue;
-						}else if(closeHour.equals("29")){
-							continue;
-						}else if(closeHour.equals("30")){
-							continue;
-						}else{
-							stores.remove(testStore);
-						}
-					}
+				// 	if(testStore.getWeekdaysTime() != null){
+				//
+				// 		String storeTime = testStore.getWeekdaysTime();
+				//
+				// 		String[] storeTimes = storeTime.split("~");
+				// 		String closeHour = storeTimes[1].substring(0, 2);
+				//
+				// 		if(closeHour.equals("24")) {
+				// 			continue;
+				// 		}else if(closeHour.equals("25")){
+				// 			continue;
+				// 		}else if(closeHour.equals("26")){
+				// 			continue;
+				// 		}else if(closeHour.equals("27")){
+				// 			continue;
+				// 		}else if(closeHour.equals("28")){
+				// 			continue;
+				// 		}else if(closeHour.equals("29")){
+				// 			continue;
+				// 		}else if(closeHour.equals("30")){
+				// 			continue;
+				// 		}else{
+				// 			stores.remove(testStore);
+				// 		}
+				// 	}
+				//
+				// if(testStore.getSaturdayTime() != null){
+				//
+				// 	String storeTime = testStore.getSaturdayTime();
+				//
+				// 	String[] storeTimes = storeTime.split("~");
+				// 	String closeHour = storeTimes[1].substring(0, 2);
+				//
+				// 	if(closeHour.equals("24")) {
+				// 		continue;
+				// 	}else if(closeHour.equals("25")){
+				// 		continue;
+				// 	}else if(closeHour.equals("26")){
+				// 		continue;
+				// 	}else if(closeHour.equals("27")){
+				// 		continue;
+				// 	}else if(closeHour.equals("28")){
+				// 		continue;
+				// 	}else if(closeHour.equals("29")){
+				// 		continue;
+				// 	}else if(closeHour.equals("30")){
+				// 		continue;
+				// 	}else{
+				// 		stores.remove(testStore);
+				// 	}
+				// }
+				//
+				// if (testStore.getSundayTime() != null){
+				//
+				// 		String storeTime = testStore.getSundayTime();
+				//
+				// 		String[] storeTimes = storeTime.split("~");
+				// 		String closeHour = storeTimes[1].substring(0, 2);
+				//
+				// 		if(closeHour.equals("24")) {
+				// 			continue;
+				// 		}else if(closeHour.equals("25")){
+				// 			continue;
+				// 		}else if(closeHour.equals("26")){
+				// 			continue;
+				// 		}else if(closeHour.equals("27")){
+				// 			continue;
+				// 		}else if(closeHour.equals("28")){
+				// 			continue;
+				// 		}else if(closeHour.equals("29")){
+				// 			continue;
+				// 		}else if(closeHour.equals("30")){
+				// 			continue;
+				// 		}else{
+				// 			stores.remove(testStore);
+				// 		}
+				// 	}
 				}
 			}
 		}
@@ -730,74 +732,76 @@ public class StoreService {
 
 				progress = 1;
 
-				List<Store> newStores = new ArrayList<>();
+				// List<Store> newStores = new ArrayList<>();
 
-				stores = storeRepository.findAllByWeekdaysTimeContaining("24");
+				stores = storeRepository.findAllByNightPharmacy(1);
 
-				newStores = storeRepository.findAllByWeekdaysTimeContaining("25");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
+				// stores = storeRepository.findAllByWeekdaysTimeContaining("24");
 
-				newStores = storeRepository.findAllByWeekdaysTimeContaining("26");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllByWeekdaysTimeContaining("27");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllBysaturdayTimeContaining("24");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllBysaturdayTimeContaining("25");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllBysaturdayTimeContaining("26");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllBysaturdayTimeContaining("27");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllBysundayTimeContaining("24");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllBysundayTimeContaining("25");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllBysundayTimeContaining("26");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllBysundayTimeContaining("27");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllBysundayTimeContaining("28");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllBysundayTimeContaining("29");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
+				// newStores = storeRepository.findAllByWeekdaysTimeContaining("25");
+				// for (Store store : newStores) {
+				// 	stores.add(store);
+				// }
+				//
+				// newStores = storeRepository.findAllByWeekdaysTimeContaining("26");
+				// for (Store store : newStores) {
+				// 	stores.add(store);
+				// }
+				//
+				// newStores = storeRepository.findAllByWeekdaysTimeContaining("27");
+				// for (Store store : newStores) {
+				// 	stores.add(store);
+				// }
+				//
+				// newStores = storeRepository.findAllBysaturdayTimeContaining("24");
+				// for (Store store : newStores) {
+				// 	stores.add(store);
+				// }
+				//
+				// newStores = storeRepository.findAllBysaturdayTimeContaining("25");
+				// for (Store store : newStores) {
+				// 	stores.add(store);
+				// }
+				//
+				// newStores = storeRepository.findAllBysaturdayTimeContaining("26");
+				// for (Store store : newStores) {
+				// 	stores.add(store);
+				// }
+				//
+				// newStores = storeRepository.findAllBysaturdayTimeContaining("27");
+				// for (Store store : newStores) {
+				// 	stores.add(store);
+				// }
+				//
+				// newStores = storeRepository.findAllBysundayTimeContaining("24");
+				// for (Store store : newStores) {
+				// 	stores.add(store);
+				// }
+				//
+				// newStores = storeRepository.findAllBysundayTimeContaining("25");
+				// for (Store store : newStores) {
+				// 	stores.add(store);
+				// }
+				//
+				// newStores = storeRepository.findAllBysundayTimeContaining("26");
+				// for (Store store : newStores) {
+				// 	stores.add(store);
+				// }
+				//
+				// newStores = storeRepository.findAllBysundayTimeContaining("27");
+				// for (Store store : newStores) {
+				// 	stores.add(store);
+				// }
+				//
+				// newStores = storeRepository.findAllBysundayTimeContaining("28");
+				// for (Store store : newStores) {
+				// 	stores.add(store);
+				// }
+				//
+				// newStores = storeRepository.findAllBysundayTimeContaining("29");
+				// for (Store store : newStores) {
+				// 	stores.add(store);
+				// }
 			}else if(progress == 1){
 
 				//test
@@ -808,84 +812,89 @@ public class StoreService {
 
 				for(Store testStore : testStores){
 
-					if(testStore.getWeekdaysTime() != null){
+					if(testStore.getNightPharmacy() != 1){
 
-						String storeTime = testStore.getWeekdaysTime();
-
-						String[] storeTimes = storeTime.split("~");
-						String closeHour = storeTimes[1].substring(0, 2);
-
-						if(closeHour.equals("24")) {
-							continue;
-						}else if(closeHour.equals("25")){
-							continue;
-						}else if(closeHour.equals("26")){
-							continue;
-						}else if(closeHour.equals("27")){
-							continue;
-						}else if(closeHour.equals("28")){
-							continue;
-						}else if(closeHour.equals("29")){
-							continue;
-						}else if(closeHour.equals("30")){
-							continue;
-						}else{
-							stores.remove(testStore);
-						}
-
+						stores.remove(testStore);
 					}
 
-					if(testStore.getSaturdayTime() != null){
-
-						String storeTime = testStore.getSaturdayTime();
-
-						String[] storeTimes = storeTime.split("~");
-						String closeHour = storeTimes[1].substring(0, 2);
-
-						if(closeHour.equals("24")) {
-							continue;
-						}else if(closeHour.equals("25")){
-							continue;
-						}else if(closeHour.equals("26")){
-							continue;
-						}else if(closeHour.equals("27")){
-							continue;
-						}else if(closeHour.equals("28")){
-							continue;
-						}else if(closeHour.equals("29")){
-							continue;
-						}else if(closeHour.equals("30")){
-							continue;
-						}else{
-							stores.remove(testStore);
-						}
-					}
-
-					if (testStore.getSundayTime() != null){
-
-						String storeTime = testStore.getSundayTime();
-
-						String[] storeTimes = storeTime.split("~");
-						String closeHour = storeTimes[1].substring(0, 2);
-
-						if(closeHour.equals("24")) {
-							continue;
-						}else if(closeHour.equals("25")){
-							continue;
-						}else if(closeHour.equals("26")){
-							continue;
-						}else if(closeHour.equals("27")){
-							continue;
-						}else if(closeHour.equals("28")){
-							continue;
-						}else if(closeHour.equals("29")){
-							continue;
-						}else if(closeHour.equals("30")){
-							continue;
-						}else{
-							stores.remove(testStore);
-						}
-					}
+					// if(testStore.getWeekdaysTime() != null){
+					//
+					// 	String storeTime = testStore.getWeekdaysTime();
+					//
+					// 	String[] storeTimes = storeTime.split("~");
+					// 	String closeHour = storeTimes[1].substring(0, 2);
+					//
+					// 	if(closeHour.equals("24")) {
+					// 		continue;
+					// 	}else if(closeHour.equals("25")){
+					// 		continue;
+					// 	}else if(closeHour.equals("26")){
+					// 		continue;
+					// 	}else if(closeHour.equals("27")){
+					// 		continue;
+					// 	}else if(closeHour.equals("28")){
+					// 		continue;
+					// 	}else if(closeHour.equals("29")){
+					// 		continue;
+					// 	}else if(closeHour.equals("30")){
+					// 		continue;
+					// 	}else{
+					// 		stores.remove(testStore);
+					// 	}
+					//
+					// }
+					//
+					// if(testStore.getSaturdayTime() != null){
+					//
+					// 	String storeTime = testStore.getSaturdayTime();
+					//
+					// 	String[] storeTimes = storeTime.split("~");
+					// 	String closeHour = storeTimes[1].substring(0, 2);
+					//
+					// 	if(closeHour.equals("24")) {
+					// 		continue;
+					// 	}else if(closeHour.equals("25")){
+					// 		continue;
+					// 	}else if(closeHour.equals("26")){
+					// 		continue;
+					// 	}else if(closeHour.equals("27")){
+					// 		continue;
+					// 	}else if(closeHour.equals("28")){
+					// 		continue;
+					// 	}else if(closeHour.equals("29")){
+					// 		continue;
+					// 	}else if(closeHour.equals("30")){
+					// 		continue;
+					// 	}else{
+					// 		stores.remove(testStore);
+					// 	}
+					// }
+					//
+					// if (testStore.getSundayTime() != null){
+					//
+					// 	String storeTime = testStore.getSundayTime();
+					//
+					// 	String[] storeTimes = storeTime.split("~");
+					// 	String closeHour = storeTimes[1].substring(0, 2);
+					//
+					// 	if(closeHour.equals("24")) {
+					// 		continue;
+					// 	}else if(closeHour.equals("25")){
+					// 		continue;
+					// 	}else if(closeHour.equals("26")){
+					// 		continue;
+					// 	}else if(closeHour.equals("27")){
+					// 		continue;
+					// 	}else if(closeHour.equals("28")){
+					// 		continue;
+					// 	}else if(closeHour.equals("29")){
+					// 		continue;
+					// 	}else if(closeHour.equals("30")){
+					// 		continue;
+					// 	}else{
+					// 		stores.remove(testStore);
+					// 	}
+					// }
 				}
 			}
 		}
