@@ -987,6 +987,18 @@ public class StoreService {
 
 		ForeignOneStoreResponse foreignOneStoreResponse = new ForeignOneStoreResponse(store);
 
+		if(store.getSaturdayTime() != null){
+			foreignOneStoreResponse.setSaturdayTime(store.getSaturdayTime());
+		}
+
+		if(store.getSundayTime() != null){
+			foreignOneStoreResponse.setSundayTime(store.getSundayTime());
+		}
+
+		if(store.getHolidayTime() != null){
+			foreignOneStoreResponse.setHolidayTime(store.getHolidayTime());
+		}
+
 		if(userDetails != null){
 			Member member = userDetails.getMember();
 

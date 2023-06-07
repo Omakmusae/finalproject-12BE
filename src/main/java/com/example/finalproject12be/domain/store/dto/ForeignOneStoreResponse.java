@@ -11,9 +11,9 @@ public class ForeignOneStoreResponse {
 	private final String name;
 	private final String callNumber;
 	private final String weekdaysTime;
-	private final String saturdayTime;
-	private final String sundayTime;
-	private final String holidayTime;
+	private String saturdayTime = null;
+	private String sundayTime = null;
+	private String holidayTime = null;
 	private final Double longitude;
 	private final Double latitude;
 	private boolean nightBusiness = false;
@@ -29,9 +29,6 @@ public class ForeignOneStoreResponse {
 		this.name = store.getName();
 		this.callNumber = store.getCallNumber();
 		this.weekdaysTime = store.getWeekdaysTime();
-		this.saturdayTime = store.getSaturdayTime().substring(2, 15);
-		this.sundayTime = store.getSundayTime().substring(2, 15);
-		this.holidayTime = store.getHolidayTime().substring(4, 17);
 		this.longitude = store.getLongitude();
 		this.latitude = store.getLatitude();
 		// this.totalBookmark = store.getBookmarks().size();
@@ -56,5 +53,17 @@ public class ForeignOneStoreResponse {
 
 	public void setNightBusiness(boolean nightBusiness){
 		this.nightBusiness = nightBusiness;
+	}
+
+	public void setSaturdayTime(String saturdayTime){
+		this.saturdayTime = saturdayTime.substring(2, 15);
+	}
+
+	public void setSundayTime(String sundayTime){
+		this.sundayTime = sundayTime.substring(2, 15);
+	}
+
+	public void setHolidayTime(String holidayTime){
+		this.holidayTime = holidayTime.substring(4, 17);
 	}
 }
