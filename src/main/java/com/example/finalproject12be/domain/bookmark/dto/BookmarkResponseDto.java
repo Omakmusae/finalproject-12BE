@@ -16,6 +16,7 @@ public class BookmarkResponseDto {
 	private long totalBookmark;
 	private boolean holidayBusiness = false;
 	private boolean nightBusiness = false;
+	private boolean foreign = false;
 
 	public BookmarkResponseDto(Store store) {
 		this.storeId = store.getId();
@@ -33,4 +34,6 @@ public class BookmarkResponseDto {
 	public void setNightBusiness(boolean nightBusiness){
 		this.nightBusiness = nightBusiness;
 	}
+
+	public void setForeign(boolean foreign){ this.foreign = foreign; }
 }
