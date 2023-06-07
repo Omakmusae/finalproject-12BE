@@ -165,7 +165,7 @@ public class MemberService {
 			memberRepository.delete(member);
 		} else {
 			// 카카오 소셜 로그인 회원의 경우 카카오 계정 연결 해제 후 삭제
-			disconnectKakaoAccount(member, kakaoAccessToken);
+			//disconnectKakaoAccount(member, kakaoAccessToken);
 			memberRepository.delete(member);
 		}
 	}

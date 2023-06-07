@@ -6,9 +6,16 @@ import lombok.Getter;
 public class MemberLoginResponse {
 	private String email;
 	private String nickname;
+	private String kakaoAccessToken;
 
+	public MemberLoginResponse(String email, String nickname, String kakaoAccessToken) {
+		this.email = email;
+		this.nickname = nickname;
+		this.kakaoAccessToken = kakaoAccessToken;
+	}
 	public MemberLoginResponse(String email, String nickname) {
 		this.email = email;
 		this.nickname = nickname;
+
 	}
 }
