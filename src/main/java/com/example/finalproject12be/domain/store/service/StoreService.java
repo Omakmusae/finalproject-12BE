@@ -526,7 +526,7 @@ public class StoreService {
 
 				String storeTime = testStore.getSaturdayTime();
 
-				if (storeTime != null){
+				if (storeTime != null && !storeTime.contains("nu")){
 					String[] storeTimes = storeTime.split("~");
 
 					openHour = Integer.parseInt(storeTimes[0].substring(2, 4));
@@ -542,7 +542,7 @@ public class StoreService {
 
 				String storeTime = testStore.getSundayTime();
 
-				if(storeTime != null){
+				if(storeTime != null && !storeTime.contains("nu")){
 					String[] storeTimes = storeTime.split("~");
 
 					openHour = Integer.parseInt(storeTimes[0].substring(2, 4));
