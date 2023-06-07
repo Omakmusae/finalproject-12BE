@@ -83,7 +83,12 @@ public class CommentService {
         for (Comment comment : comments) {
             boolean isCurrentUserComment = comment.getMember().getId().equals(userDetails.getMember().getId());
             Store store = comment.getStore(); // 댓글이 속한 상점 객체 가져오기
+
             CommentResponseDto responseDto = new CommentResponseDto(comment, isCurrentUserComment, store);
+
+            boolean isForeignLanguageStore = store.getForeignLanguage() != null && store.getForeignLanguage() == 1;
+            responseDto.setForeign(isForeignLanguageStore);
+
             responseDtos.add(responseDto);
         }
 

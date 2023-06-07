@@ -6,10 +6,12 @@ import com.example.finalproject12be.domain.store.entity.Store;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Getter
+@Setter
 @NoArgsConstructor
 public class CommentResponseDto {
     private Long commentId;
@@ -18,6 +20,7 @@ public class CommentResponseDto {
     private String nickname;
     private String contents;
     private boolean check;
+    private boolean foreign = false;
     private String createdAt;
     private String address;
 
@@ -58,5 +61,8 @@ public class CommentResponseDto {
         this.name = store.getName();
         this.callNumber = store.getCallNumber();
         this.weekdaysTime = store.getWeekdaysTime();
+        this.foreign = store.getForeignLanguage() != null && store.getForeignLanguage() == 1; // 외국어 가능약국 여부 설정
     }
+
+
 }
