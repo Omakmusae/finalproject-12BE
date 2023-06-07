@@ -61,7 +61,6 @@ public class MemberController {
 		return ResponseEntity.status(HttpStatus.OK).body(changeResult);
 	}
 
-
 	@DeleteMapping("/user/signout")
 	public ResponseEntity<String> signout(
 		@AuthenticationPrincipal UserDetailsImpl userDetails,
