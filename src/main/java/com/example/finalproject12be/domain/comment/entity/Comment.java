@@ -44,8 +44,6 @@ public class Comment extends Timestamped {
     @Column(nullable = false)
     private String contents;
 
-
-
     public Comment(CommentRequestDto commentRequestDto, Store store, Member member) {
         this.contents = commentRequestDto.getContents();
         this.member = member;

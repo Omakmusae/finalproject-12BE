@@ -2,6 +2,7 @@ package com.example.finalproject12be.domain.member.entity;
 
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -39,7 +40,7 @@ public class Member {
 	@Column(nullable = true)
 	private Long kakaoId;
 
-	@OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
+	@OneToMany(mappedBy = "member", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
 	private List<Bookmark> bookmarks;
 
 	public Member(String email, String password, String nickname) {
