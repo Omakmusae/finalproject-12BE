@@ -51,5 +51,4 @@ public class Comment extends Timestamped {
         this.nickname = member.getNickname();
     }
 
-
 }

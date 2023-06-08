@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 //import org.springframework.security.crypto.password.PasswordEncoder;
+import com.example.finalproject12be.domain.comment.repository.CommentRepository;
 import com.example.finalproject12be.domain.member.dto.response.MemberLoginResponse;
 import com.example.finalproject12be.domain.member.dto.response.MemberNewNameResponse;
 import com.example.finalproject12be.exception.MemberErrorCode;
@@ -56,6 +57,7 @@ public class MemberService {
 	private final PasswordEncoder passwordEncoder;
 	private final RefreshTokenRepository refreshTokenRepository;
 	private final EmailService emailService;
+	private final CommentRepository commentRepository;
 
 	@Transactional
 	public void signup(final MemberSignupRequest memberSignupRequest) {
@@ -188,14 +190,14 @@ public class MemberService {
 				.orElseThrow(() ->  new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
 
 		String kakaoAccessToken = request.getHeader("authorization");
-		System.out.println(kakaoAccessToken + "!!!!!!!!!!!!!!!!!!!kakao 토큰!!!!!!!!!!!!!!!!!!!");
-		System.out.println("토큰토큰 확인확인" + kakaoAccessToken);
+
 		if (member.getKakaoId() == null) {
 			// 카카오 소셜 로그인이 아닌 일반 가입 회원의 경우 직접 삭제
 			memberRepository.delete(member);
 		} else {
 			// 카카오 소셜 로그인 회원의 경우 카카오 계정 연결 해제 후 삭제
 			disconnectKakaoAccount(kakaoAccessToken);
+			commentRepository.deleteCommentsByMemberId(member.getId());//수정 필요
 			memberRepository.delete(member);
 		}
 	}
@@ -204,50 +206,40 @@ public class MemberService {
 		// *** 카카오 API를 사용하여 카카오 계정 연결 해제 로직 구현해주셔야합니다 ***
 		// *** 카카오 계정 연결 해제 작업 수행 ***
 		// HTTP Header 생성
-
 		String reqURL = "https://kapi.kakao.com/v1/user/unlink";
 		System.out.println(kakaoAccessToken + "탈퇴 시작 로직 시작 !!!!!!!!! ");
 		try {
-			URL url = new URL(reqURL);
-			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-			conn.setRequestMethod("POST");
-			conn.setRequestProperty("Authorization", kakaoAccessToken);
+			// HTTP Header 생성
+			HttpHeaders headers = new HttpHeaders();
+			headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
+			headers.add("Authorization", kakaoAccessToken);
 
-			int responseCode = conn.getResponseCode();
+			// HTTP Body 생성
+			MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+			body.add("message", "탈퇴 완료");
+
+			// HTTP 요청을 보낼 RestTemplate 객체 생성
+			RestTemplate restTemplate = new RestTemplate();
+
+			// HTTP 요청을 보내고 응답 받기
+			ResponseEntity<String> response = restTemplate.exchange(
+				reqURL,
+				HttpMethod.POST,
+				new HttpEntity<>(body, headers),
+				String.class
+			);
+
+			// 응답코드 확인
+			int responseCode = response.getStatusCodeValue();
 			System.out.println("responseCode : " + responseCode);
 
-			BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-		
-			String result = "";
-			String line = "";
-
-			while ((line = br.readLine()) != null) {
-				result += line;
-			}
+			// 응답 결과 출력
+			String result = response.getBody();
 			System.out.println(result);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		System.out.println(kakaoAccessToken + "탈퇴 시작 로직 마무리 !!!!!!!!! ");
-		// HttpHeaders headers = new HttpHeaders();
-		// headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
-		// headers.add("Authorization", kakaoAccessToken);
-		//
-		// // HTTP Body 생성
-		// MultiValueMap<String,String> body = new LinkedMultiValueMap<>();
-		// body.add("message", "탈퇴 완료");
-		// HttpEntity<MultiValueMap<String, String>> kakaoTokenDisconnect =
-		// 	new HttpEntity<>(body, headers);
-		// RestTemplate rt = new RestTemplate();
-		// System.out.println("HTTP!!!!!!!!!!~");
-		//
-		// ResponseEntity<String> signOut = rt.exchange(
-		// 	"https://kapi.kakao.com/v1/user/unlink",
-		// 	HttpMethod.POST,
-		// 	kakaoTokenDisconnect,
-		// 	String.class
-		// );
-		// System.out.println("소셜 계정 삭제 실행 완료!!!!!!!!!!~");
 	}
 
 	private void throwIfExistOwner(String loginEmail, String loginNickName) {

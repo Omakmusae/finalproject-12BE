@@ -32,10 +32,10 @@ public class MemberController {
 	private final MemberService memberService;
 
 	@PostMapping("/user/signup")
-	public ResponseEntity<Void> signup(@RequestBody @Valid final MemberSignupRequest memberSignupRequest) {
+	public ResponseEntity<String> signup(@RequestBody @Valid final MemberSignupRequest memberSignupRequest) {
 
 		memberService.signup(memberSignupRequest);
-		return ResponseEntity.status(HttpStatus.OK).body(null);
+		return ResponseEntity.status(HttpStatus.OK).body("회원가입 완료");
 	}
 
 	@PostMapping("/user/login")
