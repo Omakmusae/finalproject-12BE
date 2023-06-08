@@ -433,6 +433,20 @@ public class StoreService {
 
 		OneStoreResponseDto oneStoreResponseDto = new OneStoreResponseDto(store);
 
+		if(store.getSaturdayTime() != null){
+			oneStoreResponseDto.setSaturdayTime(store.getSaturdayTime());
+		}
+
+		if(store.getSundayTime() != null){
+			oneStoreResponseDto.setSundayTime(store.getSundayTime());
+		}
+
+		if(store.getHolidayTime() != null){
+			oneStoreResponseDto.setHolidayTime(store.getHolidayTime());
+		}
+
+
+
 		if(userDetails != null){
 			Member member = userDetails.getMember();
 
@@ -972,6 +986,18 @@ public class StoreService {
 			.orElseThrow(() -> new IllegalArgumentException("해당 약국은 존재하지 않습니다."));
 
 		ForeignOneStoreResponse foreignOneStoreResponse = new ForeignOneStoreResponse(store);
+
+		if(store.getSaturdayTime() != null){
+			foreignOneStoreResponse.setSaturdayTime(store.getSaturdayTime());
+		}
+
+		if(store.getSundayTime() != null){
+			foreignOneStoreResponse.setSundayTime(store.getSundayTime());
+		}
+
+		if(store.getHolidayTime() != null){
+			foreignOneStoreResponse.setHolidayTime(store.getHolidayTime());
+		}
 
 		if(userDetails != null){
 			Member member = userDetails.getMember();
