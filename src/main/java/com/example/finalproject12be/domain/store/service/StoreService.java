@@ -507,7 +507,7 @@ public class StoreService {
 
 		for (Store testStore : testStores) {
 
-			int status = 0;
+			int status = 0; //시간 null이면 1, 아니면 0
 
 			if (dayOfWeek > 0 && dayOfWeek < 6) { //평일
 
@@ -525,7 +525,7 @@ public class StoreService {
 					// }
 
 					openHour = Integer.parseInt(storeTimes[0].substring(3, 5));
-					openMin = Integer.parseInt(storeTimes[0].substring(6, 8)); //원래: 6
+					openMin = Integer.parseInt(storeTimes[0].substring(6, 8));
 
 					closeHour = Integer.parseInt(storeTimes[1].substring(1, 3));
 					closeMin = Integer.parseInt(storeTimes[1].substring(4, 6));
@@ -572,16 +572,31 @@ public class StoreService {
 			}
 
 			if(status != 1){
-				if(nowHour < 5){
-					nowHour = nowHour + 24;
+				// if(closeHour <= 6){
+				// 	closeHour += 24;
+				// }
+				// if((openHour > nowHour) && (closeHour > nowHour)){
+				// 	stores.remove(testStore);
+				// }else if((openHour < nowHour) && (closeHour < nowHour)){
+				// 	stores.remove(testStore);
+				// }else if(openHour == nowHour && openMin > nowMin){
+				// 	stores.remove(testStore);
+				// } else if(closeHour == nowHour && closeMin < nowMin){ //현재 시간이 영업 시간에 포함되지 않을 때
+				// 	stores.remove(testStore);
+				// }
+
+				if((openHour < nowHour) && (closeHour > nowHour)){
+					continue;
+				}else if((openHour == nowHour) && (openMin < nowMin)){
+					continue;
+				}else if((closeHour == nowHour) && (closeMin > nowMin)){
+					continue;
+				}else if((closeHour == openHour)){
+					continue;
+				}else{
+					stores.remove(testStore);
 				}
-				if((openHour > nowHour) || (closeHour < nowHour)){
-					stores.remove(testStore);
-				}else if(openHour == nowHour && openMin > nowMin){
-					stores.remove(testStore);
-				} else if(closeHour == nowHour && closeMin < nowMin){ //현재 시간이 영업 시간에 포함되지 않을 때
-					stores.remove(testStore);
-				}
+
 			}
 		}
 		return stores;
