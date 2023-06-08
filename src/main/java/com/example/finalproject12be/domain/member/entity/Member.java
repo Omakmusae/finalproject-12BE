@@ -60,8 +60,6 @@ public class Member {
 		return new Member(email, password, nickname);
 	}
 
-
-
 	public void deleteBookmark(Bookmark bookmark){
 		this.bookmarks.remove(bookmark);
 	}
