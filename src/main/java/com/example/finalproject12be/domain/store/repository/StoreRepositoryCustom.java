@@ -48,6 +48,8 @@ public class StoreRepositoryCustom {
 		}
 	}
 
+
+
 	private NumberExpression<Double> distance(double baseLatitude, double baseLongitude, NumberPath<Double> latitude, NumberPath<Double> longitude) {
 		double earthRadius = 6371; // 지구 반지름 (단위: km)
 		double baseLatitudeRad = Math.toRadians(baseLatitude);
@@ -57,6 +59,7 @@ public class StoreRepositoryCustom {
 			"({0} * acos(cos({1}) * cos(radians({3})) * cos(radians({4})-{2}) + sin({1}) * sin(radians({3}))))",
 			earthRadius, baseLatitudeRad, baseLongitudeRad, latitude, longitude);
 	}
+
 
 }
 
