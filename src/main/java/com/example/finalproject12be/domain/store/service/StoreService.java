@@ -544,10 +544,10 @@ public class StoreService {
 					String[] storeTimes = storeTime.split("~");
 
 					openHour = Integer.parseInt(storeTimes[0].substring(2, 4));
-					openMin = Integer.parseInt(storeTimes[0].substring(5));
+					openMin = Integer.parseInt(storeTimes[0].substring(5, 7));
 
-					closeHour = Integer.parseInt(storeTimes[1].substring(0, 2));
-					closeMin = Integer.parseInt(storeTimes[1].substring(3));
+					closeHour = Integer.parseInt(storeTimes[1].substring(1, 3));
+					closeMin = Integer.parseInt(storeTimes[1].substring(4, 6));
 				}else{
 					status = 1;
 					stores.remove(testStore);
@@ -560,10 +560,10 @@ public class StoreService {
 					String[] storeTimes = storeTime.split("~");
 
 					openHour = Integer.parseInt(storeTimes[0].substring(2, 4));
-					openMin = Integer.parseInt(storeTimes[0].substring(5));
+					openMin = Integer.parseInt(storeTimes[0].substring(5, 7));
 
-					closeHour = Integer.parseInt(storeTimes[1].substring(0, 2));
-					closeMin = Integer.parseInt(storeTimes[1].substring(3));
+					closeHour = Integer.parseInt(storeTimes[1].substring(1, 3));
+					closeMin = Integer.parseInt(storeTimes[1].substring(4, 6));
 				}else {
 
 					status = 1;
