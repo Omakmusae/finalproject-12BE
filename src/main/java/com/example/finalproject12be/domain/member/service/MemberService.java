@@ -6,6 +6,10 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
@@ -17,6 +21,9 @@ import javax.servlet.http.HttpServletResponse;
 import com.example.finalproject12be.domain.comment.repository.CommentRepository;
 import com.example.finalproject12be.domain.member.dto.response.MemberLoginResponse;
 import com.example.finalproject12be.domain.member.dto.response.MemberNewNameResponse;
+import com.example.finalproject12be.domain.validNumber.entity.ValidNumber;
+import com.example.finalproject12be.domain.validNumber.repository.ValidNumberRepository;
+import com.example.finalproject12be.exception.CommonErrorCode;
 import com.example.finalproject12be.exception.MemberErrorCode;
 import com.example.finalproject12be.exception.RestApiException;
 import com.example.finalproject12be.security.UserDetailsImpl;
@@ -58,6 +65,7 @@ public class MemberService {
 	private final RefreshTokenRepository refreshTokenRepository;
 	private final EmailService emailService;
 	private final CommentRepository commentRepository;
+	private final ValidNumberRepository validNumberRepository;
 
 	@Transactional
 	public void signup(final MemberSignupRequest memberSignupRequest) {
@@ -293,7 +301,7 @@ public class MemberService {
 			member.updatePassword(encodePw);
 			memberRepository.save(member);
 
-			emailService.sendMail(newPassword, email);
+			emailService.sendPassword(newPassword, email);
 		}else{
 			throw new RestApiException(MemberErrorCode.INACTIVE_MEMBER);
 		}
@@ -307,23 +315,62 @@ public class MemberService {
 
 	}
 
-	// @Override
+	//ing
+	public void checkEmail(String email) {
 
-	// public void mailSend() {
-	//
-	// 	@Autowired
-	// 	MailSender mailSender;
-	//
-	//
-	//
-	// 	// System.out.println("전송 완료!");
-	// 	SimpleMailMessage message = new SimpleMailMessage();
-	// 	message.setTo("kmskes1125@gmail.com"); //수신자 설정
-	// 	message.setSubject("오디약! 비밀번호 변경"); //메일 제목
-	// 	message.setText("이건 메일 내용이고 임시 비밀번호를 보낼 예정입니다."); //메일 내용 설정
-	// 	message.setFrom("kmskes0917@naver.com"); //발신자 설정
-	// 	// message.setReplyTo("보낸이@naver.com");
-	// 	// System.out.println("message"+message);
-	// 	mailSender.send(message);
-	// }
+		//해당 이메일로 전에 인증번호를 요청했다면 전 인증번호를 db에서 삭제함
+		Optional<ValidNumber> pastNumber = validNumberRepository.findByEmail(email);
+		if(pastNumber.isPresent()){
+			validNumberRepository.delete(pastNumber.get());
+		}
+
+		Optional<Member> memberOptional = memberRepository.findByEmail(email);
+
+		if(memberOptional.isPresent()){
+			throw new RestApiException(MemberErrorCode.DUPLICATED_EMAIL);
+		}
+
+		// int number = (int)((Math.random()*10000)%10);
+		int number = (int)(Math.random() * 899999) + 100000;
+
+
+		LocalTime now = LocalTime.now();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH.mm");
+		double formatedNow = Double.parseDouble(now.format(formatter));
+
+		ValidNumber validNumber = new ValidNumber(number, email, formatedNow);
+		validNumberRepository.save(validNumber);
+
+		emailService.sendNumber(number, email);
+	}
+
+	public boolean checkValidNumber(int number, String email) {
+		boolean checkNumber;
+
+		LocalTime now = LocalTime.now();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH.mm");
+		double formatedNow = Double.parseDouble(now.format(formatter));
+
+		Optional<ValidNumber> validNumberOptional = validNumberRepository.findByEmail(email);
+
+		if(!validNumberOptional.isPresent()){
+			throw new RestApiException(CommonErrorCode.INVALID_REQUEST_PARAMETER); //이메일로 인증번호를 찾을 수 없음
+		}
+
+		ValidNumber validNumber = validNumberOptional.get();
+		double time = validNumber.getTime();
+
+		if(formatedNow - time >= 0.03){ // 인증번호 발급 받은지 3분 초과
+			validNumberRepository.delete(validNumber);
+			throw new RestApiException(CommonErrorCode.INVALID_REQUEST_PARAMETER);
+		}
+
+		if(number != validNumber.getValidNumber()){
+			checkNumber = false;
+		}else{
+			checkNumber = true;
+		}
+
+		return checkNumber;
+	}
 }

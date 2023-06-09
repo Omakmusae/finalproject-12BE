@@ -12,11 +12,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import com.example.finalproject12be.domain.bookmark.entity.Bookmark;
 import com.example.finalproject12be.domain.member.dto.request.MemberEmailRequest;
 import com.example.finalproject12be.domain.member.dto.request.MemberLoginRequest;
 import com.example.finalproject12be.domain.member.dto.request.MemberNameRequest;
 import com.example.finalproject12be.domain.member.dto.request.MemberPasswordRequest;
 import com.example.finalproject12be.domain.member.dto.request.MemberSignupRequest;
+import com.example.finalproject12be.domain.member.dto.request.MemberValidNumberRequest;
 import com.example.finalproject12be.domain.member.dto.response.MemberLoginResponse;
 import com.example.finalproject12be.domain.member.dto.response.MemberNewNameResponse;
 import com.example.finalproject12be.domain.member.entity.Member;
@@ -88,8 +90,23 @@ public class MemberController {
 		return ResponseEntity.status(HttpStatus.OK).body(null);
 	}
 
+	//ing
+	//이메일로
+	@PostMapping("/user/signup/email")
+	public ResponseEntity<Void> checkEmail(
+		@RequestBody @Valid MemberEmailRequest memberEmailRequest){
+		memberService.checkEmail(memberEmailRequest.getEmail());
+		return ResponseEntity.status(HttpStatus.OK).body(null);
+	}
 
 
 
+	@PostMapping("/user/signup/email/valid")
+	public ResponseEntity<Boolean> checkValidNumber(
+		@RequestBody MemberValidNumberRequest memberValidNumberRequest
+	){
+		boolean checkNumber = memberService.checkValidNumber(memberValidNumberRequest.getValidNumber(), memberValidNumberRequest.getEmail());
+		return ResponseEntity.status(HttpStatus.OK).body(checkNumber);
+	}
 
 }
