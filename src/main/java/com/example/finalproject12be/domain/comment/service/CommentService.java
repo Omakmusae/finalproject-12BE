@@ -6,12 +6,8 @@ import com.example.finalproject12be.domain.comment.dto.CommentResponseDto;
 import com.example.finalproject12be.domain.comment.entity.Comment;
 import com.example.finalproject12be.domain.comment.repository.CommentRepository;
 import com.example.finalproject12be.domain.member.entity.Member;
-import com.example.finalproject12be.domain.member.entity.MemberRoleEnum;
-import com.example.finalproject12be.domain.member.repository.MemberRepository;
 import com.example.finalproject12be.domain.store.entity.Store;
 import com.example.finalproject12be.domain.store.repository.StoreRepository;
-import com.example.finalproject12be.exception.MemberErrorCode;
-import com.example.finalproject12be.exception.RestApiException;
 import com.example.finalproject12be.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -105,28 +101,13 @@ public class CommentService {
             Long commentId,
             CommentRequestDto commentRequestDto,
             Member member) {
-
-        MemberRoleEnum memberRoleEnum =  member.getRole();
-
-        if (memberRoleEnum == MemberRoleEnum.ADMIN) {
-            Comment comment = commentRepository.findById(commentId)
+        Comment comment = commentRepository.findByIdAndMemberId(commentId, member.getId())
                 .orElseThrow(() -> new RuntimeException("Comment not found"));
 
-            comment.setContents(commentRequestDto.getContents());
-            Comment updatedComment = commentRepository.save(comment);
+        comment.setContents(commentRequestDto.getContents());
+        Comment updatedComment = commentRepository.save(comment);
 
-            return ResponseEntity.ok(new CommentResponseDto(updatedComment));
-
-        } else {
-            Comment comment = commentRepository.findByIdAndMemberId(commentId, member.getId())
-                .orElseThrow(() -> new RestApiException(MemberErrorCode.INACTIVE_MEMBER));
-
-            comment.setContents(commentRequestDto.getContents());
-            Comment updatedComment = commentRepository.save(comment);
-
-            return ResponseEntity.ok(new CommentResponseDto(updatedComment));
-        }
-
+        return ResponseEntity.ok(new CommentResponseDto(updatedComment));
     }
 
     // 댓글 삭제
@@ -134,24 +115,11 @@ public class CommentService {
     public ResponseEntity<Void> deleteComment(
             Long commentId,
             Member member) {
-
-        MemberRoleEnum memberRoleEnum =  member.getRole();
-
-        if (memberRoleEnum == MemberRoleEnum.ADMIN) {
-            Comment comment = commentRepository.findById(commentId)
+        Comment comment = commentRepository.findByIdAndMemberId(commentId, member.getId())
                 .orElseThrow(() -> new RuntimeException("Comment not found"));
 
-            commentRepository.delete(comment);
+        commentRepository.delete(comment);
 
-            return ResponseEntity.ok().build();
-        }
-        else {
-            Comment comment = commentRepository.findByIdAndMemberId(commentId, member.getId())
-                .orElseThrow(() -> new RestApiException(MemberErrorCode.INACTIVE_MEMBER));
-
-            commentRepository.delete(comment);
-
-            return ResponseEntity.ok().build();
-        }
+        return ResponseEntity.ok().build();
     }
 }
