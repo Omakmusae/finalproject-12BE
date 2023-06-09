@@ -19,6 +19,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.example.finalproject12be.domain.member.dto.TokenDto;
 import com.example.finalproject12be.domain.member.entity.Member;
+import com.example.finalproject12be.domain.member.entity.MemberRoleEnum;
 import com.example.finalproject12be.domain.member.entity.RefreshToken;
 import com.example.finalproject12be.domain.member.repository.MemberRepository;
 import com.example.finalproject12be.domain.member.repository.RefreshTokenRepository;
@@ -42,6 +43,7 @@ public class OauthMemberService {
 	private final PasswordEncoder passwordEncoder;
 	private final RefreshTokenRepository refreshTokenRepository;
 
+
 	public String[] kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
 
 		String[] tokenArray = getToken(code);
@@ -56,7 +58,7 @@ public class OauthMemberService {
 		Member kakaoMember = registerKakaoUserIfNeeded(kakaoMemberInfo);
 
 		// 4. JWT 토큰 반환
-		TokenDto tokenDto = jwtUtil.createAllToken(kakaoMember.getEmail()); // Access, Refresh 토큰 생성
+		TokenDto tokenDto = jwtUtil.createAllToken(kakaoMember.getEmail(), MemberRoleEnum.USER); // Access, Refresh 토큰 생성
 
 		Optional<RefreshToken> refreshToken = refreshTokenRepository.findByEmail(kakaoMember.getEmail());
 		if(refreshToken.isPresent()) {
@@ -91,12 +93,12 @@ public class OauthMemberService {
 		MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
 		body.add("grant_type", "authorization_code");
 
-		//body.add("client_id", "048f9445160611c1cc986c481c2d6b94");//내 앱 rest api 키
-		//body.add("redirect_uri", "http://localhost:8080/user/signin/kakao");
+		body.add("client_id", "048f9445160611c1cc986c481c2d6b94");//내 앱 rest api 키
+		body.add("redirect_uri", "http://localhost:8080/user/signin/kakao");
 
-		body.add("client_id", "7463ed7e96bc168b9023480e535add90");//오디약 rest api 키
+		//body.add("client_id", "7463ed7e96bc168b9023480e535add90");//오디약 rest api 키
 		//body.add("redirect_uri", "https://finalproject-12-fe.vercel.app/user/signin/kakao");//오디약 redirect url
-		body.add("redirect_uri", "http://localhost:3000/user/signin/kakao");// 프런트 로컬 redirect url
+		//body.add("redirect_uri", "http://localhost:3000/user/signin/kakao");// 프런트 로컬 redirect url
 
 		body.add("code", code);
 
@@ -175,7 +177,6 @@ public class OauthMemberService {
 				// 기존 회원정보에 카카오 Id 추가
 				kakaoUser = kakaoUser.kakaoIdUpdate(kakaoId);
 			} else {
-
 				// 신규 회원가입
 				String email = kakaoUserInfo.getEmail();
 
@@ -190,7 +191,8 @@ public class OauthMemberService {
 				
 				String password = UUID.randomUUID().toString();
 				String encodedPassword = passwordEncoder.encode(password);
-				kakaoUser = new Member(email, encodedPassword, nickname, kakaoId);
+
+				kakaoUser = new Member(email, encodedPassword, nickname, kakaoId, MemberRoleEnum.USER);
 				memberRepository.save(kakaoUser);
 			}
 		}
