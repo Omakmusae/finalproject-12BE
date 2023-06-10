@@ -35,7 +35,6 @@ import lombok.extern.slf4j.Slf4j;
 public class JwtAuthFilter extends OncePerRequestFilter {
 
 	private final JwtUtil jwtUtil;
-	private final MemberRepository memberRepository;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws
@@ -48,13 +47,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 		if(accessToken != null) {
 			if(jwtUtil.validateToken(accessToken)) {
 				Claims accessInfo =jwtUtil.getUserInfoFromToken(accessToken);
+				accessInfo.get(AUTHORIZATION_HEADER);
 				setAuthentication(accessInfo.getSubject());
 			} else if(refreshToken != null && jwtUtil.refreshTokenValidation(refreshToken)) {
 				Claims refreshInfo = jwtUtil.getUserInfoFromToken(refreshToken);
-				Member member = memberRepository.findByEmail(refreshInfo.getSubject()).orElseThrow(
-					() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
 
-				String newAccessToken = jwtUtil.createToken(refreshInfo.getSubject(), "Access", member.getRole());
+				String newAccessToken = jwtUtil.createToken(refreshInfo.getSubject(), "Access", (MemberRoleEnum)refreshInfo.get(AUTHORIZATION_HEADER));
 				jwtUtil.setHeaderAccessToken(response, newAccessToken);
 				setAuthentication(refreshInfo.getSubject());
 			} else if(refreshToken == null) {

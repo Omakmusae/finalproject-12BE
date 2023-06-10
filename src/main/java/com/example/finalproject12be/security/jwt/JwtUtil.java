@@ -79,13 +79,13 @@ public class JwtUtil {
 	public String createToken(String username, String tokentype, MemberRoleEnum role) {
 
 		Date date = new Date();
-		String role1 = "USER";
+
 		long expireTime = tokentype.equals("Access") ? ACCESS_TIME : REFRESH_TIME;
 
 		String jwToken =  BEARER_PREFIX +
 			Jwts.builder()
 				.setSubject(username)
-				.claim(AUTHORIZATION_HEADER, role1)
+				.claim(AUTHORIZATION_HEADER, role)
 				.setExpiration(new Date(date.getTime() + expireTime))
 				.setIssuedAt(date)
 				.signWith(key, signatureAlgorithm)
@@ -126,7 +126,11 @@ public class JwtUtil {
 
 	public Claims getUserInfoFromToken(String token) {
 
-		return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+		try {
+			return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+		} catch (ExpiredJwtException e) {
+			return e.getClaims();
+		}
 	}
 
 	public Authentication createAuthentication(String email) {
@@ -140,11 +144,4 @@ public class JwtUtil {
 		response.setHeader(ACCESS_KEY, accessToken);
 	}
 
-	public Claims parseClaims(String accessToken) {
-		try {
-			return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken).getBody();
-		} catch (ExpiredJwtException e) {
-			return e.getClaims();
-		}
-	}
 }
