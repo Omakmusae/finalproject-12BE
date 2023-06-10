@@ -6,6 +6,7 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import com.example.finalproject12be.domain.member.entity.Member;
+import com.example.finalproject12be.domain.member.entity.MemberRoleEnum;
 
 import lombok.Getter;
 
@@ -24,11 +25,15 @@ public class MemberSignupRequest {
 	@Pattern(regexp = "^[a-zA-Z가-힣0-9]{2,10}$", message = "닉네임은 2~10자 한글, 알파벳 대소문자, 숫자로 작성해주세요.")
 	private String nickname;
 
-	public static Member toEntity(MemberSignupRequest memberSignupRequest, String password) {
+	private boolean admin = false;
+	private String adminToken = "";//관리자 권한 토큰
+
+	public static Member toEntity(MemberSignupRequest memberSignupRequest, String password, MemberRoleEnum role) {
 		return Member.of(
 			memberSignupRequest.getEmail(),
 			password,
-			memberSignupRequest.getNickname()
+			memberSignupRequest.getNickname(),
+			role
 		);
 	}
 

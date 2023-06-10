@@ -1,5 +1,7 @@
 package com.example.finalproject12be.security.jwt;
 
+import static com.example.finalproject12be.security.jwt.JwtUtil.*;
+
 import java.io.IOException;
 
 import javax.servlet.FilterChain;
@@ -14,10 +16,16 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.example.finalproject12be.domain.member.dto.response.ErrorResponse;
+import com.example.finalproject12be.domain.member.entity.Member;
+import com.example.finalproject12be.domain.member.entity.MemberRoleEnum;
+import com.example.finalproject12be.domain.member.repository.MemberRepository;
 import com.example.finalproject12be.exception.ErrorCode;
+import com.example.finalproject12be.exception.MemberErrorCode;
+import com.example.finalproject12be.exception.RestApiException;
 import com.example.finalproject12be.exception.TokenErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,6 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 public class JwtAuthFilter extends OncePerRequestFilter {
 
 	private final JwtUtil jwtUtil;
+	private final MemberRepository memberRepository;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws
@@ -38,12 +47,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
 		if(accessToken != null) {
 			if(jwtUtil.validateToken(accessToken)) {
-				setAuthentication(jwtUtil.getUserInfoFromToken(accessToken));
+				Claims accessInfo =jwtUtil.getUserInfoFromToken(accessToken);
+				setAuthentication(accessInfo.getSubject());
 			} else if(refreshToken != null && jwtUtil.refreshTokenValidation(refreshToken)) {
-				String username = jwtUtil.getUserInfoFromToken(refreshToken);
-				String newAccessToken = jwtUtil.createToken(username, "Access");
+				Claims refreshInfo = jwtUtil.getUserInfoFromToken(refreshToken);
+				Member member = memberRepository.findByEmail(refreshInfo.getSubject()).orElseThrow(
+					() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+				String newAccessToken = jwtUtil.createToken(refreshInfo.getSubject(), "Access", member.getRole());
 				jwtUtil.setHeaderAccessToken(response, newAccessToken);
-				setAuthentication(username);
+				setAuthentication(refreshInfo.getSubject());
 			} else if(refreshToken == null) {
 				jwtExceptionHandler(response, TokenErrorCode.EXPIRED_ACCESS_TOKEN);
 				return;
@@ -78,4 +91,5 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 			log.error(e.getMessage());
 		}
 	}
+
 }

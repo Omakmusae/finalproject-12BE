@@ -149,6 +149,7 @@ public class MemberService {
 			}
 
 			String refreshToken = jwtUtil.resolveToken(request, JwtUtil.REFRESH_KEY);
+
 			if (refreshToken != null) {
 				boolean isRefreshTokenValid = jwtUtil.refreshTokenValidation(refreshToken);
 				if (isRefreshTokenValid) {
