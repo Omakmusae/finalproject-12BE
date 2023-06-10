@@ -118,7 +118,7 @@ public class StoreController {
 	public ResponseEntity<String> createStore (
 		@RequestBody StoreRequest storeRequest,
 		@AuthenticationPrincipal UserDetailsImpl userDetails) {
-		System.out.println("test!");
+
 		storeService.createStore(storeRequest, userDetails.getMember());
 		return ResponseEntity.ok("약국이 등록되었습니다.");
 	}

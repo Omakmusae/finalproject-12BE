@@ -1077,7 +1077,7 @@ public class StoreService {
 
 		MemberRoleEnum memberRoleEnum =  member.getRole();
 		if (memberRoleEnum != MemberRoleEnum.ADMIN) {
-			throw new RestApiException(MemberErrorCode.INACTIVE_MEMBER);
+			throw new RestApiException(MemberErrorCode.ADMIN_ERROR);
 		}
 		Store store = new Store(storeRequest);
 		return storeRepository.save(store);
