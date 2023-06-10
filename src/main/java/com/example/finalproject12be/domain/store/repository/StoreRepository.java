@@ -40,4 +40,8 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
     List<Store> findAllByJapanese(int japanese);
 
 	List<Store> findAllByNightPharmacy(int nightPharmacy);
+
+    Optional<Store> deleteStoresById(Long storeId);
+
+    Optional<Store> findById(Long storeId);
 }

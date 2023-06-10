@@ -10,16 +10,21 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.finalproject12be.domain.bookmark.entity.Bookmark;
 import com.example.finalproject12be.domain.member.entity.Member;
+import com.example.finalproject12be.domain.member.entity.MemberRoleEnum;
 import com.example.finalproject12be.domain.store.dto.ForeignOneStoreResponse;
 import com.example.finalproject12be.domain.store.dto.ForeignStoreResponse;
 import com.example.finalproject12be.domain.store.dto.OneStoreResponseDto;
+import com.example.finalproject12be.domain.store.dto.StoreRequest;
 import com.example.finalproject12be.domain.store.dto.StoreResponseDto;
 import com.example.finalproject12be.domain.store.entity.Store;
 import com.example.finalproject12be.domain.store.repository.StoreRepository;
 import com.example.finalproject12be.domain.store.repository.StoreRepositoryCustom;
+import com.example.finalproject12be.exception.MemberErrorCode;
+import com.example.finalproject12be.exception.RestApiException;
 import com.example.finalproject12be.security.UserDetailsImpl;
 
 import lombok.RequiredArgsConstructor;
@@ -33,7 +38,7 @@ public class StoreService {
 	private final StoreRepository storeRepository;
 	private final StoreRepositoryCustom storeRepositoryCustom;
 
-
+	@Transactional
 	public List<StoreResponseDto> getAllStores(UserDetailsImpl userDetails) {
 
 		List<Store> stores = storeRepository.findAll();
@@ -52,7 +57,7 @@ public class StoreService {
 
 		return storeResponseDtos;
 	}
-
+	@Transactional
 	private List<ForeignStoreResponse> checkForeignBookmark(List<Store> stores, List<ForeignStoreResponse> foreignStoreResponses, UserDetailsImpl userDetails){
 
 		int bookmarkCheck = 0;
@@ -118,6 +123,7 @@ public class StoreService {
 
 	}
 
+	@Transactional
 	private List<StoreResponseDto> checkBookmark(List<Store> stores, List<StoreResponseDto> storeResponseDtos, Member member){
 
 		int check = 0;
@@ -151,6 +157,7 @@ public class StoreService {
 
 	}
 
+	@Transactional
 	public List<StoreResponseDto> searchStore(String storeName, String gu, boolean open, boolean holidayBusiness, boolean nightBusiness,
 		String radius, String latitude, String longitude,
 		UserDetailsImpl userDetails) {
@@ -426,7 +433,7 @@ public class StoreService {
 
 		return storeResponseDtos;
 	}
-
+	@Transactional
 	public OneStoreResponseDto getStore(Long storeId, UserDetailsImpl userDetails) {
 		Store store = storeRepository.findById(storeId)
 				.orElseThrow(() -> new IllegalArgumentException("해당 약국은 존재하지 않습니다."));
@@ -479,7 +486,7 @@ public class StoreService {
 
 		return oneStoreResponseDto;
 	}
-
+	@Transactional
 	private List<Store> openCheck(List<Store> stores){
 
 		//test
@@ -601,13 +608,14 @@ public class StoreService {
 		}
 		return stores;
 	}
-
+	@Transactional
 	public List<Store> getLocation(Double baseRadius,Double baseLatitude, Double baseLongitude) {
 
 		List<Store> result = storeRepository.findByDistanceWithinRadius(baseLatitude, baseLongitude, baseRadius);
 		return result;
 	}
 
+	@Transactional
 	public List<ForeignStoreResponse> searchForeignStore(String storeName, String gu, boolean open, boolean holidayBusiness, boolean nightBusiness,
 		boolean english, boolean chinese, boolean japanese,
 		String radius, String latitude, String longitude,
@@ -991,6 +999,7 @@ public class StoreService {
 	}
 
 	//외국어 약국 상세보기
+	@Transactional
 	public ForeignOneStoreResponse getForeignStore(Long storeId, UserDetailsImpl userDetails) {
 
 		boolean english = false;
@@ -1063,4 +1072,41 @@ public class StoreService {
 
 		return result;
 	}
+	@Transactional
+	public Store createStore (StoreRequest storeRequest, Member member) {
+
+		MemberRoleEnum memberRoleEnum =  member.getRole();
+		if (memberRoleEnum != MemberRoleEnum.ADMIN) {
+			throw new RestApiException(MemberErrorCode.INACTIVE_MEMBER);
+		}
+		Store store = new Store(storeRequest);
+		return storeRepository.save(store);
+
+	}
+
+	@Transactional
+	public void updateStore (Long storeId, StoreRequest storeRequest, Member member) {
+		MemberRoleEnum memberRoleEnum =  member.getRole();
+		if (memberRoleEnum != MemberRoleEnum.ADMIN) {
+			throw new RestApiException(MemberErrorCode.INACTIVE_MEMBER);
+		}
+
+		Store store = storeRepository.findById(storeId)
+			.orElseThrow(() -> new RestApiException(MemberErrorCode.STORE_NOT_FOUND));
+
+		store.updateStore(storeRequest);
+
+	}
+
+	@Transactional
+	public void deleteStore (Long storeId, Member member) {
+		MemberRoleEnum memberRoleEnum =  member.getRole();
+		if (memberRoleEnum != MemberRoleEnum.ADMIN) {
+			throw new RestApiException(MemberErrorCode.INACTIVE_MEMBER);
+		}
+
+		storeRepository.deleteStoresById(storeId);
+		System.out.println("숙소 삭제 완료");
+	}
+
 }
