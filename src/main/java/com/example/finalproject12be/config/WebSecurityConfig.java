@@ -70,6 +70,7 @@ public class WebSecurityConfig {
 		config.addAllowedOrigin("https://finalproject-12-fe.vercel.app/");
 		config.addAllowedOrigin("https://finalproject-12-o68248vtx-pill-my-rhythm.vercel.app");
 		config.addAllowedOrigin("https://www.odimedi.site");
+		config.addAllowedOrigin("https://odimedi.site");
 		// 특정 헤더를 클라이언트 측에서 사용할 수 있게 지정
 		// 만약 지정하지 않는다면, 토큰 값을 사용할 수 없음
 		config.addExposedHeader(JwtUtil.ACCESS_KEY);
