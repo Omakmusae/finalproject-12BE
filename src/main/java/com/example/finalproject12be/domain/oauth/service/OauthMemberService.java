@@ -19,6 +19,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.example.finalproject12be.domain.member.dto.TokenDto;
 import com.example.finalproject12be.domain.member.entity.Member;
+import com.example.finalproject12be.domain.member.entity.MemberRoleEnum;
 import com.example.finalproject12be.domain.member.entity.RefreshToken;
 import com.example.finalproject12be.domain.member.repository.MemberRepository;
 import com.example.finalproject12be.domain.member.repository.RefreshTokenRepository;
@@ -56,7 +57,7 @@ public class OauthMemberService {
 		Member kakaoMember = registerKakaoUserIfNeeded(kakaoMemberInfo);
 
 		// 4. JWT 토큰 반환
-		TokenDto tokenDto = jwtUtil.createAllToken(kakaoMember.getEmail()); // Access, Refresh 토큰 생성
+		TokenDto tokenDto = jwtUtil.createAllToken(kakaoMember.getEmail(), MemberRoleEnum.USER); // Access, Refresh 토큰 생성// Access, Refresh 토큰 생성
 
 		Optional<RefreshToken> refreshToken = refreshTokenRepository.findByEmail(kakaoMember.getEmail());
 		if(refreshToken.isPresent()) {
@@ -190,7 +191,7 @@ public class OauthMemberService {
 				
 				String password = UUID.randomUUID().toString();
 				String encodedPassword = passwordEncoder.encode(password);
-				kakaoUser = new Member(email, encodedPassword, nickname, kakaoId);
+				kakaoUser = new Member(email, encodedPassword, nickname, kakaoId, MemberRoleEnum.USER);
 				memberRepository.save(kakaoUser);
 			}
 		}

@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.example.finalproject12be.domain.member.repository.MemberRepository;
 import com.example.finalproject12be.security.jwt.JwtAuthFilter;
 import com.example.finalproject12be.security.jwt.JwtUtil;
 
@@ -30,6 +31,7 @@ public class WebSecurityConfig {
 
 	 private final JwtAuthFilter jwtAuthFilter;
 	 private final JwtUtil jwtUtil;
+	 private final MemberRepository memberRepository;
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();

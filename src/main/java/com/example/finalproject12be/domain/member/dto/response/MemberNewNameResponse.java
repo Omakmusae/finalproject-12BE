@@ -6,7 +6,7 @@ import lombok.Getter;
 public class MemberNewNameResponse {
 	private String nickname;
 
-	public MemberNewNameResponse(String newName){
-		this.nickname = newName;
+	public MemberNewNameResponse(String nickname){
+		this.nickname = nickname;
 	}
 }
