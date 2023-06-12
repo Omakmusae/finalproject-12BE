@@ -16,7 +16,7 @@ public class Profile {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "VALIDNUMBER_ID")
+	@Column(name = "PROFILE_ID")
 	private Long id;
 
 	@Column
