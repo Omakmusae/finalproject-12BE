@@ -57,7 +57,7 @@ public class StoreService {
 
 		return storeResponseDtos;
 	}
-	@Transactional
+
 	private List<ForeignStoreResponse> checkForeignBookmark(List<Store> stores, List<ForeignStoreResponse> foreignStoreResponses, UserDetailsImpl userDetails){
 
 		int bookmarkCheck = 0;
@@ -123,7 +123,6 @@ public class StoreService {
 
 	}
 
-	@Transactional
 	private List<StoreResponseDto> checkBookmark(List<Store> stores, List<StoreResponseDto> storeResponseDtos, Member member){
 
 		int check = 0;
@@ -486,7 +485,7 @@ public class StoreService {
 
 		return oneStoreResponseDto;
 	}
-	@Transactional
+
 	private List<Store> openCheck(List<Store> stores){
 
 		//test

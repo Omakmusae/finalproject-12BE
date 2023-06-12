@@ -4,22 +4,27 @@ import com.example.finalproject12be.domain.board.entity.Board;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@AllArgsConstructor
+@NoArgsConstructor
 public class BoardResponse {
 	private Long id;
 	private String title;
 	private String content;
 	private String nickname;
 
-	public static BoardResponse from (Board entity) {
+	public BoardResponse(Long id, String title, String content, String nickname) {
+		this.id = id;
+		this.title = title;
+		this.content = content;
+		this.nickname = nickname;
+	}
 
-		return new BoardResponse(
-			entity.getId(),
-			entity.getTitle(),
-			entity.getContent(),
-			entity.getMember().getNickname()
-		);
+	public BoardResponse(Board board) {
+		this.id = board.getId();
+		this.title = board.getTitle();
+		this.content = board.getContent();
+		this.nickname = board.getMember().getNickname();
 	}
 }

@@ -2,8 +2,7 @@ package com.example.finalproject12be.domain.board.controller;
 
 import java.util.List;
 
-import javax.validation.Valid;
-
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -14,12 +13,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.example.finalproject12be.domain.board.dto.BoardRequest;
+
 import com.example.finalproject12be.domain.board.dto.BoardResponse;
+import com.example.finalproject12be.domain.board.entity.Board;
 import com.example.finalproject12be.domain.board.service.BoardService;
 import com.example.finalproject12be.security.UserDetailsImpl;
 
@@ -32,17 +31,18 @@ public class BoardController {
 	private final BoardService boardService;
 
 	@GetMapping("/api/board")
-	public ResponseEntity<List<BoardResponse>> getBoardList() {
-
+	public ResponseEntity<Page<BoardResponse>> getBoardList(
+		@RequestParam("page") int page, @RequestParam("size") int size
+	) {
 		return ResponseEntity.status(HttpStatus.OK)
-			.body(boardService.searchBoards());
+			.body(boardService.getAllBoards(page, size));
 	}
 
 	@GetMapping("/api/board/{boardId}")
 	public ResponseEntity<BoardResponse> getBoard(@PathVariable final Long boardId) {
-
+		System.out.println(boardId + " !!!!!!!!!!!!");
 		return ResponseEntity.status(HttpStatus.OK)
-			.body(boardService.searchBoard(boardId));
+			.body(boardService.getBoard(boardId));
 	}
 
 	@PostMapping("/api/board")
@@ -50,6 +50,8 @@ public class BoardController {
 		@AuthenticationPrincipal final UserDetailsImpl userDetails,
 		@RequestBody final BoardRequest boardRequest) {
 
+		System.out.println(boardRequest.getContent());
+		System.out.println(boardRequest.getTitle());
 		boardService.createBoard(userDetails.getMember(), boardRequest);
 		return ResponseEntity.status(HttpStatus.OK).body(null);
 	}

@@ -3,15 +3,23 @@ package com.example.finalproject12be.domain.board.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.example.finalproject12be.domain.board.dto.BoardRequest;
 import com.example.finalproject12be.domain.board.dto.BoardResponse;
+import com.example.finalproject12be.domain.board.dto.MappedBoardRequest;
 import com.example.finalproject12be.domain.board.entity.Board;
 import com.example.finalproject12be.domain.board.repository.BoardRepository;
 import com.example.finalproject12be.domain.member.entity.Member;
+import com.example.finalproject12be.domain.member.entity.MemberRoleEnum;
 import com.example.finalproject12be.exception.MemberErrorCode;
 import com.example.finalproject12be.exception.RestApiException;
 
@@ -24,46 +32,58 @@ public class BoardService {
 	private final BoardRepository boardRepository;
 
 	@Transactional(readOnly = true)
-	public List<BoardResponse> searchBoards() {
+	public Page<BoardResponse> getAllBoards(int page, int size) {
 
-		return boardRepository.findAll()
-			.stream()
-			.map(BoardResponse::from)
+		Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+		Page<Board> boardsPage = boardRepository.findAll(pageable);
+
+		List<BoardResponse> boardList = boardsPage.getContent().stream()
+			.map(BoardResponse::new)
 			.collect(Collectors.toList());
+
+		return new PageImpl<>(boardList, pageable, boardsPage.getTotalElements());
+
 	}
 
 	@Transactional(readOnly = true)
-	public BoardResponse searchBoard(final Long boardId) {
+	public BoardResponse getBoard(final Long boardId) {
 
 		Board board = findBoardByIdOrElseThrow(boardId);
 		boardRepository.findById(boardId).orElseThrow(
-			() -> new RestApiException(MemberErrorCode.INACTIVE_MEMBER));
+			() -> new RestApiException(MemberErrorCode.BOARD_NOT_FOUND));
 
-		return BoardResponse.from(board);
+		return new BoardResponse(boardId, board.getTitle(), board.getContent(), board.getMember().getNickname());
 	}
-
 
 	@Transactional
 	public void createBoard(final Member member, final BoardRequest boardRequest) {
 
-		boardRequest.setMember(member);
+		MemberRoleEnum memberRoleEnum =  member.getRole();
+		if (memberRoleEnum != MemberRoleEnum.ADMIN) {
+			throw new RestApiException(MemberErrorCode.ADMIN_ERROR);
+		}
+		MappedBoardRequest board = new MappedBoardRequest(boardRequest.getTitle(), boardRequest.getContent(), member);
+		Board result = boardRepository.saveAndFlush(MappedBoardRequest.toEntity(board));
 
-		Board board = boardRepository.saveAndFlush(BoardRequest.toEntity(boardRequest));
 	}
 
 	@Transactional
 	public void updateBoard(final Member member, final Long boardId, final BoardRequest boardRequest) {
-
+		MemberRoleEnum memberRoleEnum =  member.getRole();
+		if (memberRoleEnum != MemberRoleEnum.ADMIN) {
+			throw new RestApiException(MemberErrorCode.ADMIN_ERROR);
+		}
 		Board board = findBoardByIdOrElseThrow(boardId);
-
-		throwIfNotOwner(board, member.getNickname());
 
 		board.updateBoard(boardRequest);
 	}
 
 	@Transactional
 	public void deleteBoard(final Member member, final Long boardId) {
-
+		MemberRoleEnum memberRoleEnum =  member.getRole();
+		if (memberRoleEnum != MemberRoleEnum.ADMIN) {
+			throw new RestApiException(MemberErrorCode.ADMIN_ERROR);
+		}
 		Board board = findBoardByIdOrElseThrow(boardId);
 
 		boardRepository.delete(board);
@@ -72,14 +92,10 @@ public class BoardService {
 	private Board findBoardByIdOrElseThrow(Long boardId) {
 
 		return boardRepository.findById(boardId).orElseThrow(
-			() -> new RestApiException(MemberErrorCode.INACTIVE_MEMBER)
+			() -> new RestApiException(MemberErrorCode.BOARD_NOT_FOUND)
 		);
 	}
 
-	private void throwIfNotOwner(Board board, String loginUsername) {
 
-		if (!board.getMember().getNickname().equals(loginUsername))
-			throw new RestApiException(MemberErrorCode.INACTIVE_MEMBER);
-	}
 
 }
