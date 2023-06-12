@@ -4,27 +4,35 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-
+import java.net.URI;
 import java.net.URL;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-
+import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
+//import org.springframework.security.crypto.password.PasswordEncoder;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.example.finalproject12be.domain.comment.entity.Comment;
 import com.example.finalproject12be.domain.comment.repository.CommentRepository;
 import com.example.finalproject12be.domain.member.dto.request.MemberNameRequest;
 import com.example.finalproject12be.domain.member.dto.request.MemberNameRequestAdmin;
 import com.example.finalproject12be.domain.member.dto.response.MemberLoginResponse;
 import com.example.finalproject12be.domain.member.dto.response.MemberNewNameResponse;
+import com.example.finalproject12be.domain.member.dto.response.ProfileResponse;
 import com.example.finalproject12be.domain.member.entity.MemberRoleEnum;
+import com.example.finalproject12be.domain.profile.entity.Profile;
+import com.example.finalproject12be.domain.profile.repository.ProfileRepository;
 import com.example.finalproject12be.domain.store.entity.Store;
 import com.example.finalproject12be.domain.validNumber.entity.ValidNumber;
 import com.example.finalproject12be.domain.validNumber.repository.ValidNumberRepository;
@@ -47,6 +55,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.finalproject12be.domain.member.dto.request.MemberLoginRequest;
 import com.example.finalproject12be.domain.member.dto.request.MemberSignupRequest;
@@ -56,7 +65,7 @@ import com.example.finalproject12be.domain.member.entity.RefreshToken;
 import com.example.finalproject12be.domain.member.repository.MemberRepository;
 import com.example.finalproject12be.domain.member.repository.RefreshTokenRepository;
 import com.example.finalproject12be.security.jwt.JwtUtil;
-
+//import com.example.finalproject12be.security.jwt.JwtUtil;
 
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -73,6 +82,10 @@ public class MemberService {
 	private final CommentRepository commentRepository;
 	private final ValidNumberRepository validNumberRepository;
 	private static final String ADMIN_TOKEN = "Odiyac";
+	private final AmazonS3Client amazonS3Client;
+	private final String S3Bucket = "odimedi-profile";
+	private final ProfileRepository profileRepository;
+
 
 	@Transactional
 	public void signup(final MemberSignupRequest memberSignupRequest) {
@@ -471,5 +484,46 @@ public class MemberService {
 		}
 
 		return checkNumber;
+	}
+
+	public ProfileResponse uploadProfile(MultipartFile file, Member member) {
+
+		if(file.isEmpty()){
+			throw new RestApiException(CommonErrorCode.INVALID_REQUEST_PARAMETER);
+		}
+
+		Long memberId = member.getId();
+		Optional<Profile> optionalProfile = profileRepository.findByMemberId(memberId);
+
+		if(optionalProfile.isPresent()){
+			Profile pastProfile = optionalProfile.get();
+			profileRepository.delete(pastProfile);
+		}
+
+		String imagePath = saveImg(file);
+		Profile profile = new Profile(imagePath, memberId);
+		profileRepository.save(profile);
+
+		return new ProfileResponse(imagePath);
+	}
+
+	private String saveImg (final MultipartFile file) {
+
+		String fileName = UUID.randomUUID() + "-" + file.getOriginalFilename();
+		long size = file.getSize();
+		ObjectMetadata objectMetaData = new ObjectMetadata();
+		objectMetaData.setContentType(file.getContentType());
+		objectMetaData.setContentLength(size);
+
+		try {
+			amazonS3Client.putObject(
+				new PutObjectRequest(S3Bucket, fileName, file.getInputStream(), objectMetaData)
+					.withCannedAcl(CannedAccessControlList.PublicRead)
+			);
+		} catch (IOException e) {
+			throw new RestApiException(CommonErrorCode.IO_EXCEPTION);
+		}
+
+		return amazonS3Client.getUrl(S3Bucket, fileName).toString();
 	}
 }
