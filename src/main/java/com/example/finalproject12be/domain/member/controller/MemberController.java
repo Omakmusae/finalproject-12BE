@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.finalproject12be.domain.bookmark.entity.Bookmark;
 import com.example.finalproject12be.domain.member.dto.request.MemberEmailRequest;
@@ -22,6 +23,7 @@ import com.example.finalproject12be.domain.member.dto.request.MemberSignupReques
 import com.example.finalproject12be.domain.member.dto.request.MemberValidNumberRequest;
 import com.example.finalproject12be.domain.member.dto.response.MemberLoginResponse;
 import com.example.finalproject12be.domain.member.dto.response.MemberNewNameResponse;
+import com.example.finalproject12be.domain.member.dto.response.ProfileResponse;
 import com.example.finalproject12be.domain.member.entity.Member;
 import com.example.finalproject12be.domain.member.service.MemberService;
 import com.example.finalproject12be.security.UserDetailsImpl;
@@ -104,5 +106,14 @@ public class MemberController {
 		final HttpServletRequest request) {
 		memberService.signoutAdmin(memberNameRequest, userDetails.getMember(), request);
 		return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
+	}
+
+	@PostMapping("/user/change/profile")
+	public ResponseEntity<ProfileResponse> uploadProfile(
+		@RequestPart(value = "file") final MultipartFile file,
+		@AuthenticationPrincipal UserDetailsImpl userDetails
+	){
+		ProfileResponse profileResponse = memberService.uploadProfile(file, userDetails.getMember());
+		return ResponseEntity.status(HttpStatus.OK).body(profileResponse);
 	}
 }
