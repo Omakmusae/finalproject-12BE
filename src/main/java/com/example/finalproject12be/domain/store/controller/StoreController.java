@@ -2,6 +2,8 @@ package com.example.finalproject12be.domain.store.controller;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 //import com.example.finalproject12be.domain.store.OpenApiManager;
+import com.example.finalproject12be.domain.board.dto.BoardResponse;
 import com.example.finalproject12be.domain.store.dto.ForeignOneStoreResponse;
 import com.example.finalproject12be.domain.store.dto.ForeignStoreResponse;
 import com.example.finalproject12be.domain.store.dto.OneStoreResponseDto;
@@ -48,9 +51,13 @@ public class StoreController {
 		return storeService.getStore(storeId, userDetails);
 	}
 
+
 	//약국 검색하기
 	@GetMapping("/api/store/search")
-	public List<StoreResponseDto> searchStore(
+	public Page<StoreResponseDto> searchStore(
+		@RequestParam("page") int page,
+		@RequestParam("size") int size,
+		//페이지네이션 추가
 		@RequestParam("storeName") String storeName,
 		@RequestParam("gu") String gu,
 		@RequestParam("open") boolean open,
@@ -61,7 +68,7 @@ public class StoreController {
 
 		@AuthenticationPrincipal UserDetailsImpl userDetails){
 
-		return storeService.searchStore(storeName, gu, open, holidayBusiness, nightBusiness, radius, latitude, longitude,userDetails);
+		return storeService.searchStore(page, size, storeName, gu, open, holidayBusiness, nightBusiness, radius, latitude, longitude,userDetails);
 	}
 
 	// private final OpenApiManager openApiManager;
@@ -73,7 +80,7 @@ public class StoreController {
 	// 	openApiManager.fetch();
 	// }
 
-	//ING
+
 	//외국어 가능 약국 상세보기
 	@GetMapping("/api/store/foreign/{store-id}")
 	public ForeignOneStoreResponse getForeignStore(
@@ -84,7 +91,9 @@ public class StoreController {
 
 	//외국어 가능 약국 검색하기
 	@GetMapping("/api/store/foreign/search")
-	public List<ForeignStoreResponse> searchForeignStore(
+	public Page<ForeignStoreResponse> searchForeignStore(
+		@RequestParam("page") int page,
+		@RequestParam("size") int size,
 		@RequestParam("storeName") String storeName,
 		@RequestParam("gu") String gu,
 		@RequestParam("open") boolean open,
@@ -96,7 +105,7 @@ public class StoreController {
 		@RequestParam("radius") String radius,//위치 필터
 		@RequestParam("latitude") String latitude, @RequestParam("longitude") String longitude,
 		@AuthenticationPrincipal UserDetailsImpl userDetails){
-		return storeService.searchForeignStore(storeName, gu, open, holidayBusiness, nightBusiness, english, chinese, japanese, radius, latitude, longitude, userDetails);
+		return storeService.searchForeignStore(page, size, storeName, gu, open, holidayBusiness, nightBusiness, english, chinese, japanese, radius, latitude, longitude, userDetails);
 	}
 
 
@@ -142,5 +151,3 @@ public class StoreController {
 	}
 
 }
-
-//
