@@ -18,8 +18,10 @@ public enum MemberErrorCode implements ErrorCode {
 	EMAIL_ERROR1(HttpStatus.NOT_FOUND, "이메일 형식이 올바르지 않습니다"),
 	ADMIN_ERROR(HttpStatus.NOT_FOUND, "관리자 암호가 틀려 등록이 불가능합니다."),
 	STORE_NOT_FOUND(HttpStatus.NOT_FOUND, "약국을 찾을 수 없습니다"),
-	COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "댓글을 찾을 수 없습니다")
-	;
+	COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "댓글을 찾을 수 없습니다"),
+	BOARD_NOT_FOUND(HttpStatus.NOT_FOUND, "게시글을 찾을 수 없습니다")
+
+		;
 
 	private final HttpStatus httpStatus;
 	private final String message;

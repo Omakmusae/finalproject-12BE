@@ -15,6 +15,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import com.example.finalproject12be.domain.board.entity.Board;
 import com.example.finalproject12be.domain.bookmark.entity.Bookmark;
 
 import lombok.Getter;

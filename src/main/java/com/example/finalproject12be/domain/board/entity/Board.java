@@ -17,6 +17,8 @@ import javax.persistence.OneToMany;
 import com.example.finalproject12be.common.Timestamped;
 import com.example.finalproject12be.domain.board.dto.BoardRequest;
 import com.example.finalproject12be.domain.member.entity.Member;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,25 +39,22 @@ public class Board extends Timestamped {
 	@Column(nullable = false)
 	private String content;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name="MEMBER_ID")
 	private Member member;
-
 
 	private Board(String title, String content, Member member) {
 		this.title = title;
 		this.content = content;
+		//this.nickname = nickname;
 		this.member = member;
 	}
 
 	public void updateBoard(BoardRequest boardRequest){
 		this.title = boardRequest.getTitle();
 		this.content = boardRequest.getContent();
-
 	}
-
 	public static Board of(String title, String content, Member member) {
 		return new Board(title, content, member);
 	}
-
 }
