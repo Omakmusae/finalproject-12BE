@@ -37,16 +37,25 @@ public class Board extends Timestamped {
 	@Column(nullable = false)
 	private String content;
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name="MEMBER_ID")
+	private Member member;
 
-	private Board(String title, String content) {
+
+	private Board(String title, String content, Member member) {
 		this.title = title;
 		this.content = content;
+		this.member = member;
 	}
 
 	public void updateBoard(BoardRequest boardRequest){
 		this.title = boardRequest.getTitle();
 		this.content = boardRequest.getContent();
 
+	}
+
+	public static Board of(String title, String content, Member member) {
+		return new Board(title, content, member);
 	}
 
 }

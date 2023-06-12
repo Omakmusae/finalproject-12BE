@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -47,10 +48,9 @@ public class BoardController {
 	@PostMapping("/api/board")
 	public ResponseEntity<Void> createBoard(
 		@AuthenticationPrincipal final UserDetailsImpl userDetails,
-		@RequestPart(value = "data") @Valid final BoardRequest boardRequest,
-		@RequestPart(value = "ImgUrl") final MultipartFile file) {
+		@RequestBody final BoardRequest boardRequest) {
 
-		boardService.createBoard(userDetails.getMember(), boardRequest, file);
+		boardService.createBoard(userDetails.getMember(), boardRequest);
 		return ResponseEntity.status(HttpStatus.OK).body(null);
 	}
 
@@ -58,10 +58,9 @@ public class BoardController {
 	public ResponseEntity<Void> updateBoard(
 		@AuthenticationPrincipal final UserDetailsImpl userDetails,
 		@PathVariable final Long boardId,
-		@RequestPart(value = "data") @Valid final BoardRequest boardRequest,
-		@RequestPart(value = "ImgUrl") final MultipartFile file) {
+		@RequestBody final BoardRequest boardRequest) {
 
-		boardService.updateBoard(userDetails.getMember(), boardId, boardRequest, file);
+		boardService.updateBoard(userDetails.getMember(), boardId, boardRequest);
 		return ResponseEntity.status(HttpStatus.OK).body(null);
 	}
 

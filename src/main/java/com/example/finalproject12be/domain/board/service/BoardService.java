@@ -12,6 +12,8 @@ import com.example.finalproject12be.domain.board.dto.BoardResponse;
 import com.example.finalproject12be.domain.board.entity.Board;
 import com.example.finalproject12be.domain.board.repository.BoardRepository;
 import com.example.finalproject12be.domain.member.entity.Member;
+import com.example.finalproject12be.exception.MemberErrorCode;
+import com.example.finalproject12be.exception.RestApiException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,10 +26,9 @@ public class BoardService {
 	@Transactional(readOnly = true)
 	public List<BoardResponse> searchBoards() {
 
-		return boardRepository.findAllJoinFetch()
+		return boardRepository.findAll()
 			.stream()
 			.map(BoardResponse::from)
-			// .sorted(Comparator.comparing(BoardResponse::getCreatedAt).reversed())
 			.collect(Collectors.toList());
 	}
 
@@ -35,34 +36,27 @@ public class BoardService {
 	public BoardResponse searchBoard(final Long boardId) {
 
 		Board board = findBoardByIdOrElseThrow(boardId);
+		boardRepository.findById(boardId).orElseThrow(
+			() -> new RestApiException(MemberErrorCode.INACTIVE_MEMBER));
 
 		return BoardResponse.from(board);
 	}
 
-	@Transactional(readOnly = true)
-	public List<BoardResponse> searchBoards(String address) {
-
-		return boardRepository.findByAddressJoinFetch(address)
-			.stream()
-			.map(BoardResponse::from)
-			.collect(Collectors.toList());
-	}
 
 	@Transactional
-	public void createBoard(final Member member, final BoardRequest boardRequest, final MultipartFile file) {
+	public void createBoard(final Member member, final BoardRequest boardRequest) {
 
 		boardRequest.setMember(member);
 
 		Board board = boardRepository.saveAndFlush(BoardRequest.toEntity(boardRequest));
 	}
 
-
 	@Transactional
-	public void updateBoard(final Member member, final Long boardId, final BoardRequest boardRequest, final MultipartFile file) {
+	public void updateBoard(final Member member, final Long boardId, final BoardRequest boardRequest) {
 
 		Board board = findBoardByIdOrElseThrow(boardId);
 
-		throwIfNotOwner(board, member.getUsername());
+		throwIfNotOwner(board, member.getNickname());
 
 		board.updateBoard(boardRequest);
 	}
@@ -72,9 +66,20 @@ public class BoardService {
 
 		Board board = findBoardByIdOrElseThrow(boardId);
 
-
-
 		boardRepository.delete(board);
+	}
+
+	private Board findBoardByIdOrElseThrow(Long boardId) {
+
+		return boardRepository.findById(boardId).orElseThrow(
+			() -> new RestApiException(MemberErrorCode.INACTIVE_MEMBER)
+		);
+	}
+
+	private void throwIfNotOwner(Board board, String loginUsername) {
+
+		if (!board.getMember().getNickname().equals(loginUsername))
+			throw new RestApiException(MemberErrorCode.INACTIVE_MEMBER);
 	}
 
 }
