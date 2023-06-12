@@ -116,4 +116,19 @@ public class MemberController {
 		ProfileResponse profileResponse = memberService.uploadProfile(file, userDetails.getMember());
 		return ResponseEntity.status(HttpStatus.OK).body(profileResponse);
 	}
+
+	@PostMapping("/user/signup/email")
+	public ResponseEntity<Void> checkEmail(
+		@RequestBody @Valid MemberEmailRequest memberEmailRequest){
+		memberService.checkEmail(memberEmailRequest.getEmail());
+		return ResponseEntity.status(HttpStatus.OK).body(null);
+	}
+
+	@PostMapping("/user/signup/email/valid")
+	public ResponseEntity<Boolean> checkValidNumber(
+		@RequestBody MemberValidNumberRequest memberValidNumberRequest
+	){
+		boolean checkNumber = memberService.checkValidNumber(memberValidNumberRequest.getValidNumber(), memberValidNumberRequest.getEmail());
+		return ResponseEntity.status(HttpStatus.OK).body(checkNumber);
+	}
 }
