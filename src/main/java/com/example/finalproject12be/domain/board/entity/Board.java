@@ -1,30 +1,26 @@
 package com.example.finalproject12be.domain.board.entity;
 
-import java.util.ArrayList;
-import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 
 import com.example.finalproject12be.common.Timestamped;
 import com.example.finalproject12be.domain.board.dto.BoardRequest;
 import com.example.finalproject12be.domain.member.entity.Member;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
+@Data
 @Entity
 public class Board extends Timestamped {
 
@@ -39,6 +35,13 @@ public class Board extends Timestamped {
 	@Column(nullable = false)
 	private String content;
 
+	@Transient
+	private Board prev_board;
+
+	@Transient
+	private Board next_board;
+
+
 	@ManyToOne
 	@JoinColumn(name="MEMBER_ID")
 	private Member member;
@@ -46,7 +49,6 @@ public class Board extends Timestamped {
 	private Board(String title, String content, Member member) {
 		this.title = title;
 		this.content = content;
-		//this.nickname = nickname;
 		this.member = member;
 	}
 

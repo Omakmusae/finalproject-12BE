@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.finalproject12be.domain.board.dto.BoardDetailResponse;
 import com.example.finalproject12be.domain.board.dto.BoardRequest;
 
 import com.example.finalproject12be.domain.board.dto.BoardResponse;
@@ -39,7 +40,7 @@ public class BoardController {
 	}
 
 	@GetMapping("/api/board/{boardId}")
-	public ResponseEntity<BoardResponse> getBoard(@PathVariable final Long boardId) {
+	public ResponseEntity<BoardDetailResponse> getBoard(@PathVariable final Long boardId) {
 		System.out.println(boardId + " !!!!!!!!!!!!");
 		return ResponseEntity.status(HttpStatus.OK)
 			.body(boardService.getBoard(boardId));

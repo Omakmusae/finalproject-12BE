@@ -1,6 +1,7 @@
 package com.example.finalproject12be.domain.board.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.finalproject12be.domain.board.dto.BoardDetailResponse;
 import com.example.finalproject12be.domain.board.dto.BoardRequest;
 import com.example.finalproject12be.domain.board.dto.BoardResponse;
 import com.example.finalproject12be.domain.board.dto.MappedBoardRequest;
@@ -45,13 +47,20 @@ public class BoardService {
 	}
 
 	@Transactional(readOnly = true)
-	public BoardResponse getBoard(final Long boardId) {
-
+	public BoardDetailResponse getBoard(final Long boardId) {
+		System.out.println("에러 시작");
 		Board board = findBoardByIdOrElseThrow(boardId);
-		boardRepository.findById(boardId).orElseThrow(
-			() -> new RestApiException(MemberErrorCode.BOARD_NOT_FOUND));
 
-		return new BoardResponse(boardId, board.getTitle(), board.getContent(), board.getMember().getNickname());
+		Optional<Board> prevBoard = boardRepository.findPrevBoard(boardId);
+		Optional<Board> nextBoard = boardRepository.findNextBoard(boardId);
+
+		Board prevBoardObject = prevBoard.orElse(null);
+		Board nextBoardObject = nextBoard.orElse(null);
+
+		board.setPrev_board(prevBoardObject);
+		board.setNext_board(nextBoardObject);
+
+		return new BoardDetailResponse(board);
 	}
 
 	@Transactional
