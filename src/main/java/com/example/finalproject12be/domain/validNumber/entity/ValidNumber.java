@@ -30,9 +30,9 @@ public class ValidNumber {
 	private String email;
 
 	@Column
-	private double time;
+	private long time;
 
-	public ValidNumber(int validNumber, String email, double time) {
+	public ValidNumber(int validNumber, String email, long time) {
 		this.validNumber = validNumber;
 		this.email = email;
 		this.time = time;
