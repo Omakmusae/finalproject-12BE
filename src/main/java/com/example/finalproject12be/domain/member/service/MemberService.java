@@ -447,8 +447,8 @@ public class MemberService {
 
 
 		LocalTime now = LocalTime.now();
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH.mm");
-		double formatedNow = Double.parseDouble(now.format(formatter));
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HHmmss");
+		long formatedNow = Long.parseLong(now.format(formatter));
 
 		ValidNumber validNumber = new ValidNumber(number, email, formatedNow);
 		validNumberRepository.save(validNumber);
@@ -460,8 +460,8 @@ public class MemberService {
 		boolean checkNumber;
 
 		LocalTime now = LocalTime.now();
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH.mm");
-		double formatedNow = Double.parseDouble(now.format(formatter));
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HHmmss");
+		long formatedNow = Long.parseLong(now.format(formatter));
 
 		Optional<ValidNumber> validNumberOptional = validNumberRepository.findByEmail(email);
 
@@ -472,7 +472,7 @@ public class MemberService {
 		ValidNumber validNumber = validNumberOptional.get();
 		double time = validNumber.getTime();
 
-		if(formatedNow - time >= 0.03){ // 인증번호 발급 받은지 3분 초과
+		if(formatedNow - time >= 300){ // 인증번호 발급 받은지 3분 초과
 			validNumberRepository.delete(validNumber);
 			throw new RestApiException(CommonErrorCode.INVALID_REQUEST_PARAMETER);
 		}
