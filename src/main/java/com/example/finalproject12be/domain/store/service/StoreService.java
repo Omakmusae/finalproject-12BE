@@ -9,9 +9,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.finalproject12be.domain.board.entity.Board;
 import com.example.finalproject12be.domain.bookmark.entity.Bookmark;
 import com.example.finalproject12be.domain.member.entity.Member;
 import com.example.finalproject12be.domain.member.entity.MemberRoleEnum;
@@ -156,8 +162,11 @@ public class StoreService {
 
 	}
 
+
+
+
 	@Transactional
-	public List<StoreResponseDto> searchStore(String storeName, String gu, boolean open, boolean holidayBusiness, boolean nightBusiness,
+	public Page<StoreResponseDto> searchStore(int page, int size, String storeName, String gu, boolean open, boolean holidayBusiness, boolean nightBusiness,
 		String radius, String latitude, String longitude,
 		UserDetailsImpl userDetails) {
 
@@ -251,79 +260,11 @@ public class StoreService {
 
 		}else if (nightBusiness == true){
 
-			// nightBusinessCheck(stores);
-
 			if(progress == 0){
 
 				progress = 1;
 
 				stores = storeRepository.findAllByNightPharmacy(1);
-
-				// newStores = storeRepository.findAllByWeekdaysTimeContaining("25");
-				// for (Store store : newStores) {
-				// 	stores.add(store);
-				// }
-				//
-				// newStores = storeRepository.findAllByWeekdaysTimeContaining("26");
-				// for (Store store : newStores) {
-				// 	stores.add(store);
-				// }
-				//
-				// newStores = storeRepository.findAllByWeekdaysTimeContaining("27");
-				// for (Store store : newStores) {
-				// 	stores.add(store);
-				// }
-				//
-				// newStores = storeRepository.findAllBysaturdayTimeContaining("24");
-				// for (Store store : newStores) {
-				// 	stores.add(store);
-				// }
-				//
-				// newStores = storeRepository.findAllBysaturdayTimeContaining("25");
-				// for (Store store : newStores) {
-				// 	stores.add(store);
-				// }
-				//
-				// newStores = storeRepository.findAllBysaturdayTimeContaining("26");
-				// for (Store store : newStores) {
-				// 	stores.add(store);
-				// }
-				//
-				// newStores = storeRepository.findAllBysaturdayTimeContaining("27");
-				// for (Store store : newStores) {
-				// 	stores.add(store);
-				// }
-				//
-				// newStores = storeRepository.findAllBysundayTimeContaining("24");
-				// for (Store store : newStores) {
-				// 	stores.add(store);
-				// }
-				//
-				// newStores = storeRepository.findAllBysundayTimeContaining("25");
-				// for (Store store : newStores) {
-				// 	stores.add(store);
-				// }
-				//
-				// newStores = storeRepository.findAllBysundayTimeContaining("26");
-				// for (Store store : newStores) {
-				// 	stores.add(store);
-				// }
-				//
-				// newStores = storeRepository.findAllBysundayTimeContaining("27");
-				// for (Store store : newStores) {
-				// 	stores.add(store);
-				// }
-				//
-				// newStores = storeRepository.findAllBysundayTimeContaining("28");
-				// for (Store store : newStores) {
-				// 	stores.add(store);
-				// }
-				//
-				// newStores = storeRepository.findAllBysundayTimeContaining("29");
-				// for (Store store : newStores) {
-				// 	stores.add(store);
-				// }
-
 
 			}else if(progress == 1){
 
@@ -338,84 +279,6 @@ public class StoreService {
 					if(testStore.getNightPharmacy() != 1){
 						stores.remove(testStore);
 					}
-
-				// 	if(testStore.getWeekdaysTime() != null){
-				//
-				// 		String storeTime = testStore.getWeekdaysTime();
-				//
-				// 		String[] storeTimes = storeTime.split("~");
-				// 		String closeHour = storeTimes[1].substring(0, 2);
-				//
-				// 		if(closeHour.equals("24")) {
-				// 			continue;
-				// 		}else if(closeHour.equals("25")){
-				// 			continue;
-				// 		}else if(closeHour.equals("26")){
-				// 			continue;
-				// 		}else if(closeHour.equals("27")){
-				// 			continue;
-				// 		}else if(closeHour.equals("28")){
-				// 			continue;
-				// 		}else if(closeHour.equals("29")){
-				// 			continue;
-				// 		}else if(closeHour.equals("30")){
-				// 			continue;
-				// 		}else{
-				// 			stores.remove(testStore);
-				// 		}
-				// 	}
-				//
-				// if(testStore.getSaturdayTime() != null){
-				//
-				// 	String storeTime = testStore.getSaturdayTime();
-				//
-				// 	String[] storeTimes = storeTime.split("~");
-				// 	String closeHour = storeTimes[1].substring(0, 2);
-				//
-				// 	if(closeHour.equals("24")) {
-				// 		continue;
-				// 	}else if(closeHour.equals("25")){
-				// 		continue;
-				// 	}else if(closeHour.equals("26")){
-				// 		continue;
-				// 	}else if(closeHour.equals("27")){
-				// 		continue;
-				// 	}else if(closeHour.equals("28")){
-				// 		continue;
-				// 	}else if(closeHour.equals("29")){
-				// 		continue;
-				// 	}else if(closeHour.equals("30")){
-				// 		continue;
-				// 	}else{
-				// 		stores.remove(testStore);
-				// 	}
-				// }
-				//
-				// if (testStore.getSundayTime() != null){
-				//
-				// 		String storeTime = testStore.getSundayTime();
-				//
-				// 		String[] storeTimes = storeTime.split("~");
-				// 		String closeHour = storeTimes[1].substring(0, 2);
-				//
-				// 		if(closeHour.equals("24")) {
-				// 			continue;
-				// 		}else if(closeHour.equals("25")){
-				// 			continue;
-				// 		}else if(closeHour.equals("26")){
-				// 			continue;
-				// 		}else if(closeHour.equals("27")){
-				// 			continue;
-				// 		}else if(closeHour.equals("28")){
-				// 			continue;
-				// 		}else if(closeHour.equals("29")){
-				// 			continue;
-				// 		}else if(closeHour.equals("30")){
-				// 			continue;
-				// 		}else{
-				// 			stores.remove(testStore);
-				// 		}
-				// 	}
 				}
 			}
 		}
@@ -430,8 +293,19 @@ public class StoreService {
 
 		}
 
-		return storeResponseDtos;
+		// storeResponseDtos -> 이게 원래 반환 값
+
+		Pageable pageable = PageRequest.of(page, size);
+		// Page<Board> boardsPage = boardRepository.findAll(pageable);
+
+		final int start = (int)pageable.getOffset();
+		final int end = Math.min((start + pageable.getPageSize()), storeResponseDtos.size());
+		final Page<StoreResponseDto> storeResponsePage = new PageImpl<>(storeResponseDtos.subList(start, end), pageable, storeResponseDtos.size());
+
+		return storeResponsePage;
 	}
+
+
 	@Transactional
 	public OneStoreResponseDto getStore(Long storeId, UserDetailsImpl userDetails) {
 		Store store = storeRepository.findById(storeId)
@@ -522,14 +396,6 @@ public class StoreService {
 				if(storeTime != null && !storeTime.contains("nu")){ //TODO: nu:ll 로 시간 들어가 있는 객체 골라서 작업하기
 					String[] storeTimes = storeTime.split("~");
 
-					// //test
-					// if(storeTimes[0].substring(3, 5).equals("nu")){
-					// 	System.out.println("원래 문자열: " + storeTimes[0]);
-					// 	System.out.println("두 번째 문자열: " + storeTimes[1]);
-					// 	stores.remove(testStore);
-					// 	status = 1;
-					// }
-
 					openHour = Integer.parseInt(storeTimes[0].substring(3, 5));
 					openMin = Integer.parseInt(storeTimes[0].substring(6, 8));
 
@@ -578,18 +444,6 @@ public class StoreService {
 			}
 
 			if(status != 1){
-				// if(closeHour <= 6){
-				// 	closeHour += 24;
-				// }
-				// if((openHour > nowHour) && (closeHour > nowHour)){
-				// 	stores.remove(testStore);
-				// }else if((openHour < nowHour) && (closeHour < nowHour)){
-				// 	stores.remove(testStore);
-				// }else if(openHour == nowHour && openMin > nowMin){
-				// 	stores.remove(testStore);
-				// } else if(closeHour == nowHour && closeMin < nowMin){ //현재 시간이 영업 시간에 포함되지 않을 때
-				// 	stores.remove(testStore);
-				// }
 
 				if((openHour < nowHour) && (closeHour > nowHour)){
 					continue;
@@ -615,7 +469,7 @@ public class StoreService {
 	}
 
 	@Transactional
-	public List<ForeignStoreResponse> searchForeignStore(String storeName, String gu, boolean open, boolean holidayBusiness, boolean nightBusiness,
+	public Page<ForeignStoreResponse> searchForeignStore(int page, int size, String storeName, String gu, boolean open, boolean holidayBusiness, boolean nightBusiness,
 		boolean english, boolean chinese, boolean japanese,
 		String radius, String latitude, String longitude,
 		UserDetailsImpl userDetails) {
@@ -762,82 +616,12 @@ public class StoreService {
 
 		}else if (nightBusiness == true){
 
-			// nightBusinessCheck(stores);
-
 			if(progress == 0){
 
 				progress = 1;
 
-				// List<Store> newStores = new ArrayList<>();
-
 				stores = storeRepository.findAllByNightPharmacy(1);
 
-				// stores = storeRepository.findAllByWeekdaysTimeContaining("24");
-
-				// newStores = storeRepository.findAllByWeekdaysTimeContaining("25");
-				// for (Store store : newStores) {
-				// 	stores.add(store);
-				// }
-				//
-				// newStores = storeRepository.findAllByWeekdaysTimeContaining("26");
-				// for (Store store : newStores) {
-				// 	stores.add(store);
-				// }
-				//
-				// newStores = storeRepository.findAllByWeekdaysTimeContaining("27");
-				// for (Store store : newStores) {
-				// 	stores.add(store);
-				// }
-				//
-				// newStores = storeRepository.findAllBysaturdayTimeContaining("24");
-				// for (Store store : newStores) {
-				// 	stores.add(store);
-				// }
-				//
-				// newStores = storeRepository.findAllBysaturdayTimeContaining("25");
-				// for (Store store : newStores) {
-				// 	stores.add(store);
-				// }
-				//
-				// newStores = storeRepository.findAllBysaturdayTimeContaining("26");
-				// for (Store store : newStores) {
-				// 	stores.add(store);
-				// }
-				//
-				// newStores = storeRepository.findAllBysaturdayTimeContaining("27");
-				// for (Store store : newStores) {
-				// 	stores.add(store);
-				// }
-				//
-				// newStores = storeRepository.findAllBysundayTimeContaining("24");
-				// for (Store store : newStores) {
-				// 	stores.add(store);
-				// }
-				//
-				// newStores = storeRepository.findAllBysundayTimeContaining("25");
-				// for (Store store : newStores) {
-				// 	stores.add(store);
-				// }
-				//
-				// newStores = storeRepository.findAllBysundayTimeContaining("26");
-				// for (Store store : newStores) {
-				// 	stores.add(store);
-				// }
-				//
-				// newStores = storeRepository.findAllBysundayTimeContaining("27");
-				// for (Store store : newStores) {
-				// 	stores.add(store);
-				// }
-				//
-				// newStores = storeRepository.findAllBysundayTimeContaining("28");
-				// for (Store store : newStores) {
-				// 	stores.add(store);
-				// }
-				//
-				// newStores = storeRepository.findAllBysundayTimeContaining("29");
-				// for (Store store : newStores) {
-				// 	stores.add(store);
-				// }
 			}else if(progress == 1){
 
 				//test
@@ -853,84 +637,6 @@ public class StoreService {
 						stores.remove(testStore);
 					}
 
-					// if(testStore.getWeekdaysTime() != null){
-					//
-					// 	String storeTime = testStore.getWeekdaysTime();
-					//
-					// 	String[] storeTimes = storeTime.split("~");
-					// 	String closeHour = storeTimes[1].substring(0, 2);
-					//
-					// 	if(closeHour.equals("24")) {
-					// 		continue;
-					// 	}else if(closeHour.equals("25")){
-					// 		continue;
-					// 	}else if(closeHour.equals("26")){
-					// 		continue;
-					// 	}else if(closeHour.equals("27")){
-					// 		continue;
-					// 	}else if(closeHour.equals("28")){
-					// 		continue;
-					// 	}else if(closeHour.equals("29")){
-					// 		continue;
-					// 	}else if(closeHour.equals("30")){
-					// 		continue;
-					// 	}else{
-					// 		stores.remove(testStore);
-					// 	}
-					//
-					// }
-					//
-					// if(testStore.getSaturdayTime() != null){
-					//
-					// 	String storeTime = testStore.getSaturdayTime();
-					//
-					// 	String[] storeTimes = storeTime.split("~");
-					// 	String closeHour = storeTimes[1].substring(0, 2);
-					//
-					// 	if(closeHour.equals("24")) {
-					// 		continue;
-					// 	}else if(closeHour.equals("25")){
-					// 		continue;
-					// 	}else if(closeHour.equals("26")){
-					// 		continue;
-					// 	}else if(closeHour.equals("27")){
-					// 		continue;
-					// 	}else if(closeHour.equals("28")){
-					// 		continue;
-					// 	}else if(closeHour.equals("29")){
-					// 		continue;
-					// 	}else if(closeHour.equals("30")){
-					// 		continue;
-					// 	}else{
-					// 		stores.remove(testStore);
-					// 	}
-					// }
-					//
-					// if (testStore.getSundayTime() != null){
-					//
-					// 	String storeTime = testStore.getSundayTime();
-					//
-					// 	String[] storeTimes = storeTime.split("~");
-					// 	String closeHour = storeTimes[1].substring(0, 2);
-					//
-					// 	if(closeHour.equals("24")) {
-					// 		continue;
-					// 	}else if(closeHour.equals("25")){
-					// 		continue;
-					// 	}else if(closeHour.equals("26")){
-					// 		continue;
-					// 	}else if(closeHour.equals("27")){
-					// 		continue;
-					// 	}else if(closeHour.equals("28")){
-					// 		continue;
-					// 	}else if(closeHour.equals("29")){
-					// 		continue;
-					// 	}else if(closeHour.equals("30")){
-					// 		continue;
-					// 	}else{
-					// 		stores.remove(testStore);
-					// 	}
-					// }
 				}
 			}
 		}
@@ -994,7 +700,17 @@ public class StoreService {
 		}
 		foreignStoreResponses = checkForeignBookmark(stores, foreignStoreResponses, userDetails);
 
-		return foreignStoreResponses;
+		 // foreignStoreResponses -> 이게 원래 반환 값
+
+		// Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+		Pageable pageable = PageRequest.of(page, size);
+		// Page<Board> boardsPage = boardRepository.findAll(pageable);
+
+		final int start = (int)pageable.getOffset();
+		final int end = Math.min((start + pageable.getPageSize()), foreignStoreResponses.size());
+		final Page<ForeignStoreResponse> foreignStoreResponsePage = new PageImpl<>(foreignStoreResponses.subList(start, end), pageable, foreignStoreResponses.size());
+
+		return foreignStoreResponsePage;
 	}
 
 	//외국어 약국 상세보기
