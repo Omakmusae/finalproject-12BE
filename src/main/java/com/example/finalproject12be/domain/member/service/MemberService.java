@@ -90,7 +90,6 @@ public class MemberService {
 	private final String S3Bucket = "odimedi-profile";
 	private final ProfileRepository profileRepository;
 
-
 	@Transactional
 	public void signup(final MemberSignupRequest memberSignupRequest) {
 
