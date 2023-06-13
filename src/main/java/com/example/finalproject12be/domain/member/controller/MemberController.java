@@ -50,8 +50,10 @@ public class MemberController {
 
 	@PostMapping("/user/logout")
 	public ResponseEntity<String> logout(HttpServletRequest request,
-		final HttpServletResponse response) {
-		memberService.logout(request, response);
+		final HttpServletResponse response,
+		@AuthenticationPrincipal UserDetailsImpl userDetails
+	) {
+		memberService.logout(request, response, userDetails.getMember());
 		return ResponseEntity.ok("로그아웃되었습니다.");
 	}
 
