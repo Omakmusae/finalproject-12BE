@@ -45,11 +45,11 @@ public class CommentResponseDto {
         }
     }
 
-    public CommentResponseDto(Comment comment, boolean isCurrentUserComment, Optional<Profile> profile) {
+    public CommentResponseDto(Comment comment, boolean isCurrentUserComment, Member member, Optional<Profile> profile) {
         this.commentId = comment.getId();
-        this.memberId = comment.getMember().getId();
+        this.memberId = member != null ? member.getId() : null;
         this.storeId = comment.getStore().getId();
-        this.nickname = comment.getNickname();
+        this.nickname = member != null ? comment.getNickname() : "탈퇴한 회원";
         this.contents = comment.getContents();
         this.check = isCurrentUserComment;
         this.createdAt = comment.getCreatedAt();
