@@ -14,6 +14,7 @@ public class BoardDetailResponse {
 	private String nickname;
 	private Long prevId;
 	private Long nextId;
+	private String createdAt;
 
 	public BoardDetailResponse(Board board) {
 		this.id = board.getId();
@@ -22,5 +23,6 @@ public class BoardDetailResponse {
 		this.nickname = board.getMember().getNickname();
 		this.prevId = board.getPrev_board() != null ? board.getPrev_board().getId() : null;
 		this.nextId = board.getNext_board() != null ? board.getNext_board().getId() : null;
+		this.createdAt = board.getCreatedAt();
 	}
 }

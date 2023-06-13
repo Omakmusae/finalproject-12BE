@@ -13,18 +13,20 @@ public class BoardResponse {
 	private String title;
 	private String content;
 	private String nickname;
+	private String createdAt;
 
-	public BoardResponse(Long id, String title, String content, String nickname) {
-		this.id = id;
-		this.title = title;
-		this.content = content;
-		this.nickname = nickname;
-	}
+	// public BoardResponse(Long id, String title, String content, String nickname) {
+	// 	this.id = id;
+	// 	this.title = title;
+	// 	this.content = content;
+	// 	this.nickname = nickname;
+	// }
 
 	public BoardResponse(Board board) {
 		this.id = board.getId();
 		this.title = board.getTitle();
 		this.content = board.getContent();
 		this.nickname = board.getMember().getNickname();
+		this.createdAt = board.getCreatedAt();
 	}
 }
