@@ -65,11 +65,15 @@ import com.example.finalproject12be.domain.member.entity.RefreshToken;
 import com.example.finalproject12be.domain.member.repository.MemberRepository;
 import com.example.finalproject12be.domain.member.repository.RefreshTokenRepository;
 import com.example.finalproject12be.security.jwt.JwtUtil;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 //import com.example.finalproject12be.security.jwt.JwtUtil;
 
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MemberService {
@@ -147,11 +151,18 @@ public class MemberService {
 	}
 
 	@Transactional
-	public void logout(HttpServletRequest request, HttpServletResponse response) {
+	public void logout(HttpServletRequest request, HttpServletResponse response, Member member) {
 
 		String accessToken = jwtUtil.resolveToken(request, JwtUtil.ACCESS_KEY);
-		String kakaoAccessToken = request.getHeader("Authorization");
+		Optional<RefreshToken> memberToken = refreshTokenRepository.findByEmail(member.getEmail());
 
+		String kakaoAccessToken = "Bearer " + memberToken.get().getKakaoAccessToken();
+		String kakaoRefreshToken = "Bearer " + memberToken.get().getKakaoRefreshToken();
+		// String[] renewalTokenArray = renewalToken(kakaoAccessToken, memberToken.get().getKakaoRefreshToken());
+		// kakaoAccessToken = renewalTokenArray[0];
+		// kakaoRefreshToken = renewalTokenArray[1];
+
+		System.out.println(kakaoAccessToken + " $$$$!!!!!!!!!!!");
 		if (kakaoAccessToken == null){
 			if (accessToken != null) {
 				boolean isAccessTokenExpired = jwtUtil.validateToken(accessToken);
@@ -235,7 +246,13 @@ public class MemberService {
 		Member member = memberRepository.findByEmail(email)
 				.orElseThrow(() ->  new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
 
-		String kakaoAccessToken = request.getHeader("authorization");
+		Optional<RefreshToken> memberToken = refreshTokenRepository.findByEmail(email);
+		String kakaoAccessToken = "Bearer " + memberToken.get().getKakaoAccessToken();
+		String kakaoRefreshToken = "Bearer " + memberToken.get().getKakaoRefreshToken();
+
+		// String[] renewalTokenArray = renewalToken(kakaoAccessToken, kakaoRefreshToken);
+		// kakaoAccessToken = "Bearer " + renewalTokenArray[0];
+		// kakaoRefreshToken = "Bearer " + renewalTokenArray[1];
 
 		if (member.getKakaoId() == null) {
 			// 카카오 소셜 로그인이 아닌 일반 가입 회원의 경우 직접 삭제
@@ -246,6 +263,7 @@ public class MemberService {
 				comment.setNickname("탈퇴한 회원");
 			}
 			memberRepository.delete(member);
+			refreshTokenRepository.deleteRefreshTokenByEmail(member.getEmail());
 
 		} else {
 			// 카카오 소셜 로그인 회원의 경우 카카오 계정 연결 해제 후 삭제
@@ -256,8 +274,10 @@ public class MemberService {
 				comment.setNickname("탈퇴한 회원");
 			}
 			disconnectKakaoAccount(kakaoAccessToken);
+			refreshTokenRepository.deleteRefreshTokenByEmail(member.getEmail());
 			commentRepository.deleteCommentsByMemberId(member.getId());//수정 필요
 			memberRepository.delete(member);
+
 		}
 	}
 
@@ -394,6 +414,7 @@ public class MemberService {
 
 	@Transactional
 	public void signoutAdmin(MemberNameRequest memberNameRequest, Member member, final HttpServletRequest request) {
+
 		MemberRoleEnum memberRoleEnum =  member.getRole();
 		if (memberRoleEnum != MemberRoleEnum.ADMIN) {
 			throw new RestApiException(MemberErrorCode.INACTIVE_MEMBER);
@@ -410,6 +431,7 @@ public class MemberService {
 		}
 
 		memberRepository.delete(deleteMember);
+		refreshTokenRepository.deleteById(deleteMember.getId());
 
 	}
 
@@ -433,7 +455,6 @@ public class MemberService {
 	// 	mailSender.send(message);
 	// }
 
-
 	//ing
 	public void checkEmail(String email) {
 
@@ -451,7 +472,6 @@ public class MemberService {
 
 		// int number = (int)((Math.random()*10000)%10);
 		int number = (int)(Math.random() * 899999) + 100000;
-
 
 		LocalTime now = LocalTime.now();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HHmmss");
@@ -532,5 +552,49 @@ public class MemberService {
 		}
 
 		return amazonS3Client.getUrl(S3Bucket, fileName).toString();
+	}
+
+	private String[] renewalToken (String kakaoAccessToken, String kakaoRefreshToken) {
+
+		String reqURL = "https://kauth.kakao.com/oauth/token";
+		System.out.println(kakaoRefreshToken + "갱신 시작 !!!!!!!!! ");
+		String[] tokenArray = new String[2];
+		try {
+			// HTTP Header 생성
+			HttpHeaders headers = new HttpHeaders();
+			headers.add("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
+
+			// HTTP Body 생성
+			MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+			body.add("grant_type", "refresh_token");
+			body.add("client_id", "048f9445160611c1cc986c481c2d6b94");//내 앱 rest api 키
+			body.add("refresh_token", kakaoRefreshToken);
+
+			// HTTP 요청을 보낼 RestTemplate 객체 생성
+			RestTemplate restTemplate = new RestTemplate();
+
+			// HTTP 요청을 보내고 응답 받기
+			ResponseEntity<String> response = restTemplate.exchange(
+				reqURL,
+				HttpMethod.POST,
+				new HttpEntity<>(body, headers),
+				String.class
+			);
+			System.out.println( "HTTP 보내기 시작 !!!!!!!!! ");
+			// HTTP 응답 (JSON) -> 액세스 토큰 파싱
+			String responseBody = response.getBody();
+			ObjectMapper objectMapper = new ObjectMapper();
+			JsonNode jsonNode = objectMapper.readTree(responseBody);
+			System.out.println( "HTTP 받기 시작 !!!!!!!!! ");
+
+			tokenArray[0] = jsonNode.get("access_token").asText();
+			tokenArray[1] = jsonNode.get("refresh_token").asText();
+			System.out.println(tokenArray[0] + "갱신 마무리 !!!!!!!!! ");
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return tokenArray;
 	}
 }
