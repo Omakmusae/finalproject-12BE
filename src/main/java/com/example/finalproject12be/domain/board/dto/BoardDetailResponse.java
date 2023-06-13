@@ -2,31 +2,27 @@ package com.example.finalproject12be.domain.board.dto;
 
 import com.example.finalproject12be.domain.board.entity.Board;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class BoardResponse {
+public class BoardDetailResponse {
 	private Long id;
 	private String title;
 	private String content;
 	private String nickname;
+	private Long prevId;
+	private Long nextId;
 	private String createdAt;
 
-	// public BoardResponse(Long id, String title, String content, String nickname) {
-	// 	this.id = id;
-	// 	this.title = title;
-	// 	this.content = content;
-	// 	this.nickname = nickname;
-	// }
-
-	public BoardResponse(Board board) {
+	public BoardDetailResponse(Board board) {
 		this.id = board.getId();
 		this.title = board.getTitle();
 		this.content = board.getContent();
 		this.nickname = board.getMember().getNickname();
+		this.prevId = board.getPrev_board() != null ? board.getPrev_board().getId() : null;
+		this.nextId = board.getNext_board() != null ? board.getNext_board().getId() : null;
 		this.createdAt = board.getCreatedAt();
 	}
 }

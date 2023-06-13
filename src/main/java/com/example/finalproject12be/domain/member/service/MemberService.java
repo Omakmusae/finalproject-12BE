@@ -101,6 +101,13 @@ public class MemberService {
 			role = MemberRoleEnum.ADMIN;
 		}
 
+		// if (memberSignupRequest.isAdmin()) {
+		// 	if (!memberSignupRequest.getAdminToken().equals(ADMIN_TOKEN)) {
+		// 		throw new RestApiException(MemberErrorCode.ADMIN_ERROR);
+		// 	}
+		// 	role = MemberRoleEnum.ADMIN;
+		// }
+
 		Member member = MemberSignupRequest.toEntity(memberSignupRequest, password, role);
 		memberRepository.save(member);
 	}

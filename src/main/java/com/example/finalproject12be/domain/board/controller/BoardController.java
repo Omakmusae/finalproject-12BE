@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.finalproject12be.domain.board.dto.BoardDetailResponse;
 import com.example.finalproject12be.domain.board.dto.BoardRequest;
 
 import com.example.finalproject12be.domain.board.dto.BoardResponse;
@@ -39,40 +40,43 @@ public class BoardController {
 	}
 
 	@GetMapping("/api/board/{boardId}")
-	public ResponseEntity<BoardResponse> getBoard(@PathVariable final Long boardId) {
-		System.out.println(boardId + " !!!!!!!!!!!!");
+	public ResponseEntity<BoardDetailResponse> getBoard(@PathVariable final Long boardId) {
+
 		return ResponseEntity.status(HttpStatus.OK)
 			.body(boardService.getBoard(boardId));
 	}
 
 	@PostMapping("/api/board")
-	public ResponseEntity<Void> createBoard(
+	public ResponseEntity<String> createBoard(
 		@AuthenticationPrincipal final UserDetailsImpl userDetails,
 		@RequestBody final BoardRequest boardRequest) {
 
 		System.out.println(boardRequest.getContent());
 		System.out.println(boardRequest.getTitle());
 		boardService.createBoard(userDetails.getMember(), boardRequest);
-		return ResponseEntity.status(HttpStatus.OK).body(null);
+		//return ResponseEntity.status(HttpStatus.OK).body(null);
+		return ResponseEntity.ok("공지사항이 등록되었습니다.");
 	}
 
 	@PutMapping("/api/board/{boardId}")
-	public ResponseEntity<Void> updateBoard(
+	public ResponseEntity<String> updateBoard(
 		@AuthenticationPrincipal final UserDetailsImpl userDetails,
 		@PathVariable final Long boardId,
 		@RequestBody final BoardRequest boardRequest) {
 
 		boardService.updateBoard(userDetails.getMember(), boardId, boardRequest);
-		return ResponseEntity.status(HttpStatus.OK).body(null);
+		//return ResponseEntity.status(HttpStatus.OK).body(null);
+		return ResponseEntity.ok("공지사항이 수정되었습니다.");
 	}
 
 	@DeleteMapping("/api/board/{boardId}")
-	public ResponseEntity<Void> deleteBoard(
+	public ResponseEntity<String> deleteBoard(
 		@AuthenticationPrincipal final UserDetailsImpl userDetails,
 		@PathVariable final Long boardId) {
 
 		boardService.deleteBoard(userDetails.getMember(), boardId);
-		return ResponseEntity.status(HttpStatus.OK).body(null);
+		//return ResponseEntity.status(HttpStatus.OK).body(null);
+		return ResponseEntity.ok("공지사항이 삭제되었습니다.");
 	}
 
 }
