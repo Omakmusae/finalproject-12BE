@@ -1,11 +1,8 @@
 package com.example.finalproject12be.domain.profile.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
+import com.example.finalproject12be.domain.member.entity.Member;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -24,6 +21,9 @@ public class Profile {
 
 	@Column
 	private Long memberId;
+
+	@OneToOne(mappedBy = "profile", cascade = CascadeType.ALL)
+	private Member member;
 
 	public Profile(String img, Long memberId) {
 		this.img = img;

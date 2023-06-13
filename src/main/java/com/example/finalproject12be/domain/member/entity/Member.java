@@ -2,26 +2,18 @@ package com.example.finalproject12be.domain.member.entity;
 
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 
 import com.example.finalproject12be.domain.board.entity.Board;
 import com.example.finalproject12be.domain.bookmark.entity.Bookmark;
 
+import com.example.finalproject12be.domain.profile.entity.Profile;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
 @NoArgsConstructor
 @Entity
 public class Member {
@@ -49,6 +41,11 @@ public class Member {
 
 	@OneToMany(mappedBy = "member", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
 	private List<Bookmark> bookmarks;
+
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "MEMBER_ID", referencedColumnName = "MEMBER_ID")
+	private Profile profile;
+
 
 	public Member(String email, String password, String nickname, MemberRoleEnum role) {
 		this.email = email;
@@ -89,5 +86,7 @@ public class Member {
 	public void updatePassword(String newPassword) {
 		this.password = newPassword;
 	}
+
+
 
 }
