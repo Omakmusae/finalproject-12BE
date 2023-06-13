@@ -65,7 +65,7 @@ public class CommentController {
             @PathVariable("comment-id") Long commentId,
             @Valid @RequestBody CommentRequestDto commentRequestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return commentService.updateComment(commentId, commentRequestDto, userDetails.getMember());
+        return commentService.updateComment(commentId, commentRequestDto, userDetails);
     }
 
     // 댓글 삭제
