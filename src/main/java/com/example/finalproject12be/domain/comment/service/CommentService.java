@@ -81,19 +81,19 @@ public class CommentService {
                 profileOptional = profileRepository.findByMemberId(comment.getMember().getId());
             }
 
-            // Check if the comment's member is null
+            // 댓글의 멤버가 null인지 확인
             if (comment.getMember() == null) {
-                // Create a temporary Member with null values
+                // null 값을 가지는 임시 Member 생성
                 Member member = new Member();
                 member.setId(null);
                 member.setNickname("탈퇴한 회원");
 
-                // Create a temporary Profile with null values
+                // null 값을 가지는 임시 Profile 생성
                 Profile profile = new Profile();
                 profile.setImg("");
                 profile.setMemberId(null);
 
-                // Create CommentResponseDto with null values
+                // null 값을 가진 CommentResponseDto 생성
                 CommentResponseDto responseDto = new CommentResponseDto(comment, isCurrentUserComment, member, profileOptional);
                 responseDtos.add(responseDto);
             } else {
