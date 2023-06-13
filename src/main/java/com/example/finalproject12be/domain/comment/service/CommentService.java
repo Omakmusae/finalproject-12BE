@@ -62,7 +62,7 @@ public class CommentService {
         return ResponseMsgDto.setSuccess(HttpStatus.CREATED.value(), "댓글이 등록되었습니다.", commentResponseDto);
     }
 
-    //댓글 조회
+    //댓글 조회(store 기준)
     public ResponseEntity<List<CommentResponseDto>> getComments(Long storeId, UserDetailsImpl userDetails) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new RuntimeException("Store not found"));
@@ -71,10 +71,35 @@ public class CommentService {
 
         List<CommentResponseDto> responseDtos = new ArrayList<>();
         for (Comment comment : comments) {
-            boolean isCurrentUserComment = userDetails != null && comment.getMember().getId().equals(userDetails.getMember().getId());
-            Optional<Profile> profileOptional = profileRepository.findByMemberId(userDetails.getMember().getId());
-            CommentResponseDto responseDto = new CommentResponseDto(comment, isCurrentUserComment, profileOptional);
-            responseDtos.add(responseDto);
+            boolean isCurrentUserComment = false;
+            if (userDetails != null && userDetails.getMember() != null) {
+                isCurrentUserComment = comment.getMember() != null && comment.getMember().getId().equals(userDetails.getMember().getId());
+            }
+
+            Optional<Profile> profileOptional = Optional.empty();
+            if (comment.getMember() != null) {
+                profileOptional = profileRepository.findByMemberId(comment.getMember().getId());
+            }
+
+            // Check if the comment's member is null
+            if (comment.getMember() == null) {
+                // Create a temporary Member with null values
+                Member member = new Member();
+                member.setId(null);
+                member.setNickname("탈퇴한 회원");
+
+                // Create a temporary Profile with null values
+                Profile profile = new Profile();
+                profile.setImg("");
+                profile.setMemberId(null);
+
+                // Create CommentResponseDto with null values
+                CommentResponseDto responseDto = new CommentResponseDto(comment, isCurrentUserComment, member, profileOptional);
+                responseDtos.add(responseDto);
+            } else {
+                CommentResponseDto responseDto = new CommentResponseDto(comment, isCurrentUserComment, comment.getMember(), profileOptional);
+                responseDtos.add(responseDto);
+            }
         }
 
         return ResponseEntity.ok(responseDtos);

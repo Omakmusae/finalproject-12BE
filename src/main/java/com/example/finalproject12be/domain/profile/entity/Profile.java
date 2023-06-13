@@ -5,10 +5,12 @@ import javax.persistence.*;
 import com.example.finalproject12be.domain.member.entity.Member;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @NoArgsConstructor
 @Getter
+@Setter
 public class Profile {
 
 	@Id

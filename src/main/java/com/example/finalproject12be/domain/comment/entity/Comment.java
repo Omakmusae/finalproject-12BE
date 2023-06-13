@@ -47,7 +47,8 @@ public class Comment extends Timestamped {
         this.store = store;
         this.nickname = member.getNickname();
     }
-    public void deleteMember(){
+    public void deleteMember() {
         this.member = null;
+        this.nickname = "탈퇴한 회원"; // 탈퇴한 회원의 경우 닉네임을 "탈퇴한 회원"으로 설정
     }
 }
