@@ -38,6 +38,7 @@ public class BoardController {
 		@RequestParam("page") int page, @RequestParam("size") int size,
 		@AuthenticationPrincipal final UserDetailsImpl userDetails
 	) {
+
 		HttpHeaders headers = new HttpHeaders();
 
 		if (userDetails.getMember().getRole() == MemberRoleEnum.ADMIN) {
@@ -49,6 +50,7 @@ public class BoardController {
 		return ResponseEntity.status(HttpStatus.OK)
 			.headers(headers)
 			.body(boardService.getAllBoards(page, size));
+
 	}
 
 	@GetMapping("/api/board/{boardId}")
