@@ -29,6 +29,7 @@ import com.example.finalproject12be.domain.store.dto.StoreResponseDto;
 import com.example.finalproject12be.domain.store.entity.Store;
 import com.example.finalproject12be.domain.store.repository.StoreRepository;
 import com.example.finalproject12be.domain.store.repository.StoreRepositoryCustom;
+import com.example.finalproject12be.exception.CommonErrorCode;
 import com.example.finalproject12be.exception.MemberErrorCode;
 import com.example.finalproject12be.exception.RestApiException;
 import com.example.finalproject12be.security.UserDetailsImpl;
@@ -44,6 +45,7 @@ public class StoreService {
 	private final StoreRepository storeRepository;
 	private final StoreRepositoryCustom storeRepositoryCustom;
 
+	//약국 전체보기
 	@Transactional
 	public List<StoreResponseDto> getAllStores(UserDetailsImpl userDetails) {
 
@@ -52,18 +54,18 @@ public class StoreService {
 
 		if(userDetails != null){
 			Member member = userDetails.getMember();
-			storeResponseDtos = checkBookmark(stores, storeResponseDtos, member);
-		}else{
+			checkBookmark(stores, storeResponseDtos, member);
 
+		}else{
 			for(Store store : stores){
 				storeResponseDtos.add(new StoreResponseDto(store));
 			}
-
 		}
 
 		return storeResponseDtos;
 	}
 
+	//외국어 가능, 북마크 확인 로직
 	private List<ForeignStoreResponse> checkForeignBookmark(List<Store> stores, List<ForeignStoreResponse> foreignStoreResponses, UserDetailsImpl userDetails){
 
 		int bookmarkCheck = 0;
@@ -74,21 +76,19 @@ public class StoreService {
 		for(Store store : stores){
 
 			if(userDetails != null){
-
 				Member member = userDetails.getMember();
 
 				if(store.getBookmarks().size() != 0){
 					List<Bookmark> bookmarks = store.getBookmarks();
 
 					for(Bookmark bookmark : bookmarks){
+
 						if(bookmark.getMember().getId() == member.getId()){
 							bookmarkCheck = 1;
 						}
-
 					}
 				}
 			}
-
 
 			if(store.getForeignLanguage() != null){
 
@@ -103,13 +103,9 @@ public class StoreService {
 				if(store.getJapanese() == 1){
 					japanese = true;
 				}
-
 			}
 
-
-
 			ForeignStoreResponse foreignStoreResponse = new ForeignStoreResponse(store);
-
 
 			if(bookmarkCheck == 1){
 				foreignStoreResponse.setBookmark(true);
@@ -122,13 +118,12 @@ public class StoreService {
 			english = false;
 			chinese = false;
 			japanese = false;
-
 		}
 
 		return foreignStoreResponses;
-
 	}
 
+	//북마크 확인 로직
 	private List<StoreResponseDto> checkBookmark(List<Store> stores, List<StoreResponseDto> storeResponseDtos, Member member){
 
 		int check = 0;
@@ -139,15 +134,14 @@ public class StoreService {
 				List<Bookmark> bookmarks = store.getBookmarks();
 
 				for(Bookmark bookmark : bookmarks){
+
 					if(bookmark.getMember().getId() == member.getId()){
 						check = 1;
 					}
-
 				}
 			}
 
 			StoreResponseDto storeResponseDto = new StoreResponseDto(store);
-
 
 			if(check == 1){
 				storeResponseDto.setBookmark(true);
@@ -155,20 +149,14 @@ public class StoreService {
 
 			storeResponseDtos.add(storeResponseDto);
 			check = 0;
-
 		}
 
 		return storeResponseDtos;
-
 	}
 
-
-
-
+	//일반 약국 검색하기
 	@Transactional
-	public Page<StoreResponseDto> searchStore(int page, int size, String storeName, String gu, boolean open, boolean holidayBusiness, boolean nightBusiness,
-		String radius, String latitude, String longitude,
-		UserDetailsImpl userDetails) {
+	public Page<StoreResponseDto> searchStore(int page, int size, String storeName, String gu, boolean open, boolean holidayBusiness, boolean nightBusiness, String radius, String latitude, String longitude, UserDetailsImpl userDetails) {
 
 		int progress = 0; //stores 리스트가 null일 때 0, 반대는 1
 		List<StoreResponseDto> storeResponseDtos = new ArrayList<>();
@@ -184,19 +172,22 @@ public class StoreService {
 			stores = storeRepositoryCustom.searchTest(baseRadius, baseLatitude, baseLongitude);
 		}
 
-		//storeName
+		//약국 이름 검색
 		if(storeName != ""){
-			if(progress == 0){
+
+			if(progress == 0){ //저장된 stores가 없을 때
 				progress = 1;
 				stores = storeRepository.findAllByNameContaining(storeName);
-			}else{
 
+			}else{ //저장된 stores가 있을 때
 				List<Store> testStores = new ArrayList<>();
+
 				for(Store store: stores){
 					testStores.add(store);
 				}
 
 				for(Store testStore : testStores){
+
 					if(!testStore.getName().contains(storeName)){
 						stores.remove(testStore);
 					}
@@ -204,7 +195,7 @@ public class StoreService {
 			}
 		}
 
-		//gu
+		//구 검색
 		if(gu != ""){
 
 			if(progress == 0){ //저장된 stores가 없을 때
@@ -213,13 +204,14 @@ public class StoreService {
 				stores = storeRepository.findAllByAddressContaining(gu);
 
 			}else{ //저장된 stores가 있을 때
-
 				List<Store> testStores = new ArrayList<>();
+
 				for(Store store: stores){
 					testStores.add(store);
 				}
 
 				for(Store testStore : testStores){
+
 					if(!testStore.getAddress().contains(gu)){
 						stores.remove(testStore);
 					}
@@ -240,63 +232,57 @@ public class StoreService {
 
 			if(progress == 0){
 				progress = 1;
-
 				stores = storeRepository.findAllByHolidayTimeIsNotNull();
-			}else{
 
-				//test
-				List<Store> testStores = new ArrayList<>();
+			}else{
+				List<Store> restStores = new ArrayList<>();
+
 				for(Store store: stores){
-					testStores.add(store);
+					restStores.add(store);
 				}
 
-				for(Store testStore : testStores){
-					if(testStore.getHolidayTime() == null){
-						stores.remove(testStore);
+				for(Store restStore : restStores){
+					
+					if(restStore.getHolidayTime() == null){
+						stores.remove(restStore);
 					}
 				}
-
 			}
 
 		}else if (nightBusiness == true){
 
 			if(progress == 0){
-
 				progress = 1;
-
 				stores = storeRepository.findAllByNightPharmacy(1);
 
 			}else if(progress == 1){
+				List<Store> restStores = new ArrayList<>();
 
-				//test
-				List<Store> testStores = new ArrayList<>();
 				for(Store store: stores){
-					testStores.add(store);
+					restStores.add(store);
 				}
 
-				for(Store testStore : testStores){
+				for(Store restStore : restStores){
 
-					if(testStore.getNightPharmacy() != 1){
-						stores.remove(testStore);
+					if(restStore.getNightPharmacy() != 1){
+						stores.remove(restStore);
 					}
 				}
 			}
 		}
+
 		if(userDetails != null){
 			Member member = userDetails.getMember();
 			storeResponseDtos = checkBookmark(stores, storeResponseDtos, member);
+
 		}else{
 
 			for(Store store : stores){
 				storeResponseDtos.add(new StoreResponseDto(store));
 			}
-
 		}
 
-		// storeResponseDtos -> 이게 원래 반환 값
-
 		Pageable pageable = PageRequest.of(page, size);
-		// Page<Board> boardsPage = boardRepository.findAll(pageable);
 
 		final int start = (int)pageable.getOffset();
 		final int end = Math.min((start + pageable.getPageSize()), storeResponseDtos.size());
@@ -305,11 +291,12 @@ public class StoreService {
 		return storeResponsePage;
 	}
 
-
+	//약국 상세보기
 	@Transactional
 	public OneStoreResponseDto getStore(Long storeId, UserDetailsImpl userDetails) {
+
 		Store store = storeRepository.findById(storeId)
-				.orElseThrow(() -> new IllegalArgumentException("해당 약국은 존재하지 않습니다."));
+			.orElseThrow(() -> new RestApiException(CommonErrorCode.RESOURCE_NOT_FOUND));
 
 		OneStoreResponseDto oneStoreResponseDto = new OneStoreResponseDto(store);
 
@@ -325,8 +312,6 @@ public class StoreService {
 			oneStoreResponseDto.setHolidayTime(store.getHolidayTime());
 		}
 
-
-
 		if(userDetails != null){
 			Member member = userDetails.getMember();
 
@@ -334,19 +319,14 @@ public class StoreService {
 				List<Bookmark> bookmarks = store.getBookmarks();
 
 				for(Bookmark bookmark : bookmarks){
-					if(bookmark.getMember().getId() == member.getId()){
 
+					if(bookmark.getMember().getId() == member.getId()){
 
 						oneStoreResponseDto.setBookmark(true);
 						oneStoreResponseDto.setTotalBookmark(store.getBookmarks().size());
-
-
 					}
-
 				}
-
 			}
-
 		}
 
 		if(store.getNightPharmacy() == 1){
@@ -360,19 +340,18 @@ public class StoreService {
 		return oneStoreResponseDto;
 	}
 
+	//영업중 필터 검사 로직
 	private List<Store> openCheck(List<Store> stores){
 
-		//test
-		List<Store> testStores = new ArrayList<>();
+		List<Store> restStores = new ArrayList<>();
 		for(Store store: stores){
-			testStores.add(store);
+			restStores.add(store);
 		}
 
 		LocalDate now = LocalDate.now();
 		int dayOfWeek = now.getDayOfWeek().getValue();
 
 		LocalTime nowTime = LocalTime.now();
-
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 
 		// 포맷 적용하기
@@ -385,15 +364,16 @@ public class StoreService {
 		int closeHour = 0;
 		int closeMin = 0;
 
-		for (Store testStore : testStores) {
+		for (Store restStore : restStores) {
 
 			int status = 0; //시간 null이면 1, 아니면 0
 
 			if (dayOfWeek > 0 && dayOfWeek < 6) { //평일
 
-				String storeTime = testStore.getWeekdaysTime();
+				String storeTime = restStore.getWeekdaysTime();
 
 				if(storeTime != null && !storeTime.contains("nu")){ //TODO: nu:ll 로 시간 들어가 있는 객체 골라서 작업하기
+
 					String[] storeTimes = storeTime.split("~");
 
 					openHour = Integer.parseInt(storeTimes[0].substring(3, 5));
@@ -401,18 +381,18 @@ public class StoreService {
 
 					closeHour = Integer.parseInt(storeTimes[1].substring(1, 3));
 					closeMin = Integer.parseInt(storeTimes[1].substring(4, 6));
+
 				}else {
-
 					status = 1;
-					stores.remove(testStore);
-
+					stores.remove(restStore);
 				}
 
 			}else if (dayOfWeek == 6){ // 토요일 TODO: 일요일이랑 합치기
 
-				String storeTime = testStore.getSaturdayTime();
+				String storeTime = restStore.getSaturdayTime();
 
 				if (storeTime != null && !storeTime.contains("nu")){
+
 					String[] storeTimes = storeTime.split("~");
 
 					openHour = Integer.parseInt(storeTimes[0].substring(2, 4));
@@ -420,15 +400,18 @@ public class StoreService {
 
 					closeHour = Integer.parseInt(storeTimes[1].substring(1, 3));
 					closeMin = Integer.parseInt(storeTimes[1].substring(4, 6));
+
 				}else{
 					status = 1;
-					stores.remove(testStore);
+					stores.remove(restStore);
 				}
+
 			}else if( dayOfWeek == 7){ // 일요일
 
-				String storeTime = testStore.getSundayTime();
+				String storeTime = restStore.getSundayTime();
 
 				if(storeTime != null && !storeTime.contains("nu")){
+
 					String[] storeTimes = storeTime.split("~");
 
 					openHour = Integer.parseInt(storeTimes[0].substring(2, 4));
@@ -436,10 +419,10 @@ public class StoreService {
 
 					closeHour = Integer.parseInt(storeTimes[1].substring(1, 3));
 					closeMin = Integer.parseInt(storeTimes[1].substring(4, 6));
-				}else {
 
+				}else {
 					status = 1;
-					stores.remove(testStore);
+					stores.remove(restStore);
 				}
 			}
 
@@ -454,13 +437,15 @@ public class StoreService {
 				}else if((closeHour == openHour)){
 					continue;
 				}else{
-					stores.remove(testStore);
+					stores.remove(restStore);
 				}
-
 			}
 		}
+
 		return stores;
 	}
+
+	//위치 불러오기
 	@Transactional
 	public List<Store> getLocation(Double baseRadius,Double baseLatitude, Double baseLongitude) {
 
@@ -468,11 +453,9 @@ public class StoreService {
 		return result;
 	}
 
+	//외국어 가능 약국 검사
 	@Transactional
-	public Page<ForeignStoreResponse> searchForeignStore(int page, int size, String storeName, String gu, boolean open, boolean holidayBusiness, boolean nightBusiness,
-		boolean english, boolean chinese, boolean japanese,
-		String radius, String latitude, String longitude,
-		UserDetailsImpl userDetails) {
+	public Page<ForeignStoreResponse> searchForeignStore(int page, int size, String storeName, String gu, boolean open, boolean holidayBusiness, boolean nightBusiness, boolean english, boolean chinese, boolean japanese, String radius, String latitude, String longitude, UserDetailsImpl userDetails) {
 
 		if(gu.equals("gangnam-gu")){
 			gu = "강남구";
@@ -540,19 +523,22 @@ public class StoreService {
 			// stores = storeRepositoryCustom.searchTest(baseRadius, baseLatitude, baseLongitude);
 		}
 
-		//storeName
+		//약국 이름 검색하기
 		if(storeName != ""){
+
 			if(progress == 0){
 				progress = 1;
 				stores = storeRepository.findAllByNameContaining(storeName);
-			}else{
 
+			}else{
 				List<Store> testStores = new ArrayList<>();
+
 				for(Store store: stores){
 					testStores.add(store);
 				}
 
 				for(Store testStore : testStores){
+
 					if(!testStore.getName().contains(storeName)){
 						stores.remove(testStore);
 					}
@@ -560,22 +546,22 @@ public class StoreService {
 			}
 		}
 
-		//gu
+		//구 검색하기
 		if(!gu.equals("")){//if(gu != null){ //TODO: 주석 풀기
 
 			if(progress == 0){ //저장된 stores가 없을 때
-
 				progress = 1;
 				stores = storeRepository.findAllByAddressContaining(gu);
 
 			}else{ //저장된 stores가 있을 때
-
 				List<Store> testStores = new ArrayList<>();
+
 				for(Store store: stores){
 					testStores.add(store);
 				}
 
 				for(Store testStore : testStores){
+
 					if(!testStore.getAddress().contains(gu)){
 						stores.remove(testStore);
 					}
@@ -583,128 +569,122 @@ public class StoreService {
 			}
 		} //구가 요청되지 않았을 때는 progress가 0이고 저장될 사항이 없기 때문에 else 생략
 
-		//filter
-		if(open == true){ // 영업중 필터
+		//각종 필터
+		if(open){ // 영업중 필터
 
 			if(progress == 1){ //저장된 stores가 있을 때만 실행 가능함
-
 				stores = openCheck(stores);
-
 			}
 
-		}else if(holidayBusiness == true){
+		}else if(holidayBusiness){
 
 			if(progress == 0){
 				progress = 1;
-
 				stores = storeRepository.findAllByHolidayTimeIsNotNull();
-			}else{
 
-				//test
-				List<Store> testStores = new ArrayList<>();
+			}else{
+				List<Store> restStores = new ArrayList<>();
+
 				for(Store store: stores){
-					testStores.add(store);
+					restStores.add(store);
 				}
 
-				for(Store testStore : testStores){
-					if(testStore.getHolidayTime() == null){
-						stores.remove(testStore);
+				for(Store restStore : restStores){
+
+					if(restStore.getHolidayTime() == null){
+						stores.remove(restStore);
 					}
 				}
-
 			}
 
-		}else if (nightBusiness == true){
+		}else if (nightBusiness){
 
 			if(progress == 0){
-
 				progress = 1;
-
 				stores = storeRepository.findAllByNightPharmacy(1);
 
-			}else if(progress == 1){
-
-				//test
-				List<Store> testStores = new ArrayList<>();
+			}else {
+				List<Store> restStores = new ArrayList<>();
 				for(Store store: stores){
-					testStores.add(store);
+					restStores.add(store);
 				}
 
-				for(Store testStore : testStores){
+				for(Store restStore : restStores){
 
-					if(testStore.getNightPharmacy() != 1){
-
-						stores.remove(testStore);
+					if(restStore.getNightPharmacy() != 1){
+						stores.remove(restStore);
 					}
-
 				}
 			}
 		}
 
-		if(english == true){
+		if(english){
+
 			if(progress == 0){
 				progress = 1;
 				stores = storeRepository.findAllByEnglish(1);
-			} else{
 
-				List<Store> testStores = new ArrayList<>();
+			} else{
+				List<Store> restStores = new ArrayList<>();
+
 				for(Store store: stores){
-					testStores.add(store);
+					restStores.add(store);
 				}
 
-				for(Store testStore : testStores){
+				for(Store restStore : restStores){
 
-					if(testStore.getEnglish() == null || testStore.getEnglish() == 0){
-						stores.remove(testStore);
+					if(restStore.getEnglish() == null || restStore.getEnglish() == 0){
+						stores.remove(restStore);
 					}
 				}
 			}
 
-		}else if(chinese == true){
+		}else if(chinese){
+
 			if(progress == 0){
 				progress = 1;
 				stores = storeRepository.findAllByChinese(1);
-			} else{
 
-				List<Store> testStores = new ArrayList<>();
+			} else{
+				List<Store> restStores = new ArrayList<>();
+
 				for(Store store: stores){
-					testStores.add(store);
+					restStores.add(store);
 				}
 
-				for(Store testStore : testStores){
+				for(Store restStore : restStores){
 
-					if(testStore.getChinese() == null || testStore.getChinese() == 0){
-						stores.remove(testStore);
+					if(restStore.getChinese() == null || restStore.getChinese() == 0){
+						stores.remove(restStore);
 					}
 				}
 			}
 
-		}else if(japanese == true){
+		}else if(japanese){
+
 			if(progress == 0){
 				progress = 1;
 				stores = storeRepository.findAllByJapanese(1);
-			} else{
 
-				List<Store> testStores = new ArrayList<>();
+			} else{
+				List<Store> restStores = new ArrayList<>();
+
 				for(Store store: stores){
-					testStores.add(store);
+					restStores.add(store);
 				}
 
-				for(Store testStore : testStores){
+				for(Store restStore : restStores){
 
-					if(testStore.getJapanese() == null || testStore.getJapanese() == 0){
-						stores.remove(testStore);
+					if(restStore.getJapanese() == null || restStore.getJapanese() == 0){
+						stores.remove(restStore);
 					}
 				}
 			}
 		}
+
 		foreignStoreResponses = checkForeignBookmark(stores, foreignStoreResponses, userDetails);
 
-		 // foreignStoreResponses -> 이게 원래 반환 값
-
-		// Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
 		Pageable pageable = PageRequest.of(page, size);
-		// Page<Board> boardsPage = boardRepository.findAll(pageable);
 
 		final int start = (int)pageable.getOffset();
 		final int end = Math.min((start + pageable.getPageSize()), foreignStoreResponses.size());
@@ -722,7 +702,7 @@ public class StoreService {
 		boolean japanese = false;
 
 		Store store = storeRepository.findById(storeId)
-			.orElseThrow(() -> new IllegalArgumentException("해당 약국은 존재하지 않습니다."));
+			.orElseThrow(() -> new RestApiException(CommonErrorCode.RESOURCE_NOT_FOUND));
 
 		ForeignOneStoreResponse foreignOneStoreResponse = new ForeignOneStoreResponse(store);
 
@@ -745,13 +725,12 @@ public class StoreService {
 				List<Bookmark> bookmarks = store.getBookmarks();
 
 				for(Bookmark bookmark : bookmarks){
+
 					if(bookmark.getMember().getId() == member.getId()){
 
 						foreignOneStoreResponse.setBookmark(true);
 						long totalBookmarks = store.getBookmarks().size();
 						foreignOneStoreResponse.setTotalBookmark(totalBookmarks);
-						// return foreignOneStoreResponse;
-
 					}
 				}
 			}
@@ -766,18 +745,22 @@ public class StoreService {
 		}
 
 		if(store.getForeignLanguage() != null){
+
 			if(store.getEnglish() == 1){
 				english = true;
 			}
+
 			if (store.getChinese() == 1){
 				chinese = true;
 			}
+
 			if(store.getJapanese() == 1){
 				japanese = true;
 			}
 
 			foreignOneStoreResponse.setLanguage(english, chinese, japanese);
 		}
+
 		return foreignOneStoreResponse;
 	}
 
