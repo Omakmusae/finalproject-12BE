@@ -124,7 +124,7 @@ public class StoreController {
 
 	//관리자 약국 수정하기
 	@PutMapping("/api/store/{store-id}")
-	public ResponseEntity<String> updateComment(
+	public ResponseEntity<String> updateStore(
 		@PathVariable("store-id") Long storeId,
 		@RequestBody StoreRequest storeRequest,
 		@AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -135,7 +135,7 @@ public class StoreController {
 
 	//관리자 약국 삭제하기
 	@DeleteMapping("/api/store/{store-id}")
-	public ResponseEntity<String> deleteComment(
+	public ResponseEntity<String> deleteStore(
 		@PathVariable("store-id") Long storeId,
 		@AuthenticationPrincipal UserDetailsImpl userDetails) {
 		storeService.deleteStore(storeId, userDetails.getMember());

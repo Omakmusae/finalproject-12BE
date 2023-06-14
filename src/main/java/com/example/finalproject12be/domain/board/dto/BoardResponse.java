@@ -28,5 +28,6 @@ public class BoardResponse {
 		this.content = board.getContent();
 		this.nickname = board.getMember().getNickname();
 		this.createdAt = board.getCreatedAt();
+		//this.adminCheck = adminCheck;
 	}
 }

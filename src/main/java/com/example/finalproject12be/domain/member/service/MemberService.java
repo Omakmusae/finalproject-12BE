@@ -130,6 +130,7 @@ public class MemberService {
 			throw new RestApiException(MemberErrorCode.INVALID_PASSWORD);
 		}
 
+
 		TokenDto tokenDto = jwtUtil.createAllToken(searchedMember.getEmail(), searchedMember.getRole());
 		Optional<RefreshToken> refreshToken = refreshTokenRepository.findByEmail(email);
 

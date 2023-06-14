@@ -68,7 +68,7 @@ public class BoardService {
 
 		MemberRoleEnum memberRoleEnum =  member.getRole();
 		if (memberRoleEnum != MemberRoleEnum.ADMIN) {
-			throw new RestApiException(MemberErrorCode.ADMIN_ERROR);
+			throw new RestApiException(MemberErrorCode.BOARD_ADMIN_ERROR);
 		}
 		MappedBoardRequest board = new MappedBoardRequest(boardRequest.getTitle(), boardRequest.getContent(), member);
 		Board result = boardRepository.saveAndFlush(MappedBoardRequest.toEntity(board));
