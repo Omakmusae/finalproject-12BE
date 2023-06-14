@@ -21,7 +21,6 @@ import com.example.finalproject12be.domain.board.dto.BoardDetailResponse;
 import com.example.finalproject12be.domain.board.dto.BoardRequest;
 
 import com.example.finalproject12be.domain.board.dto.BoardResponse;
-import com.example.finalproject12be.domain.board.entity.Board;
 import com.example.finalproject12be.domain.board.service.BoardService;
 import com.example.finalproject12be.domain.member.entity.MemberRoleEnum;
 import com.example.finalproject12be.security.UserDetailsImpl;
