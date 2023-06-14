@@ -260,7 +260,7 @@ public class MemberService {
 			for (Comment comment : comments) {
 				// memberId를 임의로 변경합니다.
 				comment.deleteMember();
-				comment.setNickname("탈퇴한 회원");
+				comment.setNickname("(알수없음)");
 			}
 			memberRepository.delete(member);
 			refreshTokenRepository.deleteRefreshTokenByEmail(member.getEmail());
@@ -271,7 +271,7 @@ public class MemberService {
 			for (Comment comment : comments) {
 				// memberId를 임의로 변경합니다.
 				comment.deleteMember();
-				comment.setNickname("탈퇴한 회원");
+				comment.setNickname("(알수없음)");
 			}
 			disconnectKakaoAccount(kakaoAccessToken);
 			refreshTokenRepository.deleteRefreshTokenByEmail(member.getEmail());
