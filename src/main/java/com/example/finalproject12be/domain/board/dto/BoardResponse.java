@@ -1,6 +1,7 @@
 package com.example.finalproject12be.domain.board.dto;
 
 import com.example.finalproject12be.domain.board.entity.Board;
+import com.example.finalproject12be.domain.member.entity.MemberRoleEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,6 +15,7 @@ public class BoardResponse {
 	private String content;
 	private String nickname;
 	private String createdAt;
+	private Boolean adminCheck;
 
 	// public BoardResponse(Long id, String title, String content, String nickname) {
 	// 	this.id = id;
@@ -28,6 +30,6 @@ public class BoardResponse {
 		this.content = board.getContent();
 		this.nickname = board.getMember().getNickname();
 		this.createdAt = board.getCreatedAt();
-		//this.adminCheck = adminCheck;
+		this.adminCheck = board.getMember().getRole() == MemberRoleEnum.ADMIN ? true : false;
 	}
 }

@@ -53,6 +53,7 @@ public class BoardController {
 
 	}
 
+
 	@GetMapping("/api/board/{boardId}")
 	public ResponseEntity<BoardDetailResponse> getBoard(@PathVariable final Long boardId, @AuthenticationPrincipal final UserDetailsImpl userDetails) {
 		HttpHeaders headers = new HttpHeaders();
