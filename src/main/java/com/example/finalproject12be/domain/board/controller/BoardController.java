@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,6 +23,7 @@ import com.example.finalproject12be.domain.board.dto.BoardRequest;
 import com.example.finalproject12be.domain.board.dto.BoardResponse;
 import com.example.finalproject12be.domain.board.entity.Board;
 import com.example.finalproject12be.domain.board.service.BoardService;
+import com.example.finalproject12be.domain.member.entity.MemberRoleEnum;
 import com.example.finalproject12be.security.UserDetailsImpl;
 
 import lombok.RequiredArgsConstructor;
@@ -33,16 +36,33 @@ public class BoardController {
 
 	@GetMapping("/api/board")
 	public ResponseEntity<Page<BoardResponse>> getBoardList(
-		@RequestParam("page") int page, @RequestParam("size") int size
+		@RequestParam("page") int page, @RequestParam("size") int size,
+		@AuthenticationPrincipal final UserDetailsImpl userDetails
 	) {
+		HttpHeaders headers = new HttpHeaders();
+
+		if (userDetails.getMember().getRole() == MemberRoleEnum.ADMIN) {
+			headers.add("adminCheck", "true");
+		} else {
+			headers.add("adminCheck", "false");
+		}
+
 		return ResponseEntity.status(HttpStatus.OK)
+			.headers(headers)
 			.body(boardService.getAllBoards(page, size));
 	}
 
 	@GetMapping("/api/board/{boardId}")
-	public ResponseEntity<BoardDetailResponse> getBoard(@PathVariable final Long boardId) {
+	public ResponseEntity<BoardDetailResponse> getBoard(@PathVariable final Long boardId, @AuthenticationPrincipal final UserDetailsImpl userDetails) {
+		HttpHeaders headers = new HttpHeaders();
 
+		if (userDetails.getMember().getRole() == MemberRoleEnum.ADMIN) {
+			headers.add("adminCheck", "true");
+		} else {
+			headers.add("adminCheck", "false");
+		}
 		return ResponseEntity.status(HttpStatus.OK)
+			.headers(headers)
 			.body(boardService.getBoard(boardId));
 	}
 
