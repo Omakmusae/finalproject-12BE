@@ -43,17 +43,28 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
 		String accessToken = jwtUtil.resolveToken(request, jwtUtil.ACCESS_KEY);
 		String refreshToken = jwtUtil.resolveToken(request, jwtUtil.REFRESH_KEY);
-
+		log.info("dofilter 시작");
 		if(accessToken != null) {
 			if(jwtUtil.validateToken(accessToken)) {
+				log.info("엑세스 유효");
 				Claims accessInfo =jwtUtil.getUserInfoFromToken(accessToken);
 				accessInfo.get(AUTHORIZATION_HEADER);
 				setAuthentication(accessInfo.getSubject());
 			} else if(refreshToken != null && jwtUtil.refreshTokenValidation(refreshToken)) {
 				Claims refreshInfo = jwtUtil.getUserInfoFromToken(refreshToken);
 
-				String newAccessToken = jwtUtil.createToken(refreshInfo.getSubject(), "Access", (MemberRoleEnum)refreshInfo.get(AUTHORIZATION_HEADER));
+				String roleString = (String)refreshInfo.get(AUTHORIZATION_HEADER);
+				MemberRoleEnum memberRole = null;
+
+				if (roleString.equals("USER")) {
+					memberRole = MemberRoleEnum.USER;
+				} else if (roleString.equals("ADMIN")) {
+					memberRole = MemberRoleEnum.ADMIN;
+				}
+
+				String newAccessToken = jwtUtil.createToken(refreshInfo.getSubject(), "Access", memberRole);
 				jwtUtil.setHeaderAccessToken(response, newAccessToken);
+
 				setAuthentication(refreshInfo.getSubject());
 			} else if(refreshToken == null) {
 				jwtExceptionHandler(response, TokenErrorCode.EXPIRED_ACCESS_TOKEN);

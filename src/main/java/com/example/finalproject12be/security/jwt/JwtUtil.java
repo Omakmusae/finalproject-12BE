@@ -45,7 +45,7 @@ public class JwtUtil {
 	private static final String BEARER_PREFIX = "Bearer ";
 	public static final String ACCESS_KEY = "ACCESS_KEY";
 	public static final String REFRESH_KEY = "REFRESH_KEY";
-	private static final long ACCESS_TIME = 30 * 60 * 1000L;
+	private static final long ACCESS_TIME = 1 * 30 * 1000L;
 	private static final long REFRESH_TIME = 24 * 60 * 60 * 1000L;
 	private final RefreshTokenRepository refreshTokenRepository;
 
@@ -76,10 +76,11 @@ public class JwtUtil {
 		return new TokenDto(createToken(username, "Access", role), createToken(username, "Refresh", role));
 	}
 
-	public String createToken(String username, String tokentype, MemberRoleEnum role) {
+	public String createToken(String username, String tokentype, MemberRoleEnum roleEnum) {
 
 		Date date = new Date();
-
+		System.out.println("토큰 발급 시작");
+		String role = roleEnum.toString();
 		long expireTime = tokentype.equals("Access") ? ACCESS_TIME : REFRESH_TIME;
 
 		String jwToken =  BEARER_PREFIX +

@@ -133,7 +133,7 @@ public class StoreController {
 	}
 
 	@PutMapping("/api/store/{store-id}")
-	public ResponseEntity<String> updateComment(
+	public ResponseEntity<String> updateStore(
 		@PathVariable("store-id") Long storeId,
 		@RequestBody StoreRequest storeRequest,
 		@AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -143,7 +143,7 @@ public class StoreController {
 
 	// 댓글 삭제
 	@DeleteMapping("/api/store/{store-id}")
-	public ResponseEntity<String> deleteComment(
+	public ResponseEntity<String> deleteStore(
 		@PathVariable("store-id") Long storeId,
 		@AuthenticationPrincipal UserDetailsImpl userDetails) {
 		storeService.deleteStore(storeId, userDetails.getMember());
