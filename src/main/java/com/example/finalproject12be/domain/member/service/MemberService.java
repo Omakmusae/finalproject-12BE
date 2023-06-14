@@ -484,7 +484,7 @@ public class MemberService {
 	}
 
 	public boolean checkValidNumber(int number, String email) {
-		boolean checkNumber;
+		boolean checkNumber = false;
 
 		LocalTime now = LocalTime.now();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HHmmss");
@@ -505,7 +505,7 @@ public class MemberService {
 		}
 
 		if(number != validNumber.getValidNumber()){
-			checkNumber = false;
+			new RestApiException(CommonErrorCode.INVALID_REQUEST_PARAMETER);
 		}else{
 			checkNumber = true;
 		}
