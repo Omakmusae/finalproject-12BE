@@ -489,7 +489,7 @@ public class MemberService {
 		double time = validNumber.getTime();
 
 		if(formatedNow - time >= 300){ // 인증번호 발급 받은지 3분 초과
-			validNumberRepository.delete(validNumber);
+			// validNumberRepository.delete(validNumber);
 			throw new RestApiException(ValidNumberErrorCode.VALID_TIME_OVER);
 		}
 
