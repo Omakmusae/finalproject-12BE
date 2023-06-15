@@ -86,7 +86,7 @@ public class CommentService {
                 // null 값을 가지는 임시 Member 생성
                 Member member = new Member();
                 member.setId(null);
-                member.setNickname("탈퇴한 회원");
+                member.setNickname("(알수없음)");
 
                 // null 값을 가지는 임시 Profile 생성
                 Profile profile = new Profile();
