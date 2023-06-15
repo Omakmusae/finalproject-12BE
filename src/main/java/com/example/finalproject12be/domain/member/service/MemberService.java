@@ -130,7 +130,6 @@ public class MemberService {
 			throw new RestApiException(MemberErrorCode.INVALID_PASSWORD);
 		}
 
-
 		TokenDto tokenDto = jwtUtil.createAllToken(searchedMember.getEmail(), searchedMember.getRole());
 		Optional<RefreshToken> refreshToken = refreshTokenRepository.findByEmail(email);
 
@@ -145,7 +144,16 @@ public class MemberService {
 		response.addHeader(jwtUtil.ACCESS_KEY, tokenDto.getAccessToken());
 		response.addHeader(jwtUtil.REFRESH_KEY, tokenDto.getRefreshToken());
 
-		MemberLoginResponse loginResult = new MemberLoginResponse(searchedMember.getEmail(), searchedMember.getNickname());
+		Optional<Profile> optionalProfile = profileRepository.findByMemberId(searchedMember.getId());
+		System.out.println("!!!!!!!!!!!!!");
+		MemberLoginResponse loginResult;
+
+		if (optionalProfile.isEmpty()) {
+			loginResult = new MemberLoginResponse(searchedMember.getEmail(), searchedMember.getNickname());
+		} else {
+			loginResult = new MemberLoginResponse(searchedMember.getEmail(), searchedMember.getNickname(), optionalProfile.get().getImg());
+		}
+		System.out.println("@@@@@@@@@@@@@@@@@@@@");
 		return loginResult;
 
 	}
