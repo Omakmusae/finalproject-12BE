@@ -48,7 +48,7 @@ public class BoardService {
 
 	@Transactional(readOnly = true)
 	public BoardDetailResponse getBoard(final Long boardId) {
-		System.out.println("에러 시작");
+
 		Board board = findBoardByIdOrElseThrow(boardId);
 
 		Optional<Board> prevBoard = boardRepository.findPrevBoard(boardId);

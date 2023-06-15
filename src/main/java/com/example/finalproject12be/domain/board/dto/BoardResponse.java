@@ -28,7 +28,7 @@ public class BoardResponse {
 		this.id = board.getId();
 		this.title = board.getTitle();
 		this.content = board.getContent();
-		this.nickname = board.getMember().getNickname();
+		this.nickname = board.getMember() != null ? board.getMember().getNickname() : null;;
 		this.createdAt = board.getCreatedAt();
 		this.adminCheck = board.getMember().getRole() == MemberRoleEnum.ADMIN ? true : false;
 	}
