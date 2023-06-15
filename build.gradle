@@ -1,4 +1,4 @@
-buildscript { // 이놈
+buildscript {
     ext {
         queryDslVersion = "5.0.0"
     }
@@ -46,6 +46,9 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
 
+    //h2 local inmemory
+    //runtimeOnly 'com.h2database:h2'
+
     //mysql
     runtimeOnly 'com.mysql:mysql-connector-j'
 
@@ -83,19 +86,19 @@ dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 
 }
-//이놈
+
 def querydslDir = "$buildDir/generated/querydsl"
 
-querydsl { //이놈
+querydsl {
     jpa = true
     querydslSourcesDir = querydslDir
 }
 
-sourceSets { //이놈
+sourceSets {
     main.java.srcDir querydslDir
 }
 
-configurations { // 이놈
+configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }

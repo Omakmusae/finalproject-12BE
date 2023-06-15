@@ -41,7 +41,6 @@ public class Board extends Timestamped {
 	@Transient
 	private Board next_board;
 
-
 	@ManyToOne
 	@JoinColumn(name="MEMBER_ID")
 	private Member member;

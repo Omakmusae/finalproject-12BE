@@ -61,6 +61,7 @@ public class WebSecurityConfig {
 		return http.build();
 
 	}
+
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource(){
 
@@ -97,4 +98,12 @@ public class WebSecurityConfig {
 
 		return source;
 	}
+
+	// @Bean
+	// public WebSecurityCustomizer webSecurityCustomizer() {
+	// 	// h2-console 사용 및 resources 접근 허용 설정
+	// 	return (web) -> web.ignoring()
+	// 		.requestMatchers(PathRequest.toH2Console())
+	// 		.requestMatchers(PathRequest.toStaticResources().atCommonLocations());
+	// }
 }
