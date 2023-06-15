@@ -41,10 +41,15 @@ public class BoardController {
 
 		HttpHeaders headers = new HttpHeaders();
 
-		if (userDetails.getMember().getRole() == MemberRoleEnum.ADMIN) {
-			headers.add("adminCheck", "true");
-		} else {
+		if (userDetails == null) {
 			headers.add("adminCheck", "false");
+		}
+		else {
+			if (userDetails.getMember().getRole() == MemberRoleEnum.ADMIN) {
+				headers.add("adminCheck", "true");
+			} else {
+				headers.add("adminCheck", "false");
+			}
 		}
 
 		return ResponseEntity.status(HttpStatus.OK)
@@ -53,16 +58,22 @@ public class BoardController {
 
 	}
 
-
 	@GetMapping("/api/board/{boardId}")
 	public ResponseEntity<BoardDetailResponse> getBoard(@PathVariable final Long boardId, @AuthenticationPrincipal final UserDetailsImpl userDetails) {
+
 		HttpHeaders headers = new HttpHeaders();
 
-		if (userDetails.getMember().getRole() == MemberRoleEnum.ADMIN) {
-			headers.add("adminCheck", "true");
-		} else {
+		if (userDetails == null) {
 			headers.add("adminCheck", "false");
 		}
+		else {
+			if (userDetails.getMember().getRole() == MemberRoleEnum.ADMIN) {
+				headers.add("adminCheck", "true");
+			} else {
+				headers.add("adminCheck", "false");
+			}
+		}
+
 		return ResponseEntity.status(HttpStatus.OK)
 			.headers(headers)
 			.body(boardService.getBoard(boardId));
