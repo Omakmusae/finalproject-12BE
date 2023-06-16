@@ -37,4 +37,5 @@ public class ValidNumber {
 		this.email = email;
 		this.time = time;
 	}
+
 }

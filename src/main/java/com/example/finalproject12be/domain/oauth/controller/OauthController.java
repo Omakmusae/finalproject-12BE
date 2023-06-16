@@ -39,7 +39,7 @@ public class OauthController {
 		response.addHeader("ACCESS_KEY", createAccessToken);
 		response.addHeader("REFRESH_KEY", createRefreshToken);
 
-		MemberLoginResponse loginResult = new MemberLoginResponse(tokenArray[2],tokenArray[3], tokenArray[4]);
+		MemberLoginResponse loginResult = new MemberLoginResponse(tokenArray[2],tokenArray[3], tokenArray[4], "SOCIAL");
 		return ResponseEntity.status(HttpStatus.OK).body(loginResult);
 	}
 }
