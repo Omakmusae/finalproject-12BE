@@ -19,8 +19,6 @@ public enum MemberErrorCode implements ErrorCode {
 	ADMIN_ERROR(HttpStatus.NOT_FOUND, "관리자 암호가 틀려 등록이 불가능합니다."),
 	STORE_NOT_FOUND(HttpStatus.NOT_FOUND, "약국을 찾을 수 없습니다."),
 	COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "댓글을 찾을 수 없습니다."),
-	BOARD_NOT_FOUND(HttpStatus.NOT_FOUND, "게시글을 찾을 수 없습니다."),
-	BOARD_ADMIN_ERROR(HttpStatus.NOT_FOUND, "관리자 권한이 없습니다."),
 	;
 
 	private final HttpStatus httpStatus;

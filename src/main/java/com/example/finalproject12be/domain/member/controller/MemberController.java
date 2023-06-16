@@ -71,7 +71,7 @@ public class MemberController {
 	public ResponseEntity<String> signout(
 		@AuthenticationPrincipal UserDetailsImpl userDetails,
 		final HttpServletRequest request) {
-		memberService.signout(userDetails.getUsername(), request);
+		memberService.signout(userDetails.getMember(), request);
 		return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
 	}
 
