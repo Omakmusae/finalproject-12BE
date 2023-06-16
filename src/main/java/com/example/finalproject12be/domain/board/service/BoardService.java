@@ -1,5 +1,6 @@
 package com.example.finalproject12be.domain.board.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -21,6 +22,7 @@ import com.example.finalproject12be.domain.board.entity.Board;
 import com.example.finalproject12be.domain.board.repository.BoardRepository;
 import com.example.finalproject12be.domain.member.entity.Member;
 import com.example.finalproject12be.domain.member.entity.MemberRoleEnum;
+import com.example.finalproject12be.domain.store.dto.StoreResponseDto;
 import com.example.finalproject12be.exception.BoardErrorCode;
 import com.example.finalproject12be.exception.CommonErrorCode;
 import com.example.finalproject12be.exception.MemberErrorCode;
@@ -34,10 +36,24 @@ public class BoardService {
 
 	private final BoardRepository boardRepository;
 
+	// @Transactional(readOnly = true)
+	// public Page<BoardResponse> getAllBoards(int page, int size) {
+	//
+	// 	Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+	// 	Page<Board> boardsPage = boardRepository.findAll(pageable);
+	//
+	// 	List<BoardResponse> boardList = boardsPage.getContent().stream()
+	// 		.map(BoardResponse::new)
+	// 		.collect(Collectors.toList());
+	//
+	// 	return new PageImpl<>(boardList, pageable, boardsPage.getTotalElements());
+	//
+	// }
+
 	@Transactional(readOnly = true)
 	public Page<BoardResponse> getAllBoards(int page, int size) {
 
-		Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+		Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 		Page<Board> boardsPage = boardRepository.findAll(pageable);
 
 		List<BoardResponse> boardList = boardsPage.getContent().stream()
