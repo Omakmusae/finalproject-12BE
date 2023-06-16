@@ -65,7 +65,7 @@ public class OauthMemberService {
 			RefreshToken updateToken = refreshToken.get().updateToken(tokenDto.getRefreshToken().substring(7), kakaoAccessToken, kakaoRefreshToken);
 			refreshTokenRepository.save(updateToken);
 		} else { //새로운 회원
-			RefreshToken saveToken = new RefreshToken(tokenDto.getRefreshToken().substring(7), kakaoMember.getEmail(), kakaoAccessToken, kakaoRefreshToken);
+			RefreshToken saveToken = new RefreshToken(tokenDto.getRefreshToken().substring(7), kakaoMember.getNickname(), kakaoAccessToken, kakaoRefreshToken);
 			refreshTokenRepository.save(saveToken);
 		}
 
@@ -102,11 +102,11 @@ public class OauthMemberService {
 		MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
 		body.add("grant_type", "authorization_code");
 
-		//body.add("client_id", "048f9445160611c1cc986c481c2d6b94");//내 앱 rest api 키
-		//body.add("redirect_uri", "http://localhost:8080/user/signin/kakao");
+		body.add("client_id", "048f9445160611c1cc986c481c2d6b94");//내 앱 rest api 키
+		body.add("redirect_uri", "http://localhost:8080/user/signin/kakao");
 
-		body.add("client_id", "111b5867f4dff0156fb3f17736d40f3e");//유리님 오디약 rest api 키
-		body.add("redirect_uri", "https://www.odimedi.site/user/signin/kakao");//오디약 redirect url
+		//body.add("client_id", "111b5867f4dff0156fb3f17736d40f3e");//유리님 오디약 rest api 키
+		//body.add("redirect_uri", "https://www.odimedi.site/user/signin/kakao");//오디약 redirect url
 		//body.add("redirect_uri", "http://localhost:3000/user/signin/kakao");// 프런트 로컬 redirect url
 
 		body.add("code", code);
@@ -161,10 +161,27 @@ public class OauthMemberService {
 		JsonNode jsonNode = objectMapper.readTree(responseBody);
 
 		Long id = jsonNode.get("id").asLong();
-		String nickname = jsonNode.get("properties")
-			.get("nickname").asText();
-		String email = jsonNode.get("kakao_account")
-			.get("email").asText();
+		String nickname = jsonNode.get("properties").get("nickname").asText();
+
+		String email;
+
+		JsonNode kakaoAccountNode = jsonNode.get("kakao_account");
+
+		if (kakaoAccountNode != null && kakaoAccountNode.has("email")) {
+			email = kakaoAccountNode.get("email").asText();
+		} else {
+			int leftLimit = 97; // letter 'a'
+			int rightLimit = 122; // letter 'z'
+			int targetStringLength = 6;
+
+			Random random = new Random();
+			email = random.ints(leftLimit, rightLimit + 1)
+				.limit(targetStringLength)
+				.collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+				.toString();
+
+			email = email+"@test.com";
+		}
 
 		log.info("카카오 사용자 정보: " + id + ", " + nickname + ", " + email);
 		return new KakaoMemberInfoRequest(id, email, nickname);
@@ -179,8 +196,8 @@ public class OauthMemberService {
 
 		if (kakaoUser == null) {
 			//카카오 사용자 email 동일한 email 가진 회원이 있는지 확인
-			String kakaoEmail = kakaoUserInfo.getEmail();
-			Member sameEmailUser = memberRepository.findByEmail(kakaoEmail).orElse(null);
+			String kakaoNickname = kakaoUserInfo.getNickname();
+			Member sameEmailUser = memberRepository.findByNickname(kakaoNickname).orElse(null);
 			if (sameEmailUser != null) {
 				kakaoUser = sameEmailUser;
 				// 기존 회원정보에 카카오 Id 추가

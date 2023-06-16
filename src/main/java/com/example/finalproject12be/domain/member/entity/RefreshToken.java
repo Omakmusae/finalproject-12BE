@@ -26,14 +26,16 @@ public class RefreshToken {
 	@Column
 	private String refreshToken;
 
-	@NotNull
+	@Column
+	private String nickname;
+
 	@Column
 	private String email;
 
-	@Column(nullable = true)
+	@Column
 	private String kakaoAccessToken;
 
-	@Column(nullable = true)
+	@Column
 	private String kakaoRefreshToken;
 
 	public RefreshToken(String refreshToken, String email) {
@@ -41,9 +43,9 @@ public class RefreshToken {
 		this.email = email;
 	}
 
-	public RefreshToken(String refreshToken, String email, String kakaoAccessToken, String kakaoRefreshToken) {
+	public RefreshToken(String refreshToken, String nickname, String kakaoAccessToken, String kakaoRefreshToken) {
 		this.refreshToken = refreshToken;
-		this.email = email;
+		this.nickname = nickname;
 		this.kakaoAccessToken = kakaoAccessToken;
 		this.kakaoRefreshToken = kakaoRefreshToken;
 	}
@@ -59,4 +61,5 @@ public class RefreshToken {
 		this.kakaoRefreshToken = kakaoRefreshToken;
 		return this;
 	}
+
 }

@@ -21,6 +21,8 @@ import com.example.finalproject12be.domain.board.entity.Board;
 import com.example.finalproject12be.domain.board.repository.BoardRepository;
 import com.example.finalproject12be.domain.member.entity.Member;
 import com.example.finalproject12be.domain.member.entity.MemberRoleEnum;
+import com.example.finalproject12be.exception.BoardErrorCode;
+import com.example.finalproject12be.exception.CommonErrorCode;
 import com.example.finalproject12be.exception.MemberErrorCode;
 import com.example.finalproject12be.exception.RestApiException;
 
@@ -68,7 +70,7 @@ public class BoardService {
 
 		MemberRoleEnum memberRoleEnum =  member.getRole();
 		if (memberRoleEnum != MemberRoleEnum.ADMIN) {
-			throw new RestApiException(MemberErrorCode.BOARD_ADMIN_ERROR);
+			throw new RestApiException(BoardErrorCode.BOARD_ADMIN_ERROR);
 		}
 		MappedBoardRequest board = new MappedBoardRequest(boardRequest.getTitle(), boardRequest.getContent(), member);
 		Board result = boardRepository.saveAndFlush(MappedBoardRequest.toEntity(board));
@@ -100,7 +102,7 @@ public class BoardService {
 	private Board findBoardByIdOrElseThrow(Long boardId) {
 
 		return boardRepository.findById(boardId).orElseThrow(
-			() -> new RestApiException(MemberErrorCode.BOARD_NOT_FOUND)
+			() -> new RestApiException(BoardErrorCode.BOARD_NOT_FOUND)
 		);
 	}
 

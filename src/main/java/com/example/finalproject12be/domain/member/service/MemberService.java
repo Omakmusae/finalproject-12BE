@@ -105,13 +105,6 @@ public class MemberService {
 			role = MemberRoleEnum.ADMIN;
 		}
 
-		// if (memberSignupRequest.isAdmin()) {
-		// 	if (!memberSignupRequest.getAdminToken().equals(ADMIN_TOKEN)) {
-		// 		throw new RestApiException(MemberErrorCode.ADMIN_ERROR);
-		// 	}
-		// 	role = MemberRoleEnum.ADMIN;
-		// }
-
 		Member member = MemberSignupRequest.toEntity(memberSignupRequest, password, role);
 		memberRepository.save(member);
 	}
@@ -261,12 +254,12 @@ public class MemberService {
 	}
 
 	@Transactional
-	public void signout(String email, final HttpServletRequest request) {
+	public void signout(Member requestMember, final HttpServletRequest request) {
 
-		Member member = memberRepository.findByEmail(email)
+		Member member = memberRepository.findByNickname(requestMember.getNickname())
 				.orElseThrow(() ->  new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
 
-		Optional<RefreshToken> memberToken = refreshTokenRepository.findByEmail(email);
+		Optional<RefreshToken> memberToken = refreshTokenRepository.findByEmail(member.getEmail());
 		String kakaoAccessToken = "Bearer " + memberToken.get().getKakaoAccessToken();
 		String kakaoRefreshToken = "Bearer " + memberToken.get().getKakaoRefreshToken();
 
