@@ -39,6 +39,7 @@ import com.example.finalproject12be.domain.validNumber.repository.ValidNumberRep
 import com.example.finalproject12be.exception.CommonErrorCode;
 import com.example.finalproject12be.exception.MemberErrorCode;
 import com.example.finalproject12be.exception.RestApiException;
+import com.example.finalproject12be.exception.ValidNumberErrorCode;
 import com.example.finalproject12be.security.UserDetailsImpl;
 
 import org.apache.poi.ss.formula.functions.T;
@@ -454,26 +455,6 @@ public class MemberService {
 
 	}
 
-	// @Override
-
-	// public void mailSend() {
-	//
-	// 	@Autowired
-	// 	MailSender mailSender;
-	//
-	//
-	//
-	// 	// System.out.println("전송 완료!");
-	// 	SimpleMailMessage message = new SimpleMailMessage();
-	// 	message.setTo("kmskes1125@gmail.com"); //수신자 설정
-	// 	message.setSubject("오디약! 비밀번호 변경"); //메일 제목
-	// 	message.setText("이건 메일 내용이고 임시 비밀번호를 보낼 예정입니다."); //메일 내용 설정
-	// 	message.setFrom("kmskes0917@naver.com"); //발신자 설정
-	// 	// message.setReplyTo("보낸이@naver.com");
-	// 	// System.out.println("message"+message);
-	// 	mailSender.send(message);
-	// }
-
 	//ing
 	public void checkEmail(String email) {
 
@@ -519,12 +500,12 @@ public class MemberService {
 		double time = validNumber.getTime();
 
 		if(formatedNow - time >= 300){ // 인증번호 발급 받은지 3분 초과
-			validNumberRepository.delete(validNumber);
-			throw new RestApiException(CommonErrorCode.INVALID_REQUEST_PARAMETER);
+			// validNumberRepository.delete(validNumber);
+			throw new RestApiException(ValidNumberErrorCode.VALID_TIME_OVER);
 		}
 
 		if(number != validNumber.getValidNumber()){
-			throw new RestApiException(CommonErrorCode.INVALID_REQUEST_PARAMETER);
+			throw new RestApiException(ValidNumberErrorCode.WRONG_NUMBER);
 		}else{
 			return checkNumber;
 		}
