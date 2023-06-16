@@ -46,7 +46,6 @@ public class Member {
 	@JoinColumn(name = "MEMBER_ID", referencedColumnName = "MEMBER_ID")
 	private Profile profile;
 
-
 	public Member(String email, String password, String nickname, MemberRoleEnum role) {
 		this.email = email;
 		this.password = password;

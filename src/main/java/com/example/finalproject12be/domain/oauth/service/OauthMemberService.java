@@ -61,7 +61,6 @@ public class OauthMemberService {
 
 		Optional<RefreshToken> refreshToken = refreshTokenRepository.findByEmail(kakaoMember.getEmail());
 
-		//수정했음
 		if (refreshToken.isPresent()) { //기존 회원
 			RefreshToken updateToken = refreshToken.get().updateToken(tokenDto.getRefreshToken().substring(7), kakaoAccessToken, kakaoRefreshToken);
 			refreshTokenRepository.save(updateToken);
@@ -83,14 +82,12 @@ public class OauthMemberService {
 		tokenArrayResult[1] = tokenDto.getRefreshToken();
 		tokenArrayResult[2] = kakaoMemberInfo.getEmail();
 		tokenArrayResult[3]	=  kakaoMember.getNickname();
+
 		if (kakaoMember.getProfile() != null) {
 			tokenArrayResult[4] = kakaoMember.getProfile().getImg();
 		} else {
 			tokenArrayResult[4] = null;
 		}
-		//tokenArrayResult[4] = "Bearer " + kakaoAccessToken;
-
-		System.out.println(kakaoAccessToken + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
 		return tokenArrayResult;
 	}
@@ -108,7 +105,6 @@ public class OauthMemberService {
 		//body.add("client_id", "048f9445160611c1cc986c481c2d6b94");//내 앱 rest api 키
 		//body.add("redirect_uri", "http://localhost:8080/user/signin/kakao");
 
-		//body.add("client_id", "7463ed7e96bc168b9023480e535add90");//오디약 rest api 키
 		body.add("client_id", "111b5867f4dff0156fb3f17736d40f3e");//유리님 오디약 rest api 키
 		body.add("redirect_uri", "https://www.odimedi.site/user/signin/kakao");//오디약 redirect url
 		//body.add("redirect_uri", "http://localhost:3000/user/signin/kakao");// 프런트 로컬 redirect url

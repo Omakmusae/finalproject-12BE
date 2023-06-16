@@ -40,6 +40,7 @@ public class BoardController {
 	) {
 
 		HttpHeaders headers = new HttpHeaders();
+		System.out.println(userDetails.getMember().getRole());
 
 		if (userDetails == null) {
 			headers.add("adminCheck", "false");
@@ -62,14 +63,16 @@ public class BoardController {
 	public ResponseEntity<BoardDetailResponse> getBoard(@PathVariable final Long boardId, @AuthenticationPrincipal final UserDetailsImpl userDetails) {
 
 		HttpHeaders headers = new HttpHeaders();
-
+		System.out.println(userDetails.getMember().getRole()+"!!!!!!!!!");
 		if (userDetails == null) {
 			headers.add("adminCheck", "false");
 		}
 		else {
 			if (userDetails.getMember().getRole() == MemberRoleEnum.ADMIN) {
+				System.out.println("adminCheck admin");
 				headers.add("adminCheck", "true");
 			} else {
+				System.out.println("adminCheck user");
 				headers.add("adminCheck", "false");
 			}
 		}

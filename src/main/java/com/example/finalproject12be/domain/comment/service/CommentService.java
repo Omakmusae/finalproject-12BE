@@ -108,6 +108,7 @@ public class CommentService {
     public List<CommentResponseDto> getUserComments(UserDetailsImpl userDetails) {
         Long memberId = userDetails.getMember().getId();
         List<Comment> comments = commentRepository.findByMemberId(memberId);
+
         List<CommentResponseDto> responseDtos = new ArrayList<>();
 
         for (Comment comment : comments) {

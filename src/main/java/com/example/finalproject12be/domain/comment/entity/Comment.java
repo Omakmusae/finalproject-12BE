@@ -30,6 +30,7 @@ public class Comment extends Timestamped {
     @JoinColumn(name = "STORE_ID")
     @JsonIgnore
     private Store store;
+    //Comment -> Store 직렬화를 무시
 
     @ManyToOne
     @JoinColumn(name = "MEMBER_ID")

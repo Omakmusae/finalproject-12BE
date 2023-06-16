@@ -145,15 +145,26 @@ public class MemberService {
 		response.addHeader(jwtUtil.REFRESH_KEY, tokenDto.getRefreshToken());
 
 		Optional<Profile> optionalProfile = profileRepository.findByMemberId(searchedMember.getId());
-		System.out.println("!!!!!!!!!!!!!");
+
 		MemberLoginResponse loginResult;
 
 		if (optionalProfile.isEmpty()) {
-			loginResult = new MemberLoginResponse(searchedMember.getEmail(), searchedMember.getNickname());
+
+			if (searchedMember.getRole() == MemberRoleEnum.ADMIN) {
+				loginResult = new MemberLoginResponse(searchedMember.getEmail(), searchedMember.getNickname(), "ADMIN");
+			} else  {
+				loginResult = new MemberLoginResponse(searchedMember.getEmail(), searchedMember.getNickname(), "USER");
+			}
+
 		} else {
-			loginResult = new MemberLoginResponse(searchedMember.getEmail(), searchedMember.getNickname(), optionalProfile.get().getImg());
+
+			if (searchedMember.getRole() == MemberRoleEnum.ADMIN) {
+				loginResult = new MemberLoginResponse(searchedMember.getEmail(), searchedMember.getNickname(),  optionalProfile.get().getImg(), "ADMIN");
+			} else  {
+				loginResult = new MemberLoginResponse(searchedMember.getEmail(), searchedMember.getNickname(),  optionalProfile.get().getImg(), "USER");
+			}
 		}
-		System.out.println("@@@@@@@@@@@@@@@@@@@@");
+
 		return loginResult;
 
 	}
@@ -435,7 +446,7 @@ public class MemberService {
 		for (Comment comment : comments) {
 			// memberId를 임의로 변경합니다.
 			comment.deleteMember();
-			comment.setNickname("탈퇴한 회원");
+			comment.setNickname("(알수없음)");
 		}
 
 		memberRepository.delete(deleteMember);
@@ -573,7 +584,9 @@ public class MemberService {
 			// HTTP Body 생성
 			MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
 			body.add("grant_type", "refresh_token");
-			body.add("client_id", "111b5867f4dff0156fb3f17736d40f3e");//내 앱 rest api 키
+			body.add("client_id", "048f9445160611c1cc986c481c2d6b94");//내 앱 rest api 키
+			//body.add("client_id", "111b5867f4dff0156fb3f17736d40f3e");//유리님 앱 rest api 키
+
 			body.add("refresh_token", kakaoRefreshToken);
 
 			// HTTP 요청을 보낼 RestTemplate 객체 생성
