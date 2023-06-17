@@ -519,8 +519,8 @@ public class StoreService {
 			Double baseRadius =  Double.parseDouble(radius);
 			Double baseLatitude = Double.parseDouble(latitude);
 			Double baseLongitude = Double.parseDouble(longitude);
-			stores = storeRepository.findByDistanceWithinRadius(baseRadius, baseLatitude, baseLongitude);
-			// stores = storeRepositoryCustom.searchTest(baseRadius, baseLatitude, baseLongitude);
+			//stores = storeRepository.findByDistanceWithinRadius(baseRadius, baseLatitude, baseLongitude);
+			stores = storeRepositoryCustom.searchTest(baseRadius, baseLatitude, baseLongitude);
 		}
 
 		//약국 이름 검색하기
