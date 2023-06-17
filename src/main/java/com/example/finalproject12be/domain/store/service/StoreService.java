@@ -83,7 +83,7 @@ public class StoreService {
 
 					for(Bookmark bookmark : bookmarks){
 
-						if(bookmark.getMember().getId() == member.getId()){
+						if(bookmark.getMember().getId().equals(member.getId())){
 							bookmarkCheck = 1;
 						}
 					}
@@ -135,7 +135,7 @@ public class StoreService {
 
 				for(Bookmark bookmark : bookmarks){
 
-					if(bookmark.getMember().getId() == member.getId()){
+					if(bookmark.getMember().getId().equals(member.getId())){
 						check = 1;
 					}
 				}
@@ -320,7 +320,7 @@ public class StoreService {
 
 				for(Bookmark bookmark : bookmarks){
 
-					if(bookmark.getMember().getId() == member.getId()){
+					if(bookmark.getMember().getId().equals(member.getId())){
 
 						oneStoreResponseDto.setBookmark(true);
 						oneStoreResponseDto.setTotalBookmark(store.getBookmarks().size());
@@ -726,7 +726,7 @@ public class StoreService {
 
 				for(Bookmark bookmark : bookmarks){
 
-					if(bookmark.getMember().getId() == member.getId()){
+					if(bookmark.getMember().getId().equals(member.getId())){
 
 						foreignOneStoreResponse.setBookmark(true);
 						long totalBookmarks = store.getBookmarks().size();
