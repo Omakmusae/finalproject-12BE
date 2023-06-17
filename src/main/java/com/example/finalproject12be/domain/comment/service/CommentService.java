@@ -6,6 +6,7 @@ import com.example.finalproject12be.domain.comment.dto.CommentResponseDto;
 import com.example.finalproject12be.domain.comment.entity.Comment;
 import com.example.finalproject12be.domain.comment.repository.CommentRepository;
 import com.example.finalproject12be.domain.member.entity.Member;
+import com.example.finalproject12be.domain.member.repository.MemberRepository;
 import com.example.finalproject12be.domain.profile.entity.Profile;
 import com.example.finalproject12be.domain.profile.repository.ProfileRepository;
 import com.example.finalproject12be.domain.store.entity.Store;
@@ -28,6 +29,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final StoreRepository storeRepository;
     private final ProfileRepository profileRepository;
+    private final MemberRepository memberRepository;
 
     // 댓글 생성 responseEntity
 //    @Transactional
@@ -62,7 +64,7 @@ public class CommentService {
         return ResponseMsgDto.setSuccess(HttpStatus.CREATED.value(), "댓글이 등록되었습니다.", commentResponseDto);
     }
 
-    //댓글 조회(store 기준)
+    // 댓글 조회(store 기준)
     public ResponseEntity<List<CommentResponseDto>> getComments(Long storeId, UserDetailsImpl userDetails) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new RuntimeException("Store not found"));
@@ -81,29 +83,26 @@ public class CommentService {
                 profileOptional = profileRepository.findByMemberId(comment.getMember().getId());
             }
 
-            // 댓글의 멤버가 null인지 확인
+            Member member;
+            String nickname;
             if (comment.getMember() == null) {
-                // null 값을 가지는 임시 Member 생성
-                Member member = new Member();
+                member = new Member();
                 member.setId(null);
-                member.setNickname("(알수없음)");
-
-                // null 값을 가지는 임시 Profile 생성
-                Profile profile = new Profile();
-                profile.setImg("");
-                profile.setMemberId(null);
-
-                // null 값을 가진 CommentResponseDto 생성
-                CommentResponseDto responseDto = new CommentResponseDto(comment, isCurrentUserComment, member, profileOptional);
-                responseDtos.add(responseDto);
+                nickname = "(알수없음)";
             } else {
-                CommentResponseDto responseDto = new CommentResponseDto(comment, isCurrentUserComment, comment.getMember(), profileOptional);
-                responseDtos.add(responseDto);
+                member = comment.getMember();
+                Optional<Member> memberOptional = memberRepository.findNicknameById(member.getId());
+                nickname = memberOptional.map(Member::getNickname).orElse("");
             }
+
+            CommentResponseDto responseDto = new CommentResponseDto(comment, isCurrentUserComment, member, profileOptional);
+            responseDto.setNickname(nickname);
+            responseDtos.add(responseDto);
         }
 
         return ResponseEntity.ok(responseDtos);
     }
+
     // 마이페이지 댓글 조회
     public List<CommentResponseDto> getUserComments(UserDetailsImpl userDetails) {
         Long memberId = userDetails.getMember().getId();
@@ -115,7 +114,12 @@ public class CommentService {
             boolean isCurrentUserComment = comment.getMember().getId().equals(userDetails.getMember().getId());
             Store store = comment.getStore(); // 댓글이 속한 상점 객체 가져오기
             Optional<Profile> profileOptional = profileRepository.findByMemberId(userDetails.getMember().getId());
+
+            Optional<Member> memberOptional = memberRepository.findNicknameById(comment.getMember().getId());
+            String nickname = memberOptional.map(Member::getNickname).orElse("");
+
             CommentResponseDto responseDto = new CommentResponseDto(comment, isCurrentUserComment, store, profileOptional);
+            responseDto.setNickname(nickname);
 
             boolean isForeignLanguageStore = store.getForeignLanguage() != null && store.getForeignLanguage() == 1;
             responseDto.setForeign(isForeignLanguageStore);
