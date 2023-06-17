@@ -56,6 +56,7 @@ public class BookmarkService {
 	public List<BookmarkResponseDto> getBookmark(Member member) {
 
 		List<Bookmark> bookmarks = bookmarkRepository.findAllByMember(member);
+		// List<Bookmark> bookmarks = bookmarkRepository.findAllWithMember(member);
 		List<BookmarkResponseDto> bookmarkResponseDtos = new ArrayList<>();
 
 		for (Bookmark bookmark : bookmarks) {
@@ -74,41 +75,6 @@ public class BookmarkService {
 			if(store.getNightPharmacy() == 1){
 				bookmarkResponseDto.setNightBusiness(true);
 			}
-			//평일 야간 영업 확인하기
-			// if(store.getWeekdaysTime() != null){
-			//
-			// 	String weekTime = store.getWeekdaysTime();
-			//
-			// 	if (weekTime.contains("24") || weekTime.contains("25") || weekTime.contains("26") || weekTime.contains("27")
-			// 		|| weekTime.contains("28") || weekTime.contains("29")) {
-			//
-			// 		bookmarkResponseDto.setNightBusiness(true);
-			// 	}
-			// }
-			//
-			// //토요일 야간 영업 확인하기
-			// if(store.getSaturdayTime() != null){
-			//
-			// 	String saturdayTime = store.getSaturdayTime();
-			//
-			// 	if (saturdayTime.contains("24") || saturdayTime.contains("25") || saturdayTime.contains("26")
-			// 		|| saturdayTime.contains("27") || saturdayTime.contains("28") || saturdayTime.contains("29")) {
-			//
-			// 		bookmarkResponseDto.setNightBusiness(true);
-			// 	}
-			// }
-			//
-			// //일요일 야간 영업 확인하기
-			// if(store.getSundayTime() != null){
-			//
-			// 	String sundayTime = store.getSundayTime();
-			//
-			// 	if (sundayTime.contains("24") || sundayTime.contains("25") || sundayTime.contains("26")
-			// 		|| sundayTime.contains("27") || sundayTime.contains("28") || sundayTime.contains("29")) {
-			//
-			// 		bookmarkResponseDto.setNightBusiness(true);
-			// 	}
-			// }
 
 			if(store.getForeignLanguage() != null){
 				if(store.getForeignLanguage() == 1){
