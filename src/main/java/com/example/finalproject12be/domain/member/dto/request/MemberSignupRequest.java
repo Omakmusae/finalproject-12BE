@@ -17,11 +17,11 @@ public class MemberSignupRequest {
 	@Email(message = "이메일 형식에 맞지 않습니다.")
 	private String email;
 
-	@Size(min = 8, max = 15)
+	// @Size(min = 8, max = 15)
 	@Pattern(regexp = "^[0-9a-zA-Z]{8,15}$", message = "비밀번호는 8~15자 알파벳 대소문자, 숫자로 작성해주세요.")
 	private String password;
 
-	@Size(min = 2, max = 10)
+	// @Size(min = 2, max = 10)
 	@Pattern(regexp = "^[a-zA-Z가-힣0-9]{2,10}$", message = "닉네임은 2~10자 한글, 알파벳 대소문자, 숫자로 작성해주세요.")
 	private String nickname;
 
