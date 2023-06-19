@@ -196,34 +196,33 @@ public class StoreService {
 		}
 
 		//구 검색
-		if(gu != ""){
+		if(gu != "") {
 
-			if(progress == 0){ //저장된 stores가 없을 때
+			if (progress == 0) { //저장된 stores가 없을 때
 
 				progress = 1;
 				stores = storeRepository.findAllByAddressContaining(gu);
 
-			}else{ //저장된 stores가 있을 때
+			} else { //저장된 stores가 있을 때
 				List<Store> testStores = new ArrayList<>();
 
-				for(Store store: stores){
+				for (Store store : stores) {
 					testStores.add(store);
 				}
 
-				for(Store testStore : testStores){
+				for (Store testStore : testStores) {
 
-					if(!testStore.getAddress().contains(gu)){
+					if (!testStore.getAddress().contains(gu)) {
 						stores.remove(testStore);
 					}
 				}
 			}
-		}else{
+		}else if(progress == 0){
 			Pageable pageable = PageRequest.of(page, size);
 
 			final int start = (int)pageable.getOffset();
 			final int end = Math.min((start + pageable.getPageSize()), storeResponseDtos.size());
 			final Page<StoreResponseDto> storeResponsePage = new PageImpl<>(storeResponseDtos.subList(start, end), pageable, storeResponseDtos.size());
-
 			return storeResponsePage;
 		}
 
@@ -575,7 +574,7 @@ public class StoreService {
 					}
 				}
 			}
-		} else{
+		}else if(progress == 0){
 			Pageable pageable = PageRequest.of(page, size);
 
 			final int start = (int)pageable.getOffset();
