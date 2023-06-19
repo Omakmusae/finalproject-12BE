@@ -217,7 +217,15 @@ public class StoreService {
 					}
 				}
 			}
-		} //구가 요청되지 않았을 때는 progress가 0이고 저장될 사항이 없기 때문에 else 생략
+		}else{
+			Pageable pageable = PageRequest.of(page, size);
+
+			final int start = (int)pageable.getOffset();
+			final int end = Math.min((start + pageable.getPageSize()), storeResponseDtos.size());
+			final Page<StoreResponseDto> storeResponsePage = new PageImpl<>(storeResponseDtos.subList(start, end), pageable, storeResponseDtos.size());
+
+			return storeResponsePage;
+		}
 
 		//filter
 		if(open == true){ // 영업중 필터
@@ -547,7 +555,7 @@ public class StoreService {
 		}
 
 		//구 검색하기
-		if(!gu.equals("")){//if(gu != null){ //TODO: 주석 풀기
+		if(!gu.equals("")){
 
 			if(progress == 0){ //저장된 stores가 없을 때
 				progress = 1;
@@ -567,7 +575,15 @@ public class StoreService {
 					}
 				}
 			}
-		} //구가 요청되지 않았을 때는 progress가 0이고 저장될 사항이 없기 때문에 else 생략
+		} else{
+			Pageable pageable = PageRequest.of(page, size);
+
+			final int start = (int)pageable.getOffset();
+			final int end = Math.min((start + pageable.getPageSize()), foreignStoreResponses.size());
+			final Page<ForeignStoreResponse> foreignStoreResponsePage = new PageImpl<>(foreignStoreResponses.subList(start, end), pageable, foreignStoreResponses.size());
+
+			return foreignStoreResponsePage;
+		}
 
 		//각종 필터
 		if(open){ // 영업중 필터
