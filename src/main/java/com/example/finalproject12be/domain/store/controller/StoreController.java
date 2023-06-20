@@ -74,16 +74,17 @@ public class StoreController {
 
 	//외국어 가능 약국 상세보기
 	@GetMapping("/api/store/foreign/{store-id}")
-	public ForeignOneStoreResponse getForeignStore(
+	public ResponseEntity<ForeignOneStoreResponse> getForeignStore(
 		@PathVariable(name = "store-id") Long storeId,
 		@AuthenticationPrincipal UserDetailsImpl userDetails){
 
-		return storeService.getForeignStore(storeId, userDetails);
+		ForeignOneStoreResponse foreignOneStoreResponse = storeService.getForeignStore(storeId, userDetails);
+		return ResponseEntity.status(HttpStatus.OK).body(foreignOneStoreResponse);
 	}
 
 	//외국어 가능 약국 검색하기
 	@GetMapping("/api/store/foreign/search")
-	public Page<ForeignStoreResponse> searchForeignStore(
+	public ResponseEntity<Page<ForeignStoreResponse>> searchForeignStore(
 		@RequestParam("page") int page,
 		@RequestParam("size") int size,
 		@RequestParam("storeName") String storeName,
@@ -98,7 +99,8 @@ public class StoreController {
 		@RequestParam("latitude") String latitude, @RequestParam("longitude") String longitude,
 		@AuthenticationPrincipal UserDetailsImpl userDetails){
 
-		return storeService.searchForeignStore(page, size, storeName, gu, open, holidayBusiness, nightBusiness, english, chinese, japanese, radius, latitude, longitude, userDetails);
+		Page<ForeignStoreResponse> foreignStoreResponses = storeService.searchForeignStore(page, size, storeName, gu, open, holidayBusiness, nightBusiness, english, chinese, japanese, radius, latitude, longitude, userDetails);
+		return ResponseEntity.status(HttpStatus.OK).body(foreignStoreResponses);
 	}
 
 	//위치 불러오기
