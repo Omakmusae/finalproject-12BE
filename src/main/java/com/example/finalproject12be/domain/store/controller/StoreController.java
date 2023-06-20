@@ -3,6 +3,7 @@ package com.example.finalproject12be.domain.store.controller;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.amazonaws.Response;
 import com.example.finalproject12be.domain.store.dto.ForeignOneStoreResponse;
 import com.example.finalproject12be.domain.store.dto.ForeignStoreResponse;
 import com.example.finalproject12be.domain.store.dto.OneStoreResponseDto;
@@ -36,23 +38,25 @@ public class StoreController {
 
 	//약국 전체보기
 	@GetMapping("/api/store")
-	public List<StoreResponseDto> getAllStores(@AuthenticationPrincipal UserDetailsImpl userDetails){
+	public ResponseEntity<List<StoreResponseDto>> getAllStores(@AuthenticationPrincipal UserDetailsImpl userDetails){
 
-		return storeService.getAllStores(userDetails);
+		List<StoreResponseDto> storeResponseDtos = storeService.getAllStores(userDetails);
+		return ResponseEntity.status(HttpStatus.OK).body(storeResponseDtos);
 	}
 
 	//약국 상세보기
 	@GetMapping("/api/store/{id}")
-	public OneStoreResponseDto getStore(
+	public ResponseEntity<OneStoreResponseDto> getStore(
 		@PathVariable(name = "id") Long storeId,
 		@AuthenticationPrincipal UserDetailsImpl userDetails){
 
-		return storeService.getStore(storeId, userDetails);
+		OneStoreResponseDto oneStoreResponseDto = storeService.getStore(storeId, userDetails);
+		return ResponseEntity.status(HttpStatus.OK).body(oneStoreResponseDto);
 	}
 
 	//일반 약국 검색하기
 	@GetMapping("/api/store/search")
-	public Page<StoreResponseDto> searchStore(
+	public ResponseEntity<Page<StoreResponseDto>> searchStore(
 		@RequestParam("page") int page,
 		@RequestParam("size") int size,
 		@RequestParam("storeName") String storeName,
@@ -64,7 +68,8 @@ public class StoreController {
 		@RequestParam("latitude") String latitude, @RequestParam("longitude") String longitude,
 		@AuthenticationPrincipal UserDetailsImpl userDetails){
 
-		return storeService.searchStore(page, size, storeName, gu, open, holidayBusiness, nightBusiness, radius, latitude, longitude,userDetails);
+		Page<StoreResponseDto> storeResponseDtos = storeService.searchStore(page, size, storeName, gu, open, holidayBusiness, nightBusiness, radius, latitude, longitude,userDetails);
+		return ResponseEntity.status(HttpStatus.OK).body(storeResponseDtos);
 	}
 
 	//외국어 가능 약국 상세보기
