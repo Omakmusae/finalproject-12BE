@@ -33,8 +33,7 @@ public class Board extends Timestamped {
 	@Column(nullable = false)
 	private String title;
 
-	@Lob
-	@Column(nullable = false)
+	@Column(nullable = false, columnDefinition = "TEXT")
 	private String content;
 
 	@Transient

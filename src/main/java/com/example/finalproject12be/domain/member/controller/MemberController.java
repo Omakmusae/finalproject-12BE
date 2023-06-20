@@ -29,9 +29,11 @@ import com.example.finalproject12be.domain.member.service.MemberService;
 import com.example.finalproject12be.security.UserDetailsImpl;
 
 import lombok.RequiredArgsConstructor;
+
 @RestController
 @RequiredArgsConstructor
 public class MemberController {
+
 	private final MemberService memberService;
 
 	@PostMapping("/user/signup")
