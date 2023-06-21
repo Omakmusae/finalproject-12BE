@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class MappedSearchRequest {
+public class MappedSearchForeignRequest {
 
 	private int page;
 	private int size;
@@ -14,14 +14,19 @@ public class MappedSearchRequest {
 	private boolean holidayBusiness;
 	private boolean nightBusiness;
 
+	private Integer english;
+	private Integer chinese;
+	private Integer japanese;
+
 	private String radius;
 	private String latitude;
 	private String longitude;
 
 
 	@Builder
-	public MappedSearchRequest(int page, int size, String storeName, String gu, boolean open,
-		boolean holidayBusiness, boolean nightBusiness, String baseRadius, String baseLatitude, String baseLongitude)
+	public MappedSearchForeignRequest(int page, int size, String storeName, String gu, boolean open,
+		boolean holidayBusiness, boolean nightBusiness, Integer english, Integer chinese, Integer japanese,
+		String baseRadius, String baseLatitude, String baseLongitude)
 	{
 		this.page = page;
 		this.size = size;
@@ -30,6 +35,9 @@ public class MappedSearchRequest {
 		this.open = open;
 		this.holidayBusiness = holidayBusiness;
 		this.nightBusiness = nightBusiness;
+		this.english = english;
+		this.chinese = chinese;
+		this.japanese = japanese;
 		this.radius= baseRadius;
 		this.latitude = baseLatitude;
 		this.longitude = baseLongitude;
