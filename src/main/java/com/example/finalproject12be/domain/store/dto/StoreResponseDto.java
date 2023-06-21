@@ -32,6 +32,17 @@ public class StoreResponseDto {
 		this.longitude = store.getLongitude();
 		this.latitude = store.getLatitude();
 	}
+
+	public StoreResponseDto(Long storeId, String address, String name, String callNumber,
+		String weekdaysTime, Double longitude, Double latitude) {
+		this.storeId = storeId;
+		this.address = address;
+		this.name = name;
+		this.callNumber = callNumber;
+		this.weekdaysTime = weekdaysTime;
+		this.longitude = longitude;
+		this.latitude = latitude;
+	}
 	public void setBookmark(boolean bookmark){
 		this.bookmark = bookmark;
 	}

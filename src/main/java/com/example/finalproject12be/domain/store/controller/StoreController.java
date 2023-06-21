@@ -19,6 +19,8 @@ import com.amazonaws.Response;
 import com.example.finalproject12be.domain.store.dto.ForeignOneStoreResponse;
 import com.example.finalproject12be.domain.store.dto.ForeignStoreResponse;
 import com.example.finalproject12be.domain.store.dto.OneStoreResponseDto;
+import com.example.finalproject12be.domain.store.dto.SearchForeignOptionRequest;
+import com.example.finalproject12be.domain.store.dto.SearchOptionRequest;
 import com.example.finalproject12be.domain.store.dto.StoreRequest;
 import com.example.finalproject12be.domain.store.dto.StoreResponseDto;
 import com.example.finalproject12be.domain.store.entity.Store;
@@ -111,11 +113,7 @@ public class StoreController {
 		@RequestParam("address") String address,
 		@AuthenticationPrincipal UserDetailsImpl userDetails){
 
-		Double baseRadius =  Double.parseDouble(radius);
-		Double baseLatitude = Double.parseDouble(latitude);
-		Double baseLongitude = Double.parseDouble(longitude);
-
-		return storeService.testLocation(baseRadius,baseLatitude, baseLongitude);
+		return storeService.searchLocation(radius,latitude, longitude);
 		//return storeService.getLocation(baseRadius,baseLatitude, baseLongitude, address);
 	}
 
@@ -157,4 +155,19 @@ public class StoreController {
 	// public void fetch() {
 	// 	openApiManager.fetch();
 	// }
+
+	//일반 약국 검색 test
+	@GetMapping("/test")
+	public Page<StoreResponseDto> searchStoreWithFilter(SearchOptionRequest request,
+		@AuthenticationPrincipal UserDetailsImpl userDetails){
+
+		return storeService.searchStoreWithFilter(request,userDetails);
+	}
+
+	@GetMapping("/testFor")
+	public Page<ForeignStoreResponse> searchForeignStoreWithFilter(SearchForeignOptionRequest request,
+		@AuthenticationPrincipal UserDetailsImpl userDetails){
+
+		return storeService.searchForeignStoreWithFilter(request,userDetails);
+	}
 }

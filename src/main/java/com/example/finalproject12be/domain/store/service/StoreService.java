@@ -14,16 +14,22 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.finalproject12be.domain.board.entity.Board;
 import com.example.finalproject12be.domain.bookmark.entity.Bookmark;
+import com.example.finalproject12be.domain.bookmark.repository.BookmarkRepository;
 import com.example.finalproject12be.domain.member.entity.Member;
 import com.example.finalproject12be.domain.member.entity.MemberRoleEnum;
 import com.example.finalproject12be.domain.store.dto.ForeignOneStoreResponse;
 import com.example.finalproject12be.domain.store.dto.ForeignStoreResponse;
+import com.example.finalproject12be.domain.store.dto.MappedSearchForeignRequest;
+import com.example.finalproject12be.domain.store.dto.MappedSearchRequest;
 import com.example.finalproject12be.domain.store.dto.OneStoreResponseDto;
+import com.example.finalproject12be.domain.store.dto.SearchForeignOptionRequest;
+import com.example.finalproject12be.domain.store.dto.SearchOptionRequest;
 import com.example.finalproject12be.domain.store.dto.StoreRequest;
 import com.example.finalproject12be.domain.store.dto.StoreResponseDto;
 import com.example.finalproject12be.domain.store.entity.Store;
@@ -44,6 +50,7 @@ public class StoreService {
 
 	private final StoreRepository storeRepository;
 	private final StoreRepositoryCustom storeRepositoryCustom;
+	private BookmarkRepository bookmarkRepository;
 
 	//약국 전체보기
 	@Transactional
@@ -165,11 +172,9 @@ public class StoreService {
 		//내 위치 기반 가까운 약국 검색
 		if (latitude != "") {
 			progress = 1;
-			Double baseRadius =  Double.parseDouble(radius);
-			Double baseLatitude = Double.parseDouble(latitude);
-			Double baseLongitude = Double.parseDouble(longitude);
+
 			// stores = storeRepository.findByDistanceWithinRadius(baseRadius, baseLatitude, baseLongitude);
-			stores = storeRepositoryCustom.searchTest(baseRadius, baseLatitude, baseLongitude);
+			stores = storeRepositoryCustom.searchStoreWithinDistance(radius, latitude, longitude);
 		}
 
 		//약국 이름 검색
@@ -249,7 +254,7 @@ public class StoreService {
 				}
 
 				for(Store restStore : restStores){
-					
+
 					if(restStore.getHolidayTime() == null){
 						stores.remove(restStore);
 					}
@@ -523,11 +528,8 @@ public class StoreService {
 		//내 위치 기반 가까운 약국 검색
 		if (latitude != "") {
 			progress = 1;
-			Double baseRadius =  Double.parseDouble(radius);
-			Double baseLatitude = Double.parseDouble(latitude);
-			Double baseLongitude = Double.parseDouble(longitude);
 			//stores = storeRepository.findByDistanceWithinRadius(baseRadius, baseLatitude, baseLongitude);
-			stores = storeRepositoryCustom.searchTest(baseRadius, baseLatitude, baseLongitude);
+			stores = storeRepositoryCustom.searchStoreWithinDistance(radius, latitude, longitude);
 		}
 
 		//약국 이름 검색하기
@@ -779,8 +781,8 @@ public class StoreService {
 		return foreignOneStoreResponse;
 	}
 
-	public List<Store> testLocation(Double baseRadius,Double baseLatitude, Double baseLongitude) {
-		List<Store> result = storeRepositoryCustom.searchTest(baseRadius, baseLatitude, baseLongitude);
+	public List<Store> searchLocation(String baseRadius,String baseLatitude, String baseLongitude) {
+		List<Store> result = storeRepositoryCustom.searchStoreWithinDistance(baseRadius, baseLatitude, baseLongitude);
 		// List<Store> result = storeRepository.findByDistanceWithinRadius(baseRadius, baseLatitude, baseLongitude);
 
 		return result;
@@ -819,7 +821,24 @@ public class StoreService {
 		}
 
 		storeRepository.deleteStoresById(storeId);
-		System.out.println("숙소 삭제 완료");
+
+	}
+
+
+	public Page<StoreResponseDto> searchStoreWithFilter(SearchOptionRequest request, UserDetailsImpl userDetails) {
+		MappedSearchRequest mappedRequest = request.toMappedSearchRequest();
+
+		Page<StoreResponseDto> result = storeRepositoryCustom.searchStoreWithFilter(mappedRequest, userDetails);
+
+		return result;
+	}
+
+	public Page<ForeignStoreResponse> searchForeignStoreWithFilter(SearchForeignOptionRequest request, UserDetailsImpl userDetails) {
+		MappedSearchForeignRequest mappedRequest = request.toMappedSearchRequest();
+		System.out.println(mappedRequest.getEnglish());
+		Page<ForeignStoreResponse> result = storeRepositoryCustom.searchForeignStoreWithFilter(mappedRequest, userDetails);
+
+		return result;
 	}
 
 }
