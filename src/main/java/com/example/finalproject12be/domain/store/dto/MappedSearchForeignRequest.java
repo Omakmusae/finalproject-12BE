@@ -14,9 +14,9 @@ public class MappedSearchForeignRequest {
 	private boolean holidayBusiness;
 	private boolean nightBusiness;
 
-	private Integer english;
-	private Integer chinese;
-	private Integer japanese;
+	private int english;
+	private int chinese;
+	private int japanese;
 
 	private String radius;
 	private String latitude;
@@ -25,7 +25,7 @@ public class MappedSearchForeignRequest {
 
 	@Builder
 	public MappedSearchForeignRequest(int page, int size, String storeName, String gu, boolean open,
-		boolean holidayBusiness, boolean nightBusiness, Integer english, Integer chinese, Integer japanese,
+		boolean holidayBusiness, boolean nightBusiness, int english, int chinese, int japanese,
 		String baseRadius, String baseLatitude, String baseLongitude)
 	{
 		this.page = page;

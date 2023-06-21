@@ -216,6 +216,7 @@ public class StoreRepositoryCustom {
 
 	public Page<ForeignStoreResponse> searchForeignStoreWithFilter(MappedSearchForeignRequest request, UserDetailsImpl userDetails) {
 
+
 		int page = request.getPage();
 		int size = request.getSize();
 
@@ -229,15 +230,15 @@ public class StoreRepositoryCustom {
 				store.english, store.chinese, store.japanese))
 			.from(store)
 			.where(
+				eqEnglish(request.getEnglish()),
+				eqChinese(request.getChinese()),
+				eqJapanese(request.getJapanese()),
 				withinDistance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude),
 				eqAddress(request.getGu()),
 				eqStoreName(request.getStoreName()),
 				checkOpen(request.isOpen()),
 				checkHolidayOpen(request.isHolidayBusiness()),
-				checkNightdOpen(request.isNightBusiness()),
-				eqEnglish(request.getEnglish()),
-				eqChinese(request.getChinese()),
-				eqJapanese(request.getJapanese())
+				checkNightdOpen(request.isNightBusiness())
 			);
 
 		if (distance != null) {
@@ -339,9 +340,11 @@ public class StoreRepositoryCustom {
 				"(WEEKDAY(CONVERT_TZ(NOW(), '+00:00', '+09:00')) BETWEEN 0 AND 4 " +
 				"AND TIME_FORMAT(CONVERT_TZ(NOW(), '+00:00', '+09:00'), '%H:%i') <= TIME_FORMAT(SUBSTRING_INDEX(weekdays_time, ' ', -1), '%H:%i') " +
 				"AND TIME_FORMAT(CONVERT_TZ(NOW(), '+00:00', '+09:00'), '%H:%i') >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(weekdays_time, ' ~', 1), ' ', -1), '%H:%i')) " +
+
 				"OR (WEEKDAY(CONVERT_TZ(NOW(), '+00:00', '+09:00')) = 5 " +
 				"AND TIME_FORMAT(CONVERT_TZ(NOW(), '+00:00', '+09:00'), '%H:%i') <= TIME_FORMAT(SUBSTRING_INDEX(saturday_time, ' ', -1), '%H:%i') " +
 				"AND TIME_FORMAT(CONVERT_TZ(NOW(), '+00:00', '+09:00'), '%H:%i') >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(saturday_time, ' ~', 1), ' ', -1), '%H:%i')) " +
+
 				"OR (WEEKDAY(CONVERT_TZ(NOW(), '+00:00', '+09:00')) = 6 " +
 				"AND TIME_FORMAT(CONVERT_TZ(NOW(), '+00:00', '+09:00'), '%H:%i') <= TIME_FORMAT(SUBSTRING_INDEX(sunday_time, ' ', -1), '%H:%i') " +
 				"AND TIME_FORMAT(CONVERT_TZ(NOW(), '+00:00', '+09:00'), '%H:%i') >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(sunday_time, ' ~', 1), ' ', -1), '%H:%i'))"
@@ -367,7 +370,8 @@ public class StoreRepositoryCustom {
 		return nightBusiness == true ? store.nightPharmacy.isNotNull() : null;
 	}
 
-	private BooleanExpression eqEnglish(Integer english) {
+	private BooleanExpression eqEnglish(int english) {
+
 		return english == 1 ? store.english.eq(1) : null;
 	}
 
