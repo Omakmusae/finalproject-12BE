@@ -62,25 +62,25 @@ public class StoreRepositoryCustom {
 	}
 
 
-	public List<Store> test(MappedSearchRequest request) {
-
-		NumberExpression<Double> distance = distance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude);
-
-		return jpaQueryFactory
-			.select(store)
-			.from(store)
-			.where(
-				withinDistance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude),
-				eqAddress(request.getGu()),
-				eqStoreName(request.getStoreName()),
-				checkOpen(request.isOpen()),
-				checkHolidayOpen(request.isHolidayBusiness()),
-				checkNightdOpen(request.isNightBusiness())
-			)
-			.orderBy(distance.asc())
-			.limit(30)
-			.fetch();
-	}
+	// public List<Store> test(MappedSearchRequest request) {
+	//
+	// 	NumberExpression<Double> distance = distance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude);
+	//
+	// 	return jpaQueryFactory
+	// 		.select(store)
+	// 		.from(store)
+	// 		.where(
+	// 			withinDistance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude),
+	// 			eqAddress(request.getGu()),
+	// 			eqStoreName(request.getStoreName()),
+	// 			checkOpen(request.isOpen()),
+	// 			checkHolidayOpen(request.isHolidayBusiness()),
+	// 			checkNightdOpen(request.isNightBusiness())
+	// 		)
+	// 		.orderBy(distance.asc())
+	// 		.limit(30)
+	// 		.fetch();
+	// }
 
 	public Page<StoreResponseDto> searchStoreWithFilter(MappedSearchRequest request, UserDetailsImpl userDetails) {
 
@@ -112,13 +112,11 @@ public class StoreRepositoryCustom {
 			.limit(size)
 			.fetch();
 
-		System.out.println("serach 중간");
-
 		// 로그인한 유저의 북마크 정보 가져오기
 		List<Long> bookmarkedStoreIds = new ArrayList<>();
 
 		if (userDetails != null) {
-			System.out.println("member null 아님");
+
 			Member member = userDetails.getMember();
 			bookmarkedStoreIds = bookmarkRepository.findStoreIdsByMember(member);
 			// 북마크 여부 체크하여 StoreResponseDto에 설정
@@ -166,7 +164,6 @@ public class StoreRepositoryCustom {
 	// 	return new PageImpl<>(result.getResults(), PageRequest.of(page, size), result.getTotal());
 	// }
 
-	//
 	// public Page<StoreResponseDto> searchStoreWithFilter(MappedSearchRequest request) {
 	//
 	// 	int page = request.getPage();
@@ -221,6 +218,7 @@ public class StoreRepositoryCustom {
 
 		int page = request.getPage();
 		int size = request.getSize();
+
 		NumberExpression<Double> distance = distance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude);
 
 		JPAQuery<ForeignStoreResponse> query = jpaQueryFactory
@@ -241,6 +239,7 @@ public class StoreRepositoryCustom {
 				eqChinese(request.getChinese()),
 				eqJapanese(request.getJapanese())
 			);
+
 		if (distance != null) {
 			query = query.where(withinDistance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude));
 		}
@@ -251,16 +250,18 @@ public class StoreRepositoryCustom {
 			.limit(size)
 			.fetch();
 
-
-
 		// 로그인한 유저의 북마크 정보 가져오기
-		Member member = userDetails.getMember();
-		List<Long> bookmarkedStoreIds = bookmarkRepository.findStoreIdsByMember(member);
+		List<Long> bookmarkedStoreIds = new ArrayList<>();
 
-		// 북마크 여부 체크하여 StoreResponseDto에 설정
-		for (ForeignStoreResponse result : results) {
-			if (bookmarkedStoreIds.contains(result.getStoreId())) {
-				result.setBookmark(true);
+		if (userDetails != null) {
+
+			Member member = userDetails.getMember();
+			bookmarkedStoreIds = bookmarkRepository.findStoreIdsByMember(member);
+			// 북마크 여부 체크하여 StoreResponseDto에 설정
+			for (ForeignStoreResponse result : results) {
+				if (bookmarkedStoreIds.contains(result.getStoreId())) {
+					result.setBookmark(true);
+				}
 			}
 		}
 
@@ -393,7 +394,7 @@ public class StoreRepositoryCustom {
 	}
 
 	private NumberExpression<Double> distance(String baseLatitude, String baseLongitude, NumberPath<Double> latitude, NumberPath<Double> longitude) {
-		System.out.println("!문제는 distance일까?!!");
+
 		if (baseLatitude == null) {
 			return null;
 		} else {
