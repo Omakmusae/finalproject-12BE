@@ -834,11 +834,20 @@ public class StoreService {
 	}
 
 	public Page<ForeignStoreResponse> searchForeignStoreWithFilter(SearchForeignOptionRequest request, UserDetailsImpl userDetails) {
+
 		MappedSearchForeignRequest mappedRequest = request.toMappedSearchRequest();
-		System.out.println(mappedRequest.getEnglish());
 		Page<ForeignStoreResponse> result = storeRepositoryCustom.searchForeignStoreWithFilter(mappedRequest, userDetails);
 
 		return result;
 	}
+
+	// public Page<Store> searchForeignStoreWithFilter(SearchForeignOptionRequest request, UserDetailsImpl userDetails) {
+	// 	MappedSearchForeignRequest mappedRequest = request.toMappedSearchRequest();
+	// 	System.out.println(mappedRequest.getEnglish());
+	// 	Page<Store> result = storeRepositoryCustom.searchForeignStoreWithFilter(mappedRequest);
+	//
+	// 	return result;
+	// }
+
 
 }

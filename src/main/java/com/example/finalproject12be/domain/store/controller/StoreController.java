@@ -170,4 +170,12 @@ public class StoreController {
 
 		return storeService.searchForeignStoreWithFilter(request,userDetails);
 	}
+
+
+	// @GetMapping("/testFor")
+	// public Page<Store> searchForeignStoreWithFilter(SearchForeignOptionRequest request,
+	// 	@AuthenticationPrincipal UserDetailsImpl userDetails){
+	//
+	// 	return storeService.searchForeignStoreWithFilter(request,userDetails);
+	// }
 }
