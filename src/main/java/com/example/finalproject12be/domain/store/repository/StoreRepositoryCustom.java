@@ -229,14 +229,14 @@ public class StoreRepositoryCustom {
 				store.english, store.chinese, store.japanese))
 			.from(store)
 			.where(
-				//withinDistance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude),
-				//eqAddress(request.getGu()),
-				//eqStoreName(request.getStoreName()),
+				withinDistance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude),
+				eqAddress(request.getGu()),
+				eqStoreName(request.getStoreName()),
 				checkOpen(request.isOpen()),
-				//checkHolidayOpen(request.isHolidayBusiness()),
-				//checkNightdOpen(request.isNightBusiness()),
+				checkHolidayOpen(request.isHolidayBusiness()),
+				checkNightdOpen(request.isNightBusiness()),
 				eqEnglish(request.getEnglish()),
-				//eqChinese(request.getChinese()),
+				eqChinese(request.getChinese()),
 				eqJapanese(request.getJapanese())
 			);
 
