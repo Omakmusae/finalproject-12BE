@@ -57,22 +57,22 @@ public class StoreController {
 	}
 
 	//일반 약국 검색하기
-	// @GetMapping("/api/store/search")
-	// public ResponseEntity<Page<StoreResponseDto>> searchStore(
-	// 	@RequestParam("page") int page,
-	// 	@RequestParam("size") int size,
-	// 	@RequestParam("storeName") String storeName,
-	// 	@RequestParam("gu") String gu,
-	// 	@RequestParam("open") boolean open,
-	// 	@RequestParam("holidayBusiness") boolean holidayBusiness,
-	// 	@RequestParam("nightBusiness") boolean nightBusiness,
-	// 	@RequestParam("radius") String radius,
-	// 	@RequestParam("latitude") String latitude, @RequestParam("longitude") String longitude,
-	// 	@AuthenticationPrincipal UserDetailsImpl userDetails){
-	//
-	// 	Page<StoreResponseDto> storeResponseDtos = storeService.searchStore(page, size, storeName, gu, open, holidayBusiness, nightBusiness, radius, latitude, longitude,userDetails);
-	// 	return ResponseEntity.status(HttpStatus.OK).body(storeResponseDtos);
-	// }
+	@GetMapping("/api/store/search")
+	public ResponseEntity<Page<StoreResponseDto>> searchStore(
+		@RequestParam("page") int page,
+		@RequestParam("size") int size,
+		@RequestParam("storeName") String storeName,
+		@RequestParam("gu") String gu,
+		@RequestParam("open") boolean open,
+		@RequestParam("holidayBusiness") boolean holidayBusiness,
+		@RequestParam("nightBusiness") boolean nightBusiness,
+		@RequestParam("radius") String radius,
+		@RequestParam("latitude") String latitude, @RequestParam("longitude") String longitude,
+		@AuthenticationPrincipal UserDetailsImpl userDetails){
+
+		Page<StoreResponseDto> storeResponseDtos = storeService.searchStore(page, size, storeName, gu, open, holidayBusiness, nightBusiness, radius, latitude, longitude,userDetails);
+		return ResponseEntity.status(HttpStatus.OK).body(storeResponseDtos);
+	}
 
 	//외국어 가능 약국 상세보기
 	@GetMapping("/api/store/foreign/{store-id}")
@@ -157,8 +157,7 @@ public class StoreController {
 	// }
 
 	//일반 약국 검색 test
-	//@GetMapping("/test")
-	@GetMapping("/api/store/search")
+	@GetMapping("/test")
 	public Page<StoreResponseDto> searchStoreWithFilter(SearchOptionRequest request,
 		@AuthenticationPrincipal UserDetailsImpl userDetails){
 
