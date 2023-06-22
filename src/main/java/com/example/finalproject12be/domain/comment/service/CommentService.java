@@ -6,6 +6,9 @@ import com.example.finalproject12be.domain.comment.dto.CommentResponseDto;
 import com.example.finalproject12be.domain.comment.entity.Comment;
 import com.example.finalproject12be.domain.comment.repository.CommentRepository;
 import com.example.finalproject12be.domain.member.entity.Member;
+import com.example.finalproject12be.domain.member.repository.MemberRepository;
+import com.example.finalproject12be.domain.profile.entity.Profile;
+import com.example.finalproject12be.domain.profile.repository.ProfileRepository;
 import com.example.finalproject12be.domain.store.entity.Store;
 import com.example.finalproject12be.domain.store.repository.StoreRepository;
 import com.example.finalproject12be.security.UserDetailsImpl;
@@ -17,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +28,8 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
     private final StoreRepository storeRepository;
+    private final ProfileRepository profileRepository;
+    private final MemberRepository memberRepository;
 
     // 댓글 생성 responseEntity
 //    @Transactional
@@ -39,7 +45,6 @@ public class CommentService {
 //        return ResponseEntity.ok(new CommentResponseDto(comment));
 //    }
 
-    // 댓글 생성 api명세서에 맞춰서 코드 내려주기
     @Transactional
     public ResponseMsgDto<CommentResponseDto> createComment(CommentRequestDto commentRequestDto,
                                                             UserDetailsImpl userDetails,
@@ -52,12 +57,14 @@ public class CommentService {
         Comment comment = new Comment(commentRequestDto, store, userDetails.getMember());
         commentRepository.save(comment);
 
+        Optional<Profile> profileOptional = profileRepository.findByMemberId(userDetails.getMember().getId());
+
         // 응답 생성
-        CommentResponseDto commentResponseDto = new CommentResponseDto(comment);
+        CommentResponseDto commentResponseDto = new CommentResponseDto(comment, profileOptional);
         return ResponseMsgDto.setSuccess(HttpStatus.CREATED.value(), "댓글이 등록되었습니다.", commentResponseDto);
     }
 
-    //댓글 조회
+    // 댓글 조회(store 기준)
     public ResponseEntity<List<CommentResponseDto>> getComments(Long storeId, UserDetailsImpl userDetails) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new RuntimeException("Store not found"));
@@ -66,24 +73,57 @@ public class CommentService {
 
         List<CommentResponseDto> responseDtos = new ArrayList<>();
         for (Comment comment : comments) {
-            boolean isCurrentUserComment = userDetails != null && comment.getMember().getId().equals(userDetails.getMember().getId());
+            boolean isCurrentUserComment = false;
+            if (userDetails != null && userDetails.getMember() != null) {
+                isCurrentUserComment = comment.getMember() != null && comment.getMember().getId().equals(userDetails.getMember().getId());
+            }
 
-            CommentResponseDto responseDto = new CommentResponseDto(comment, isCurrentUserComment);
+            Optional<Profile> profileOptional = Optional.empty();
+            if (comment.getMember() != null) {
+                profileOptional = profileRepository.findByMemberId(comment.getMember().getId());
+            }
+
+            Member member;
+            String nickname;
+            if (comment.getMember() == null) {
+                member = new Member();
+                member.setId(null);
+                nickname = "(알수없음)";
+            } else {
+                member = comment.getMember();
+                Optional<Member> memberOptional = memberRepository.findNicknameById(member.getId());
+                nickname = memberOptional.map(Member::getNickname).orElse("");
+            }
+
+            CommentResponseDto responseDto = new CommentResponseDto(comment, isCurrentUserComment, member, profileOptional);
+            responseDto.setNickname(nickname);
             responseDtos.add(responseDto);
         }
 
         return ResponseEntity.ok(responseDtos);
     }
+
     // 마이페이지 댓글 조회
     public List<CommentResponseDto> getUserComments(UserDetailsImpl userDetails) {
         Long memberId = userDetails.getMember().getId();
         List<Comment> comments = commentRepository.findByMemberId(memberId);
+
         List<CommentResponseDto> responseDtos = new ArrayList<>();
 
         for (Comment comment : comments) {
             boolean isCurrentUserComment = comment.getMember().getId().equals(userDetails.getMember().getId());
             Store store = comment.getStore(); // 댓글이 속한 상점 객체 가져오기
-            CommentResponseDto responseDto = new CommentResponseDto(comment, isCurrentUserComment, store);
+            Optional<Profile> profileOptional = profileRepository.findByMemberId(userDetails.getMember().getId());
+
+            Optional<Member> memberOptional = memberRepository.findNicknameById(comment.getMember().getId());
+            String nickname = memberOptional.map(Member::getNickname).orElse("");
+
+            CommentResponseDto responseDto = new CommentResponseDto(comment, isCurrentUserComment, store, profileOptional);
+            responseDto.setNickname(nickname);
+
+            boolean isForeignLanguageStore = store.getForeignLanguage() != null && store.getForeignLanguage() == 1;
+            responseDto.setForeign(isForeignLanguageStore);
+
             responseDtos.add(responseDto);
         }
 
@@ -95,14 +135,14 @@ public class CommentService {
     public ResponseEntity<CommentResponseDto> updateComment(
             Long commentId,
             CommentRequestDto commentRequestDto,
-            Member member) {
-        Comment comment = commentRepository.findByIdAndMemberId(commentId, member.getId())
+            UserDetailsImpl userDetails) {
+        Comment comment = commentRepository.findByIdAndMemberId(commentId,userDetails.getMember().getId())
                 .orElseThrow(() -> new RuntimeException("Comment not found"));
-
+        Optional<Profile> profileOptional = profileRepository.findByMemberId(userDetails.getMember().getId());
         comment.setContents(commentRequestDto.getContents());
         Comment updatedComment = commentRepository.save(comment);
 
-        return ResponseEntity.ok(new CommentResponseDto(updatedComment));
+        return ResponseEntity.ok(new CommentResponseDto(updatedComment, profileOptional));
     }
 
     // 댓글 삭제

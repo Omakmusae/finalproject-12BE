@@ -9,17 +9,35 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.example.finalproject12be.domain.board.entity.Board;
 import com.example.finalproject12be.domain.bookmark.entity.Bookmark;
+import com.example.finalproject12be.domain.bookmark.repository.BookmarkRepository;
 import com.example.finalproject12be.domain.member.entity.Member;
+import com.example.finalproject12be.domain.member.entity.MemberRoleEnum;
 import com.example.finalproject12be.domain.store.dto.ForeignOneStoreResponse;
 import com.example.finalproject12be.domain.store.dto.ForeignStoreResponse;
+import com.example.finalproject12be.domain.store.dto.MappedSearchForeignRequest;
+import com.example.finalproject12be.domain.store.dto.MappedSearchRequest;
 import com.example.finalproject12be.domain.store.dto.OneStoreResponseDto;
+import com.example.finalproject12be.domain.store.dto.SearchForeignOptionRequest;
+import com.example.finalproject12be.domain.store.dto.SearchOptionRequest;
+import com.example.finalproject12be.domain.store.dto.StoreRequest;
 import com.example.finalproject12be.domain.store.dto.StoreResponseDto;
 import com.example.finalproject12be.domain.store.entity.Store;
 import com.example.finalproject12be.domain.store.repository.StoreRepository;
-// import com.example.finalproject12be.domain.store.repository.StoreRepositoryCustom;
+import com.example.finalproject12be.domain.store.repository.StoreRepositoryCustom;
+import com.example.finalproject12be.exception.CommonErrorCode;
+import com.example.finalproject12be.exception.MemberErrorCode;
+import com.example.finalproject12be.exception.RestApiException;
 import com.example.finalproject12be.security.UserDetailsImpl;
 
 import lombok.RequiredArgsConstructor;
@@ -31,9 +49,11 @@ import lombok.extern.slf4j.Slf4j;
 public class StoreService {
 
 	private final StoreRepository storeRepository;
-	// private final StoreRepositoryCustom storeRepositoryCustom;
+	private final StoreRepositoryCustom storeRepositoryCustom;
+	private BookmarkRepository bookmarkRepository;
 
-
+	//약국 전체보기
+	@Transactional
 	public List<StoreResponseDto> getAllStores(UserDetailsImpl userDetails) {
 
 		List<Store> stores = storeRepository.findAll();
@@ -41,18 +61,18 @@ public class StoreService {
 
 		if(userDetails != null){
 			Member member = userDetails.getMember();
-			storeResponseDtos = checkBookmark(stores, storeResponseDtos, member);
-		}else{
+			checkBookmark(stores, storeResponseDtos, member);
 
+		}else{
 			for(Store store : stores){
 				storeResponseDtos.add(new StoreResponseDto(store));
 			}
-
 		}
 
 		return storeResponseDtos;
 	}
 
+	//외국어 가능, 북마크 확인 로직
 	private List<ForeignStoreResponse> checkForeignBookmark(List<Store> stores, List<ForeignStoreResponse> foreignStoreResponses, UserDetailsImpl userDetails){
 
 		int bookmarkCheck = 0;
@@ -63,21 +83,19 @@ public class StoreService {
 		for(Store store : stores){
 
 			if(userDetails != null){
-
 				Member member = userDetails.getMember();
 
 				if(store.getBookmarks().size() != 0){
 					List<Bookmark> bookmarks = store.getBookmarks();
 
 					for(Bookmark bookmark : bookmarks){
-						if(bookmark.getMember().getId() == member.getId()){
+
+						if(bookmark.getMember().getId().equals(member.getId())){
 							bookmarkCheck = 1;
 						}
-
 					}
 				}
 			}
-
 
 			if(store.getForeignLanguage() != null){
 
@@ -92,13 +110,9 @@ public class StoreService {
 				if(store.getJapanese() == 1){
 					japanese = true;
 				}
-
 			}
 
-
-
 			ForeignStoreResponse foreignStoreResponse = new ForeignStoreResponse(store);
-
 
 			if(bookmarkCheck == 1){
 				foreignStoreResponse.setBookmark(true);
@@ -111,13 +125,12 @@ public class StoreService {
 			english = false;
 			chinese = false;
 			japanese = false;
-
 		}
 
 		return foreignStoreResponses;
-
 	}
 
+	//북마크 확인 로직
 	private List<StoreResponseDto> checkBookmark(List<Store> stores, List<StoreResponseDto> storeResponseDtos, Member member){
 
 		int check = 0;
@@ -128,15 +141,14 @@ public class StoreService {
 				List<Bookmark> bookmarks = store.getBookmarks();
 
 				for(Bookmark bookmark : bookmarks){
-					if(bookmark.getMember().getId() == member.getId()){
+
+					if(bookmark.getMember().getId().equals(member.getId())){
 						check = 1;
 					}
-
 				}
 			}
 
 			StoreResponseDto storeResponseDto = new StoreResponseDto(store);
-
 
 			if(check == 1){
 				storeResponseDto.setBookmark(true);
@@ -144,16 +156,14 @@ public class StoreService {
 
 			storeResponseDtos.add(storeResponseDto);
 			check = 0;
-
 		}
 
 		return storeResponseDtos;
-
 	}
 
-	public List<StoreResponseDto> searchStore(String storeName, String gu, boolean open, boolean holidayBusiness, boolean nightBusiness,
-		String radius, String latitude, String longitude,
-		UserDetailsImpl userDetails) {
+	//일반 약국 검색하기
+	@Transactional
+	public Page<StoreResponseDto> searchStore(int page, int size, String storeName, String gu, boolean open, boolean holidayBusiness, boolean nightBusiness, String radius, String latitude, String longitude, UserDetailsImpl userDetails) {
 
 		int progress = 0; //stores 리스트가 null일 때 0, 반대는 1
 		List<StoreResponseDto> storeResponseDtos = new ArrayList<>();
@@ -162,26 +172,27 @@ public class StoreService {
 		//내 위치 기반 가까운 약국 검색
 		if (latitude != "") {
 			progress = 1;
-			Double baseRadius =  Double.parseDouble(radius);
-			Double baseLatitude = Double.parseDouble(latitude);
-			Double baseLongitude = Double.parseDouble(longitude);
-			stores = storeRepository.findByDistanceWithinRadius(baseRadius, baseLatitude, baseLongitude);
-			// stores = storeRepositoryCustom.searchTest(baseRadius, baseLatitude, baseLongitude);
+
+			// stores = storeRepository.findByDistanceWithinRadius(baseRadius, baseLatitude, baseLongitude);
+			stores = storeRepositoryCustom.searchStoreWithinDistance(radius, latitude, longitude);
 		}
 
-		//storeName
+		//약국 이름 검색
 		if(storeName != ""){
-			if(progress == 0){
+
+			if(progress == 0){ //저장된 stores가 없을 때
 				progress = 1;
 				stores = storeRepository.findAllByNameContaining(storeName);
-			}else{
 
+			}else{ //저장된 stores가 있을 때
 				List<Store> testStores = new ArrayList<>();
+
 				for(Store store: stores){
 					testStores.add(store);
 				}
 
 				for(Store testStore : testStores){
+
 					if(!testStore.getName().contains(storeName)){
 						stores.remove(testStore);
 					}
@@ -189,28 +200,36 @@ public class StoreService {
 			}
 		}
 
-		//gu
-		if(gu != ""){
+		//구 검색
+		if(gu != "") {
 
-			if(progress == 0){ //저장된 stores가 없을 때
+			if (progress == 0) { //저장된 stores가 없을 때
 
 				progress = 1;
 				stores = storeRepository.findAllByAddressContaining(gu);
 
-			}else{ //저장된 stores가 있을 때
-
+			} else { //저장된 stores가 있을 때
 				List<Store> testStores = new ArrayList<>();
-				for(Store store: stores){
+
+				for (Store store : stores) {
 					testStores.add(store);
 				}
 
-				for(Store testStore : testStores){
-					if(!testStore.getAddress().contains(gu)){
+				for (Store testStore : testStores) {
+
+					if (!testStore.getAddress().contains(gu)) {
 						stores.remove(testStore);
 					}
 				}
 			}
-		} //구가 요청되지 않았을 때는 progress가 0이고 저장될 사항이 없기 때문에 else 생략
+		}else if(progress == 0){
+			Pageable pageable = PageRequest.of(page, size);
+
+			final int start = (int)pageable.getOffset();
+			final int end = Math.min((start + pageable.getPageSize()), storeResponseDtos.size());
+			final Page<StoreResponseDto> storeResponsePage = new PageImpl<>(storeResponseDtos.subList(start, end), pageable, storeResponseDtos.size());
+			return storeResponsePage;
+		}
 
 		//filter
 		if(open == true){ // 영업중 필터
@@ -225,211 +244,85 @@ public class StoreService {
 
 			if(progress == 0){
 				progress = 1;
-
 				stores = storeRepository.findAllByHolidayTimeIsNotNull();
-			}else{
 
-				//test
-				List<Store> testStores = new ArrayList<>();
+			}else{
+				List<Store> restStores = new ArrayList<>();
+
 				for(Store store: stores){
-					testStores.add(store);
+					restStores.add(store);
 				}
 
-				for(Store testStore : testStores){
-					if(testStore.getHolidayTime() == null){
-						stores.remove(testStore);
+				for(Store restStore : restStores){
+
+					if(restStore.getHolidayTime() == null){
+						stores.remove(restStore);
 					}
 				}
-
 			}
 
 		}else if (nightBusiness == true){
 
-			// nightBusinessCheck(stores);
-
 			if(progress == 0){
-
 				progress = 1;
-
-				List<Store> newStores = new ArrayList<>();
-
-				stores = storeRepository.findAllByWeekdaysTimeContaining("24");
-
-				newStores = storeRepository.findAllByWeekdaysTimeContaining("25");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllByWeekdaysTimeContaining("26");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllByWeekdaysTimeContaining("27");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllBysaturdayTimeContaining("24");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllBysaturdayTimeContaining("25");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllBysaturdayTimeContaining("26");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllBysaturdayTimeContaining("27");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllBysundayTimeContaining("24");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllBysundayTimeContaining("25");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllBysundayTimeContaining("26");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllBysundayTimeContaining("27");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllBysundayTimeContaining("28");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllBysundayTimeContaining("29");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
+				stores = storeRepository.findAllByNightPharmacy(1);
 
 			}else if(progress == 1){
+				List<Store> restStores = new ArrayList<>();
 
-				//test
-				List<Store> testStores = new ArrayList<>();
 				for(Store store: stores){
-					testStores.add(store);
+					restStores.add(store);
 				}
 
-				for(Store testStore : testStores){
+				for(Store restStore : restStores){
 
-					if(testStore.getWeekdaysTime() != null){
-
-						String storeTime = testStore.getWeekdaysTime();
-
-						String[] storeTimes = storeTime.split("~");
-						String closeHour = storeTimes[1].substring(0, 2);
-
-						if(closeHour.equals("24")) {
-							continue;
-						}else if(closeHour.equals("25")){
-							continue;
-						}else if(closeHour.equals("26")){
-							continue;
-						}else if(closeHour.equals("27")){
-							continue;
-						}else if(closeHour.equals("28")){
-							continue;
-						}else if(closeHour.equals("29")){
-							continue;
-						}else if(closeHour.equals("30")){
-							continue;
-						}else{
-							stores.remove(testStore);
-						}
-					}
-
-				if(testStore.getSaturdayTime() != null){
-
-					String storeTime = testStore.getSaturdayTime();
-
-					String[] storeTimes = storeTime.split("~");
-					String closeHour = storeTimes[1].substring(0, 2);
-
-					if(closeHour.equals("24")) {
-						continue;
-					}else if(closeHour.equals("25")){
-						continue;
-					}else if(closeHour.equals("26")){
-						continue;
-					}else if(closeHour.equals("27")){
-						continue;
-					}else if(closeHour.equals("28")){
-						continue;
-					}else if(closeHour.equals("29")){
-						continue;
-					}else if(closeHour.equals("30")){
-						continue;
-					}else{
-						stores.remove(testStore);
-					}
-				}
-
-				if (testStore.getSundayTime() != null){
-
-						String storeTime = testStore.getSundayTime();
-
-						String[] storeTimes = storeTime.split("~");
-						String closeHour = storeTimes[1].substring(0, 2);
-
-						if(closeHour.equals("24")) {
-							continue;
-						}else if(closeHour.equals("25")){
-							continue;
-						}else if(closeHour.equals("26")){
-							continue;
-						}else if(closeHour.equals("27")){
-							continue;
-						}else if(closeHour.equals("28")){
-							continue;
-						}else if(closeHour.equals("29")){
-							continue;
-						}else if(closeHour.equals("30")){
-							continue;
-						}else{
-							stores.remove(testStore);
-						}
+					if(restStore.getNightPharmacy() != 1){
+						stores.remove(restStore);
 					}
 				}
 			}
 		}
+
 		if(userDetails != null){
 			Member member = userDetails.getMember();
 			storeResponseDtos = checkBookmark(stores, storeResponseDtos, member);
+
 		}else{
 
 			for(Store store : stores){
 				storeResponseDtos.add(new StoreResponseDto(store));
 			}
-
 		}
 
-		return storeResponseDtos;
+		Pageable pageable = PageRequest.of(page, size);
+
+		final int start = (int)pageable.getOffset();
+		final int end = Math.min((start + pageable.getPageSize()), storeResponseDtos.size());
+		final Page<StoreResponseDto> storeResponsePage = new PageImpl<>(storeResponseDtos.subList(start, end), pageable, storeResponseDtos.size());
+
+		return storeResponsePage;
 	}
 
+	//약국 상세보기
+	@Transactional
 	public OneStoreResponseDto getStore(Long storeId, UserDetailsImpl userDetails) {
+
 		Store store = storeRepository.findById(storeId)
-				.orElseThrow(() -> new IllegalArgumentException("해당 약국은 존재하지 않습니다."));
+			.orElseThrow(() -> new RestApiException(CommonErrorCode.RESOURCE_NOT_FOUND));
 
 		OneStoreResponseDto oneStoreResponseDto = new OneStoreResponseDto(store);
+
+		if(store.getSaturdayTime() != null){
+			oneStoreResponseDto.setSaturdayTime(store.getSaturdayTime());
+		}
+
+		if(store.getSundayTime() != null){
+			oneStoreResponseDto.setSundayTime(store.getSundayTime());
+		}
+
+		if(store.getHolidayTime() != null){
+			oneStoreResponseDto.setHolidayTime(store.getHolidayTime());
+		}
 
 		if(userDetails != null){
 			Member member = userDetails.getMember();
@@ -438,19 +331,14 @@ public class StoreService {
 				List<Bookmark> bookmarks = store.getBookmarks();
 
 				for(Bookmark bookmark : bookmarks){
-					if(bookmark.getMember().getId() == member.getId()){
 
+					if(bookmark.getMember().getId().equals(member.getId())){
 
 						oneStoreResponseDto.setBookmark(true);
 						oneStoreResponseDto.setTotalBookmark(store.getBookmarks().size());
-
-
 					}
-
 				}
-
 			}
-
 		}
 
 		if(store.getNightPharmacy() == 1){
@@ -464,19 +352,18 @@ public class StoreService {
 		return oneStoreResponseDto;
 	}
 
+	//영업중 필터 검사 로직
 	private List<Store> openCheck(List<Store> stores){
 
-		//test
-		List<Store> testStores = new ArrayList<>();
+		List<Store> restStores = new ArrayList<>();
 		for(Store store: stores){
-			testStores.add(store);
+			restStores.add(store);
 		}
 
 		LocalDate now = LocalDate.now();
 		int dayOfWeek = now.getDayOfWeek().getValue();
 
 		LocalTime nowTime = LocalTime.now();
-
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 
 		// 포맷 적용하기
@@ -489,98 +376,98 @@ public class StoreService {
 		int closeHour = 0;
 		int closeMin = 0;
 
-		for (Store testStore : testStores) {
+		for (Store restStore : restStores) {
 
-			int status = 0;
+			int status = 0; //시간 null이면 1, 아니면 0
 
 			if (dayOfWeek > 0 && dayOfWeek < 6) { //평일
 
-				String storeTime = testStore.getWeekdaysTime();
+				String storeTime = restStore.getWeekdaysTime();
 
-				if(storeTime != null){
+				if(storeTime != null && !storeTime.contains("nu")){ //TODO: nu:ll 로 시간 들어가 있는 객체 골라서 작업하기
+
 					String[] storeTimes = storeTime.split("~");
 
-					// //test
-					// if(storeTimes[0].substring(3, 5).equals("nu")){
-					// 	System.out.println("원래 문자열: " + storeTimes[0]);
-					// 	System.out.println("두 번째 문자열: " + storeTimes[1]);
-					// 	stores.remove(testStore);
-					// 	status = 1;
-					// }
-
 					openHour = Integer.parseInt(storeTimes[0].substring(3, 5));
-					openMin = Integer.parseInt(storeTimes[0].substring(6));
+					openMin = Integer.parseInt(storeTimes[0].substring(6, 8));
 
-					closeHour = Integer.parseInt(storeTimes[1].substring(0, 2));
-					closeMin = Integer.parseInt(storeTimes[1].substring(3));
+					closeHour = Integer.parseInt(storeTimes[1].substring(1, 3));
+					closeMin = Integer.parseInt(storeTimes[1].substring(4, 6));
+
 				}else {
-
 					status = 1;
-					stores.remove(testStore);
-
+					stores.remove(restStore);
 				}
 
 			}else if (dayOfWeek == 6){ // 토요일 TODO: 일요일이랑 합치기
 
-				String storeTime = testStore.getSaturdayTime();
+				String storeTime = restStore.getSaturdayTime();
 
-				if (storeTime != null){
+				if (storeTime != null && !storeTime.contains("nu")){
+
 					String[] storeTimes = storeTime.split("~");
 
 					openHour = Integer.parseInt(storeTimes[0].substring(2, 4));
-					openMin = Integer.parseInt(storeTimes[0].substring(5));
+					openMin = Integer.parseInt(storeTimes[0].substring(5, 7));
 
-					closeHour = Integer.parseInt(storeTimes[1].substring(0, 2));
-					closeMin = Integer.parseInt(storeTimes[1].substring(3));
+					closeHour = Integer.parseInt(storeTimes[1].substring(1, 3));
+					closeMin = Integer.parseInt(storeTimes[1].substring(4, 6));
+
 				}else{
 					status = 1;
-					stores.remove(testStore);
+					stores.remove(restStore);
 				}
+
 			}else if( dayOfWeek == 7){ // 일요일
 
-				String storeTime = testStore.getSundayTime();
+				String storeTime = restStore.getSundayTime();
 
-				if(storeTime != null){
+				if(storeTime != null && !storeTime.contains("nu")){
+
 					String[] storeTimes = storeTime.split("~");
 
 					openHour = Integer.parseInt(storeTimes[0].substring(2, 4));
-					openMin = Integer.parseInt(storeTimes[0].substring(5));
+					openMin = Integer.parseInt(storeTimes[0].substring(5, 7));
 
-					closeHour = Integer.parseInt(storeTimes[1].substring(0, 2));
-					closeMin = Integer.parseInt(storeTimes[1].substring(3));
+					closeHour = Integer.parseInt(storeTimes[1].substring(1, 3));
+					closeMin = Integer.parseInt(storeTimes[1].substring(4, 6));
+
 				}else {
-
 					status = 1;
-					stores.remove(testStore);
+					stores.remove(restStore);
 				}
 			}
 
 			if(status != 1){
-				if(nowHour < 5){
-					nowHour = nowHour + 24;
-				}
-				if((openHour > nowHour) || (closeHour < nowHour)){
-					stores.remove(testStore);
-				}else if(openHour == nowHour && openMin > nowMin){
-					stores.remove(testStore);
-				} else if(closeHour == nowHour && closeMin < nowMin){ //현재 시간이 영업 시간에 포함되지 않을 때
-					stores.remove(testStore);
+
+				if((openHour < nowHour) && (closeHour > nowHour)){
+					continue;
+				}else if((openHour == nowHour) && (openMin < nowMin)){
+					continue;
+				}else if((closeHour == nowHour) && (closeMin > nowMin)){
+					continue;
+				}else if((closeHour == openHour)){
+					continue;
+				}else{
+					stores.remove(restStore);
 				}
 			}
 		}
+
 		return stores;
 	}
 
-	public List<Store> getLocation(Double baseRadius,Double baseLatitude, Double baseLongitude, String address) {
+	//위치 불러오기
+	@Transactional
+	public List<Store> getLocation(Double baseRadius,Double baseLatitude, Double baseLongitude) {
 
 		List<Store> result = storeRepository.findByDistanceWithinRadius(baseLatitude, baseLongitude, baseRadius);
 		return result;
 	}
 
-	public List<ForeignStoreResponse> searchForeignStore(String storeName, String gu, boolean open, boolean holidayBusiness, boolean nightBusiness,
-		boolean english, boolean chinese, boolean japanese,
-		String radius, String latitude, String longitude,
-		UserDetailsImpl userDetails) {
+	//외국어 가능 약국 검사
+	@Transactional
+	public Page<ForeignStoreResponse> searchForeignStore(int page, int size, String storeName, String gu, boolean open, boolean holidayBusiness, boolean nightBusiness, boolean english, boolean chinese, boolean japanese, String radius, String latitude, String longitude, UserDetailsImpl userDetails) {
 
 		if(gu.equals("gangnam-gu")){
 			gu = "강남구";
@@ -641,26 +528,26 @@ public class StoreService {
 		//내 위치 기반 가까운 약국 검색
 		if (latitude != "") {
 			progress = 1;
-			Double baseRadius =  Double.parseDouble(radius);
-			Double baseLatitude = Double.parseDouble(latitude);
-			Double baseLongitude = Double.parseDouble(longitude);
-			stores = storeRepository.findByDistanceWithinRadius(baseRadius, baseLatitude, baseLongitude);
-			// stores = storeRepositoryCustom.searchTest(baseRadius, baseLatitude, baseLongitude);
+			//stores = storeRepository.findByDistanceWithinRadius(baseRadius, baseLatitude, baseLongitude);
+			stores = storeRepositoryCustom.searchStoreWithinDistance(radius, latitude, longitude);
 		}
 
-		//storeName
+		//약국 이름 검색하기
 		if(storeName != ""){
+
 			if(progress == 0){
 				progress = 1;
 				stores = storeRepository.findAllByNameContaining(storeName);
-			}else{
 
+			}else{
 				List<Store> testStores = new ArrayList<>();
+
 				for(Store store: stores){
 					testStores.add(store);
 				}
 
 				for(Store testStore : testStores){
+
 					if(!testStore.getName().contains(storeName)){
 						stores.remove(testStore);
 					}
@@ -668,291 +555,163 @@ public class StoreService {
 			}
 		}
 
-		//gu
-		if(!gu.equals("")){//if(gu != null){ //TODO: 주석 풀기
+		//구 검색하기
+		if(!gu.equals("")){
 
 			if(progress == 0){ //저장된 stores가 없을 때
-
 				progress = 1;
 				stores = storeRepository.findAllByAddressContaining(gu);
 
 			}else{ //저장된 stores가 있을 때
-
 				List<Store> testStores = new ArrayList<>();
+
 				for(Store store: stores){
 					testStores.add(store);
 				}
 
 				for(Store testStore : testStores){
+
 					if(!testStore.getAddress().contains(gu)){
 						stores.remove(testStore);
 					}
 				}
 			}
-		} //구가 요청되지 않았을 때는 progress가 0이고 저장될 사항이 없기 때문에 else 생략
+		}else if(progress == 0){
+			Pageable pageable = PageRequest.of(page, size);
 
-		//filter
-		if(open == true){ // 영업중 필터
+			final int start = (int)pageable.getOffset();
+			final int end = Math.min((start + pageable.getPageSize()), foreignStoreResponses.size());
+			final Page<ForeignStoreResponse> foreignStoreResponsePage = new PageImpl<>(foreignStoreResponses.subList(start, end), pageable, foreignStoreResponses.size());
+
+			return foreignStoreResponsePage;
+		}
+
+		//각종 필터
+		if(open){ // 영업중 필터
 
 			if(progress == 1){ //저장된 stores가 있을 때만 실행 가능함
-
 				stores = openCheck(stores);
-
 			}
 
-		}else if(holidayBusiness == true){
+		}else if(holidayBusiness){
 
 			if(progress == 0){
 				progress = 1;
-
 				stores = storeRepository.findAllByHolidayTimeIsNotNull();
-			}else{
 
-				//test
-				List<Store> testStores = new ArrayList<>();
+			}else{
+				List<Store> restStores = new ArrayList<>();
+
 				for(Store store: stores){
-					testStores.add(store);
+					restStores.add(store);
 				}
 
-				for(Store testStore : testStores){
-					if(testStore.getHolidayTime() == null){
-						stores.remove(testStore);
+				for(Store restStore : restStores){
+
+					if(restStore.getHolidayTime() == null){
+						stores.remove(restStore);
 					}
 				}
-
 			}
 
-		}else if (nightBusiness == true){
-
-			// nightBusinessCheck(stores);
+		}else if (nightBusiness){
 
 			if(progress == 0){
-
 				progress = 1;
+				stores = storeRepository.findAllByNightPharmacy(1);
 
-				List<Store> newStores = new ArrayList<>();
-
-				stores = storeRepository.findAllByWeekdaysTimeContaining("24");
-
-				newStores = storeRepository.findAllByWeekdaysTimeContaining("25");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllByWeekdaysTimeContaining("26");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllByWeekdaysTimeContaining("27");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllBysaturdayTimeContaining("24");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllBysaturdayTimeContaining("25");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllBysaturdayTimeContaining("26");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllBysaturdayTimeContaining("27");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllBysundayTimeContaining("24");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllBysundayTimeContaining("25");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllBysundayTimeContaining("26");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllBysundayTimeContaining("27");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllBysundayTimeContaining("28");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-
-				newStores = storeRepository.findAllBysundayTimeContaining("29");
-				for (Store store : newStores) {
-					stores.add(store);
-				}
-			}else if(progress == 1){
-
-				//test
-				List<Store> testStores = new ArrayList<>();
+			}else {
+				List<Store> restStores = new ArrayList<>();
 				for(Store store: stores){
-					testStores.add(store);
+					restStores.add(store);
 				}
 
-				for(Store testStore : testStores){
+				for(Store restStore : restStores){
 
-					if(testStore.getWeekdaysTime() != null){
-
-						String storeTime = testStore.getWeekdaysTime();
-
-						String[] storeTimes = storeTime.split("~");
-						String closeHour = storeTimes[1].substring(0, 2);
-
-						if(closeHour.equals("24")) {
-							continue;
-						}else if(closeHour.equals("25")){
-							continue;
-						}else if(closeHour.equals("26")){
-							continue;
-						}else if(closeHour.equals("27")){
-							continue;
-						}else if(closeHour.equals("28")){
-							continue;
-						}else if(closeHour.equals("29")){
-							continue;
-						}else if(closeHour.equals("30")){
-							continue;
-						}else{
-							stores.remove(testStore);
-						}
-
-					}
-
-					if(testStore.getSaturdayTime() != null){
-
-						String storeTime = testStore.getSaturdayTime();
-
-						String[] storeTimes = storeTime.split("~");
-						String closeHour = storeTimes[1].substring(0, 2);
-
-						if(closeHour.equals("24")) {
-							continue;
-						}else if(closeHour.equals("25")){
-							continue;
-						}else if(closeHour.equals("26")){
-							continue;
-						}else if(closeHour.equals("27")){
-							continue;
-						}else if(closeHour.equals("28")){
-							continue;
-						}else if(closeHour.equals("29")){
-							continue;
-						}else if(closeHour.equals("30")){
-							continue;
-						}else{
-							stores.remove(testStore);
-						}
-					}
-
-					if (testStore.getSundayTime() != null){
-
-						String storeTime = testStore.getSundayTime();
-
-						String[] storeTimes = storeTime.split("~");
-						String closeHour = storeTimes[1].substring(0, 2);
-
-						if(closeHour.equals("24")) {
-							continue;
-						}else if(closeHour.equals("25")){
-							continue;
-						}else if(closeHour.equals("26")){
-							continue;
-						}else if(closeHour.equals("27")){
-							continue;
-						}else if(closeHour.equals("28")){
-							continue;
-						}else if(closeHour.equals("29")){
-							continue;
-						}else if(closeHour.equals("30")){
-							continue;
-						}else{
-							stores.remove(testStore);
-						}
+					if(restStore.getNightPharmacy() != 1){
+						stores.remove(restStore);
 					}
 				}
 			}
 		}
 
-		if(english == true){
+		if(english){
+
 			if(progress == 0){
 				progress = 1;
 				stores = storeRepository.findAllByEnglish(1);
-			} else{
 
-				List<Store> testStores = new ArrayList<>();
+			} else{
+				List<Store> restStores = new ArrayList<>();
+
 				for(Store store: stores){
-					testStores.add(store);
+					restStores.add(store);
 				}
 
-				for(Store testStore : testStores){
+				for(Store restStore : restStores){
 
-					if(testStore.getEnglish() == null || testStore.getEnglish() == 0){
-						stores.remove(testStore);
+					if(restStore.getEnglish() == null || restStore.getEnglish() == 0){
+						stores.remove(restStore);
 					}
 				}
 			}
 
-		}else if(chinese == true){
+		}else if(chinese){
+
 			if(progress == 0){
 				progress = 1;
 				stores = storeRepository.findAllByChinese(1);
-			} else{
 
-				List<Store> testStores = new ArrayList<>();
+			} else{
+				List<Store> restStores = new ArrayList<>();
+
 				for(Store store: stores){
-					testStores.add(store);
+					restStores.add(store);
 				}
 
-				for(Store testStore : testStores){
+				for(Store restStore : restStores){
 
-					if(testStore.getChinese() == null || testStore.getChinese() == 0){
-						stores.remove(testStore);
+					if(restStore.getChinese() == null || restStore.getChinese() == 0){
+						stores.remove(restStore);
 					}
 				}
 			}
 
-		}else if(japanese == true){
+		}else if(japanese){
+
 			if(progress == 0){
 				progress = 1;
 				stores = storeRepository.findAllByJapanese(1);
-			} else{
 
-				List<Store> testStores = new ArrayList<>();
+			} else{
+				List<Store> restStores = new ArrayList<>();
+
 				for(Store store: stores){
-					testStores.add(store);
+					restStores.add(store);
 				}
 
-				for(Store testStore : testStores){
+				for(Store restStore : restStores){
 
-					if(testStore.getJapanese() == null || testStore.getJapanese() == 0){
-						stores.remove(testStore);
+					if(restStore.getJapanese() == null || restStore.getJapanese() == 0){
+						stores.remove(restStore);
 					}
 				}
 			}
 		}
+
 		foreignStoreResponses = checkForeignBookmark(stores, foreignStoreResponses, userDetails);
 
-		return foreignStoreResponses;
+		Pageable pageable = PageRequest.of(page, size);
+
+		final int start = (int)pageable.getOffset();
+		final int end = Math.min((start + pageable.getPageSize()), foreignStoreResponses.size());
+		final Page<ForeignStoreResponse> foreignStoreResponsePage = new PageImpl<>(foreignStoreResponses.subList(start, end), pageable, foreignStoreResponses.size());
+
+		return foreignStoreResponsePage;
 	}
 
 	//외국어 약국 상세보기
+	@Transactional
 	public ForeignOneStoreResponse getForeignStore(Long storeId, UserDetailsImpl userDetails) {
 
 		boolean english = false;
@@ -960,9 +719,21 @@ public class StoreService {
 		boolean japanese = false;
 
 		Store store = storeRepository.findById(storeId)
-			.orElseThrow(() -> new IllegalArgumentException("해당 약국은 존재하지 않습니다."));
+			.orElseThrow(() -> new RestApiException(CommonErrorCode.RESOURCE_NOT_FOUND));
 
 		ForeignOneStoreResponse foreignOneStoreResponse = new ForeignOneStoreResponse(store);
+
+		if(store.getSaturdayTime() != null){
+			foreignOneStoreResponse.setSaturdayTime(store.getSaturdayTime());
+		}
+
+		if(store.getSundayTime() != null){
+			foreignOneStoreResponse.setSundayTime(store.getSundayTime());
+		}
+
+		if(store.getHolidayTime() != null){
+			foreignOneStoreResponse.setHolidayTime(store.getHolidayTime());
+		}
 
 		if(userDetails != null){
 			Member member = userDetails.getMember();
@@ -971,13 +742,12 @@ public class StoreService {
 				List<Bookmark> bookmarks = store.getBookmarks();
 
 				for(Bookmark bookmark : bookmarks){
-					if(bookmark.getMember().getId() == member.getId()){
+
+					if(bookmark.getMember().getId().equals(member.getId())){
 
 						foreignOneStoreResponse.setBookmark(true);
 						long totalBookmarks = store.getBookmarks().size();
 						foreignOneStoreResponse.setTotalBookmark(totalBookmarks);
-						// return foreignOneStoreResponse;
-
 					}
 				}
 			}
@@ -992,25 +762,93 @@ public class StoreService {
 		}
 
 		if(store.getForeignLanguage() != null){
+
 			if(store.getEnglish() == 1){
 				english = true;
 			}
+
 			if (store.getChinese() == 1){
 				chinese = true;
 			}
+
 			if(store.getJapanese() == 1){
 				japanese = true;
 			}
 
 			foreignOneStoreResponse.setLanguage(english, chinese, japanese);
 		}
+
 		return foreignOneStoreResponse;
 	}
 
-	public List<Store> testLocation(Double baseRadius,Double baseLatitude, Double baseLongitude) {
-		// List<Store> result = storeRepositoryCustom.searchTest(baseRadius, baseLatitude, baseLongitude);
-		List<Store> result = storeRepository.findByDistanceWithinRadius(baseRadius, baseLatitude, baseLongitude);
+	public List<Store> searchLocation(String baseRadius,String baseLatitude, String baseLongitude) {
+		List<Store> result = storeRepositoryCustom.searchStoreWithinDistance(baseRadius, baseLatitude, baseLongitude);
+		// List<Store> result = storeRepository.findByDistanceWithinRadius(baseRadius, baseLatitude, baseLongitude);
 
 		return result;
 	}
+	@Transactional
+	public Store createStore (StoreRequest storeRequest, Member member) {
+
+		MemberRoleEnum memberRoleEnum =  member.getRole();
+		if (memberRoleEnum != MemberRoleEnum.ADMIN) {
+			throw new RestApiException(MemberErrorCode.ADMIN_ERROR);
+		}
+		Store store = new Store(storeRequest);
+		return storeRepository.save(store);
+
+	}
+
+	@Transactional
+	public void updateStore (Long storeId, StoreRequest storeRequest, Member member) {
+		MemberRoleEnum memberRoleEnum =  member.getRole();
+		if (memberRoleEnum != MemberRoleEnum.ADMIN) {
+			throw new RestApiException(MemberErrorCode.INACTIVE_MEMBER);
+		}
+
+		Store store = storeRepository.findById(storeId)
+			.orElseThrow(() -> new RestApiException(MemberErrorCode.STORE_NOT_FOUND));
+
+		store.updateStore(storeRequest);
+
+	}
+
+	@Transactional
+	public void deleteStore (Long storeId, Member member) {
+		MemberRoleEnum memberRoleEnum =  member.getRole();
+		if (memberRoleEnum != MemberRoleEnum.ADMIN) {
+			throw new RestApiException(MemberErrorCode.INACTIVE_MEMBER);
+		}
+
+		storeRepository.deleteStoresById(storeId);
+
+	}
+
+
+	public Page<StoreResponseDto> searchStoreWithFilter(SearchOptionRequest request, UserDetailsImpl userDetails) {
+		MappedSearchRequest mappedRequest = request.toMappedSearchRequest();
+
+		Page<StoreResponseDto> result = storeRepositoryCustom.searchStoreWithFilter(mappedRequest, userDetails);
+
+		return result;
+	}
+
+	public Page<ForeignStoreResponse> searchForeignStoreWithFilter(SearchForeignOptionRequest request, UserDetailsImpl userDetails) {
+		System.out.println(request.isEnglish() + "영어영어영어!!!!!!!!!!!!!!");
+		MappedSearchForeignRequest mappedRequest = request.toMappedSearchRequest();
+		System.out.println(mappedRequest.getEnglish() + "mappedRequest 영어영어영어!~!!!!!!");
+		Page<ForeignStoreResponse> result = storeRepositoryCustom.searchForeignStoreWithFilter(mappedRequest, userDetails);
+
+		return result;
+	}
+
+	// public Page<Store> searchForeignStoreWithFilter(SearchForeignOptionRequest request, UserDetailsImpl userDetails) {
+	// 	MappedSearchForeignRequest mappedRequest = request.toMappedSearchRequest();
+	// 	System.out.println(mappedRequest.getEnglish());
+	// 	Page<Store> result = storeRepositoryCustom.searchForeignStoreWithFilter(mappedRequest);
+	//
+	// 	return result;
+	// }
+
+
 }

@@ -1,23 +1,37 @@
-// package com.example.finalproject12be.domain.store.dto;
-//
-// import lombok.Data;
-//
-// @Data
-// public class SearchOptionRequest {
-//
-// 	private Double baseRadius;
-// 	private Double baseLatitude;
-// 	private Double baseLongitude;
-// 	private String address;
-//
-// 	public MappedSearchRequest toMappedSearchRequest() {
-// 		return MappedSearchRequest.builder()
-// 			.baseRadius(baseRadius == null ? null : Double.valueOf(String.valueOf(baseRadius)))
-// 			.baseLatitude(baseLatitude == null ? null : Double.valueOf(String.valueOf(baseLatitude)))
-// 			.baseLongitude(baseLongitude == null ? null : Double.valueOf(String.valueOf(baseLongitude)))
-// 			.address(address == null ? null : String.valueOf(address))
-// 			.build();
-//
-// 	}
-//
-// }
+package com.example.finalproject12be.domain.store.dto;
+
+import lombok.Data;
+
+@Data
+public class SearchOptionRequest {
+
+	private Integer page;
+	private Integer size;
+	private String storeName;
+	private String gu;
+	private boolean open;
+	private boolean holidayBusiness;
+	private boolean nightBusiness;
+
+	private String radius;
+	private String latitude;
+	private String longitude;
+
+
+	public MappedSearchRequest toMappedSearchRequest() {
+		return MappedSearchRequest.builder()
+			.page(page == null ? null : page.intValue())
+			.size(size == null ? null : size.intValue())
+			.storeName(storeName == "" ? null : storeName)
+			.gu(gu == "" ? null : gu)
+			.open(open == true ? true : false)
+			.holidayBusiness(holidayBusiness == true ? true : false)
+			.nightBusiness(nightBusiness == true ? true : false)
+			.baseRadius(radius == "" ? null : radius)
+			.baseLatitude(latitude == "" ? null : latitude)
+			.baseLongitude(longitude == "" ? null : longitude)
+			.build();
+
+	}
+
+}

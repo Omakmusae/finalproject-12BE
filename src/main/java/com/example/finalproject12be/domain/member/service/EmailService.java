@@ -40,15 +40,24 @@ public class EmailService {
 
 	private final MailSender mailSender;
 
-	public void sendMail(String newPassword, String email){
+	public void sendPassword(String newPassword, String email){
 		SimpleMailMessage message = new SimpleMailMessage();
 		message.setTo(email); //수신자 설정
-		message.setSubject("오디약! 비밀번호 변경"); //메일 제목
+		message.setSubject("오디약! 임시 비밀번호 발급"); //메일 제목
 		message.setText("임시 비밀번호: " + newPassword); //메일 내용 설정
-		message.setFrom("kmskes0917@naver.com"); //발신자 설정
+		message.setFrom("odimedi@naver.com"); //발신자 설정
 		// message.setReplyTo("보낸이@naver.com");
 		// System.out.println("message"+message);
 		mailSender.send(message);
 	}
 
+
+	public void sendNumber(int number, String email) {
+		SimpleMailMessage message = new SimpleMailMessage();
+		message.setTo(email); //수신자 설정
+		message.setSubject("오디약! 이메일 인증 번호"); //메일 제목
+		message.setText("인증번호: " + number); //메일 내용 설정
+		message.setFrom("odimedi@naver.com"); //발신자 설정
+		mailSender.send(message);
+	}
 }

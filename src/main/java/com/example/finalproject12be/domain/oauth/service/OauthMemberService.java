@@ -1,6 +1,7 @@
 package com.example.finalproject12be.domain.oauth.service;
 
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 
 import org.springframework.http.HttpHeaders;
@@ -18,6 +19,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.example.finalproject12be.domain.member.dto.TokenDto;
 import com.example.finalproject12be.domain.member.entity.Member;
+import com.example.finalproject12be.domain.member.entity.MemberRoleEnum;
 import com.example.finalproject12be.domain.member.entity.RefreshToken;
 import com.example.finalproject12be.domain.member.repository.MemberRepository;
 import com.example.finalproject12be.domain.member.repository.RefreshTokenRepository;
@@ -51,28 +53,41 @@ public class OauthMemberService {
 		// 2. 토큰으로 카카오 API 호출 : "액세스 토큰"으로 "카카오 사용자 정보" 가져오기
 		KakaoMemberInfoRequest kakaoMemberInfo = getKakaoUserInfo(kakaoAccessToken);
 
-		// 3. 필요시에 회원가입
-		Member kakaoMember = registerKakaoUserIfNeeded(kakaoMemberInfo);
+		// 3. 필요시에 회원 가입
+		Member kakaoMember = registerKakaoUserIfNeeded(kakaoMemberInfo, kakaoAccessToken, kakaoRefreshToken);
 
 		// 4. JWT 토큰 반환
-		TokenDto tokenDto = jwtUtil.createAllToken(kakaoMember.getEmail());
-		// String createAccessToken =  jwtUtil.createToken(kakaoMember.getEmail(),"Access");
-		// String createRefreshToken =  jwtUtil.createToken(kakaoMember.getEmail(),"Refresh");
+		TokenDto tokenDto = jwtUtil.createAllToken(kakaoMember.getEmail(), MemberRoleEnum.USER); // Access, Refresh 토큰 생성// Access, Refresh 토큰 생성
 
 		Optional<RefreshToken> refreshToken = refreshTokenRepository.findByEmail(kakaoMember.getEmail());
-		if(refreshToken.isPresent()) {
-			RefreshToken updateToken = refreshToken.get().updateToken(tokenDto.getRefreshToken().substring(7));
+
+		if (refreshToken.isPresent()) { //기존 회원
+			RefreshToken updateToken = refreshToken.get().updateToken(tokenDto.getRefreshToken().substring(7), kakaoAccessToken, kakaoRefreshToken);
 			refreshTokenRepository.save(updateToken);
-		} else {
-			RefreshToken newToken =  new RefreshToken(tokenDto.getRefreshToken().substring(7), kakaoMember.getEmail());
-			refreshTokenRepository.save(newToken);
+		} else { //새로운 회원
+			RefreshToken saveToken = new RefreshToken(tokenDto.getRefreshToken().substring(7), kakaoMember.getEmail(), kakaoAccessToken, kakaoRefreshToken);
+			refreshTokenRepository.save(saveToken);
 		}
 
-		//        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, createToken);
+		// if(refreshToken.isPresent()) {
+		// 	RefreshToken updateToken = refreshToken.get().updateToken(tokenDto.getRefreshToken().substring(7));
+		// 	refreshTokenRepository.save(updateToken);
+		// } else {
+		// 	RefreshToken newToken =  new RefreshToken(tokenDto.getRefreshToken().substring(7), kakaoMember.getEmail());
+		// 	refreshTokenRepository.save(newToken);
+		// }
 
-		String[] tokenArrayResult = new String[2];
+		String[] tokenArrayResult = new String[5];
 		tokenArrayResult[0] = tokenDto.getAccessToken();
 		tokenArrayResult[1] = tokenDto.getRefreshToken();
+		tokenArrayResult[2] = kakaoMemberInfo.getEmail();
+		tokenArrayResult[3]	=  kakaoMember.getNickname();
+
+		if (kakaoMember.getProfile() != null) {
+			tokenArrayResult[4] = kakaoMember.getProfile().getImg();
+		} else {
+			tokenArrayResult[4] = null;
+		}
 
 		return tokenArrayResult;
 	}
@@ -83,14 +98,17 @@ public class OauthMemberService {
 		// HTTP Header 생성
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
-
 		// HTTP Body 생성
 		MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
 		body.add("grant_type", "authorization_code");
-		body.add("client_id", "048f9445160611c1cc986c481c2d6b94");//내 앱 rest api 키
-		//body.add("client_id", "7463ed7e96bc168b9023480e535add90");//오디약 rest api 키
-		body.add("redirect_uri", "http://localhost:8080/user/signin/kakao");
-		//body.add("redirect_uri", "https://finalproject-12-fe.vercel.app/user/signin/kakao");//오디약 redirect url
+
+		//body.add("client_id", "048f9445160611c1cc986c481c2d6b94");//내 앱 rest api 키
+		//body.add("redirect_uri", "http://localhost:8080/user/signin/kakao");
+
+		body.add("client_id", "111b5867f4dff0156fb3f17736d40f3e");//유리님 오디약 rest api 키
+		body.add("redirect_uri", "https://www.odimedi.site/user/signin/kakao");//오디약 redirect url
+		//body.add("redirect_uri", "http://localhost:3000/user/signin/kakao");// 프런트 로컬 redirect url
+
 		body.add("code", code);
 
 		// HTTP 요청 보내기
@@ -115,6 +133,8 @@ public class OauthMemberService {
 
 		return tokenArray;
 	}
+
+
 
 	// 2. 토큰으로 카카오 API 호출 : "액세스 토큰"으로 "카카오 사용자 정보" 가져오기
 	private KakaoMemberInfoRequest getKakaoUserInfo(String accessToken) throws JsonProcessingException {
@@ -141,17 +161,34 @@ public class OauthMemberService {
 		JsonNode jsonNode = objectMapper.readTree(responseBody);
 
 		Long id = jsonNode.get("id").asLong();
-		String nickname = jsonNode.get("properties")
-			.get("nickname").asText();
-		String email = jsonNode.get("kakao_account")
-			.get("email").asText();
+		String nickname = jsonNode.get("properties").get("nickname").asText();
+
+		String email;
+
+		JsonNode kakaoAccountNode = jsonNode.get("kakao_account");
+
+		if (kakaoAccountNode != null && kakaoAccountNode.has("email")) {
+			email = kakaoAccountNode.get("email").asText();
+		} else {
+			int leftLimit = 97; // letter 'a'
+			int rightLimit = 122; // letter 'z'
+			int targetStringLength = 6;
+
+			Random random = new Random();
+			email = random.ints(leftLimit, rightLimit + 1)
+				.limit(targetStringLength)
+				.collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+				.toString();
+
+			email = email+"@test.com";
+		}
 
 		log.info("카카오 사용자 정보: " + id + ", " + nickname + ", " + email);
 		return new KakaoMemberInfoRequest(id, email, nickname);
 	}
 
 	// 3. 필요시에 회원가입
-	private Member registerKakaoUserIfNeeded(KakaoMemberInfoRequest kakaoUserInfo) {
+	private Member registerKakaoUserIfNeeded(KakaoMemberInfoRequest kakaoUserInfo, String kakaoAccessToken, String kakaoRefreshToken) {
 		// DB 에 중복된 Kakao email 가 있는지 확인
 		Long kakaoId = kakaoUserInfo.getId();
 		Member kakaoUser = memberRepository.findByKakaoId(kakaoId)
@@ -159,8 +196,8 @@ public class OauthMemberService {
 
 		if (kakaoUser == null) {
 			//카카오 사용자 email 동일한 email 가진 회원이 있는지 확인
-			String kakaoEmail = kakaoUserInfo.getEmail();
-			Member sameEmailUser = memberRepository.findByEmail(kakaoEmail).orElse(null);
+			String kakaoNickname = kakaoUserInfo.getNickname();
+			Member sameEmailUser = memberRepository.findByNickname(kakaoNickname).orElse(null);
 			if (sameEmailUser != null) {
 				kakaoUser = sameEmailUser;
 				// 기존 회원정보에 카카오 Id 추가
@@ -169,13 +206,24 @@ public class OauthMemberService {
 
 				// 신규 회원가입
 				String email = kakaoUserInfo.getEmail();
-				String nickname = kakaoUserInfo.getNickname();
+
+				int leftLimit = 97; // letter 'a'
+				int rightLimit = 122; // letter 'z'
+				int targetStringLength = 8;
+				Random random = new Random();
+				String nickname = random.ints(leftLimit, rightLimit + 1)
+					.limit(targetStringLength)
+					.collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+					.toString();
+				
 				String password = UUID.randomUUID().toString();
 				String encodedPassword = passwordEncoder.encode(password);
-				kakaoUser = new Member(email, encodedPassword, nickname, kakaoId);
+				kakaoUser = new Member(email, encodedPassword, nickname, kakaoId, MemberRoleEnum.USER);
 				memberRepository.save(kakaoUser);
-				}
+
 			}
+		}
+
 		return kakaoUser;
 	}
 }

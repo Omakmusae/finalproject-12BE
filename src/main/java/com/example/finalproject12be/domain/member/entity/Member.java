@@ -2,22 +2,18 @@ package com.example.finalproject12be.domain.member.entity;
 
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 
+import com.example.finalproject12be.domain.board.entity.Board;
 import com.example.finalproject12be.domain.bookmark.entity.Bookmark;
 
+import com.example.finalproject12be.domain.profile.entity.Profile;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
 @NoArgsConstructor
 @Entity
 public class Member {
@@ -36,29 +32,38 @@ public class Member {
 	@Column(nullable = false)
 	private String nickname;
 
+	@Column(nullable = true)
 	private Long kakaoId;
 
-	@OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
+	@Column(nullable = true)
+	@Enumerated(value = EnumType.STRING)
+	private MemberRoleEnum role;
+
+	@OneToMany(mappedBy = "member", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
 	private List<Bookmark> bookmarks;
 
-	public Member(String email, String password, String nickname) {
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "MEMBER_ID", referencedColumnName = "MEMBER_ID")
+	private Profile profile;
+
+	public Member(String email, String password, String nickname, MemberRoleEnum role) {
 		this.email = email;
 		this.password = password;
 		this.nickname = nickname;
+		this.role = role;
 	}
 
-	public Member(String email, String password, String nickname, Long kakaoId) {
+	public Member(String email, String password, String nickname, Long kakaoId, MemberRoleEnum role ) {
 		this.email = email;
 		this.password = password;
 		this.nickname = nickname;
 		this.kakaoId = kakaoId;
+		this.role = role;
 	}
 
-	public static Member of(String email, String password, String nickname) {
-		return new Member(email, password, nickname);
+	public static Member of(String email, String password, String nickname, MemberRoleEnum role) {
+		return new Member(email, password, nickname, role);
 	}
-
-
 
 	public void deleteBookmark(Bookmark bookmark){
 		this.bookmarks.remove(bookmark);
@@ -80,4 +85,7 @@ public class Member {
 	public void updatePassword(String newPassword) {
 		this.password = newPassword;
 	}
+
+
+
 }

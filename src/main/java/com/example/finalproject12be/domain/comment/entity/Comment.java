@@ -14,9 +14,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
-
 
 @Getter
 @Setter
@@ -33,6 +30,7 @@ public class Comment extends Timestamped {
     @JoinColumn(name = "STORE_ID")
     @JsonIgnore
     private Store store;
+    //Comment -> Store 직렬화를 무시
 
     @ManyToOne
     @JoinColumn(name = "MEMBER_ID")
@@ -44,14 +42,14 @@ public class Comment extends Timestamped {
     @Column(nullable = false)
     private String contents;
 
-
-
     public Comment(CommentRequestDto commentRequestDto, Store store, Member member) {
         this.contents = commentRequestDto.getContents();
         this.member = member;
         this.store = store;
         this.nickname = member.getNickname();
     }
-
-
+    public void deleteMember() {
+        this.member = null;
+        this.nickname = "(알수없음)"; // 탈퇴한 회원의 경우 닉네임을 "탈퇴한 회원"으로 설정
+    }
 }

@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.example.finalproject12be.domain.member.repository.MemberRepository;
 import com.example.finalproject12be.security.jwt.JwtAuthFilter;
 import com.example.finalproject12be.security.jwt.JwtUtil;
 
@@ -30,6 +31,7 @@ public class WebSecurityConfig {
 
 	 private final JwtAuthFilter jwtAuthFilter;
 	 private final JwtUtil jwtUtil;
+	 private final MemberRepository memberRepository;
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
@@ -46,10 +48,12 @@ public class WebSecurityConfig {
 		http.authorizeRequests()
 				.antMatchers("/user/**").permitAll()
 				.antMatchers("/api/store/**").permitAll()
-
+				.antMatchers("/user/signin/**").permitAll()
 				.antMatchers("/user/signin/**").permitAll()
 				.antMatchers("/**").permitAll()
 				.antMatchers("/api/comment/{store-id}").permitAll()
+				.antMatchers(HttpMethod.GET, "/api/board").permitAll()
+				.antMatchers(HttpMethod.GET, "/api/board/**").permitAll()
 				.anyRequest().authenticated()
 				// JWT 인증/인가를 사용하기 위한 설정
 				.and().addFilterBefore(new JwtAuthFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
@@ -57,6 +61,7 @@ public class WebSecurityConfig {
 		return http.build();
 
 	}
+
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource(){
 
@@ -67,6 +72,8 @@ public class WebSecurityConfig {
 		config.addAllowedOrigin("http://localhost:8080");
 		config.addAllowedOrigin("https://finalproject-12-fe.vercel.app/");
 		config.addAllowedOrigin("https://finalproject-12-o68248vtx-pill-my-rhythm.vercel.app");
+		config.addAllowedOrigin("https://www.odimedi.site");
+		config.addAllowedOrigin("https://odimedi.site");
 		// 특정 헤더를 클라이언트 측에서 사용할 수 있게 지정
 		// 만약 지정하지 않는다면, 토큰 값을 사용할 수 없음
 		config.addExposedHeader(JwtUtil.ACCESS_KEY);
@@ -91,4 +98,12 @@ public class WebSecurityConfig {
 
 		return source;
 	}
+
+	// @Bean
+	// public WebSecurityCustomizer webSecurityCustomizer() {
+	// 	// h2-console 사용 및 resources 접근 허용 설정
+	// 	return (web) -> web.ignoring()
+	// 		.requestMatchers(PathRequest.toH2Console())
+	// 		.requestMatchers(PathRequest.toStaticResources().atCommonLocations());
+	// }
 }
