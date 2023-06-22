@@ -134,4 +134,8 @@ public class Store {
 		this.japanese = storeRequest.getJapanese();
 		this.nightPharmacy = storeRequest.getNightPharmacy();
 	}
+
+    public boolean isForeignLanguage() {
+		return foreignLanguage != null && foreignLanguage == 1;
+    }
 }

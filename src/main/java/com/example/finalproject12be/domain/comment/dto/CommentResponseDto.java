@@ -22,7 +22,7 @@ public class CommentResponseDto {
     private String nickname;
     private String contents;
     private boolean check;
-    private boolean foreign = false;
+    private boolean isForeign = false;
     private String createdAt;
     private String address;
     private String name;
@@ -72,12 +72,16 @@ public class CommentResponseDto {
         this.name = store.getName();
         this.callNumber = store.getCallNumber();
         this.weekdaysTime = store.getWeekdaysTime();
-        this.foreign = store.getForeignLanguage() != null && store.getForeignLanguage() == 1;
+        this.isForeign = comment.isForeign(); // 수정된 부분: Comment의 isForeign() 메서드를 사용하여 isForeign 값을 설정
 
         if (profile.isPresent()) {
             this.imageUrl = profile.get().getImg();
         } else {
             this.imageUrl = ""; // 이미지 URL이 없을 경우 빈 문자열로 설정
         }
+    }
+
+    public void setIsForeign(boolean isForeign) {
+        this.isForeign = isForeign;
     }
 }
