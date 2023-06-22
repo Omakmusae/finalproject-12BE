@@ -97,7 +97,7 @@ public class CommentService {
             CommentResponseDto responseDto = new CommentResponseDto(comment, isCurrentUserComment, member, profileOptional);
             responseDto.setNickname(nickname);
 
-            responseDto.setForeign(comment.isForeign()); // 프론트에서 받은 foreign 값 그대로 설정
+            responseDto.setIsForeign(comment.isForeign()); // 수정된 부분: isForeign() -> setIsForeign()
 
             responseDtos.add(responseDto);
         }
@@ -123,7 +123,7 @@ public class CommentService {
             CommentResponseDto responseDto = new CommentResponseDto(comment, isCurrentUserComment, store, profileOptional);
             responseDto.setNickname(nickname);
 
-            responseDto.setForeign(comment.isForeign()); // 프론트에서 받은 foreign 값 그대로 설정
+            responseDto.setIsForeign(comment.isForeign()); // 수정된 부분: isForeign() -> setIsForeign()
 
             responseDtos.add(responseDto);
         }
