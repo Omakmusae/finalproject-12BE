@@ -99,11 +99,16 @@ public class CommentService {
 
             CommentResponseDto responseDto = new CommentResponseDto(comment, isCurrentUserComment, member, profileOptional);
             responseDto.setNickname(nickname);
+
+            boolean isForeignLanguageStore = store.getForeignLanguage() != null && store.getForeignLanguage() == 1;
+            responseDto.setForeign(isForeignLanguageStore);
+
             responseDtos.add(responseDto);
         }
 
         return ResponseEntity.ok(responseDtos);
     }
+
     public List<CommentResponseDto> getUserComments(UserDetailsImpl userDetails) {
         Long memberId = userDetails.getMember().getId();
         List<Comment> comments = commentRepository.findByMemberId(memberId);
