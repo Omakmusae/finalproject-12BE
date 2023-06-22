@@ -13,4 +13,5 @@ public class CommentRequestDto {
     @NotBlank
     @Size(max = 100)
     private String contents;
+
 }
