@@ -72,7 +72,7 @@ public class CommentResponseDto {
         this.name = store.getName();
         this.callNumber = store.getCallNumber();
         this.weekdaysTime = store.getWeekdaysTime();
-        this.foreign = store.getForeignLanguage() != null && store.getForeignLanguage() == 1;
+        this.foreign = comment.isForeign(); // 수정된 부분: Comment의 isForeign() 메서드를 사용하여 foreign 값을 설정합니다.
 
         if (profile.isPresent()) {
             this.imageUrl = profile.get().getImg();

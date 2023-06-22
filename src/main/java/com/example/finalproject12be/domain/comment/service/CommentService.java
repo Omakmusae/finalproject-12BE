@@ -80,10 +80,7 @@ public class CommentService {
                 isCurrentUserComment = comment.getMember() != null && comment.getMember().getId().equals(userDetails.getMember().getId());
             }
 
-            Optional<Profile> profileOptional = Optional.empty();
-            if (comment.getMember() != null) {
-                profileOptional = profileRepository.findByMemberId(comment.getMember().getId());
-            }
+            Optional<Profile> profileOptional = comment.getMember() != null ? profileRepository.findByMemberId(comment.getMember().getId()) : Optional.empty();
 
             Member member;
             String nickname;
@@ -100,8 +97,7 @@ public class CommentService {
             CommentResponseDto responseDto = new CommentResponseDto(comment, isCurrentUserComment, member, profileOptional);
             responseDto.setNickname(nickname);
 
-            boolean isForeignLanguageStore = store.getForeignLanguage() != null && store.getForeignLanguage() == 1;
-            responseDto.setForeign(isForeignLanguageStore);
+            responseDto.setForeign(comment.isForeign()); // 프론트에서 받은 foreign 값 그대로 설정
 
             responseDtos.add(responseDto);
         }
@@ -118,7 +114,7 @@ public class CommentService {
         while (commentIterator.hasNext()) {
             Comment comment = commentIterator.next();
             boolean isCurrentUserComment = comment.getMember().getId().equals(userDetails.getMember().getId());
-            Store store = comment.getStore(); // 댓글이 속한 상점 객체 가져오기
+            Store store = comment.getStore();
             Optional<Profile> profileOptional = profileRepository.findByMemberId(userDetails.getMember().getId());
 
             Optional<Member> memberOptional = memberRepository.findNicknameById(comment.getMember().getId());
@@ -127,8 +123,7 @@ public class CommentService {
             CommentResponseDto responseDto = new CommentResponseDto(comment, isCurrentUserComment, store, profileOptional);
             responseDto.setNickname(nickname);
 
-            boolean isForeignLanguageStore = store.getForeignLanguage() != null && store.getForeignLanguage() == 1;
-            responseDto.setForeign(isForeignLanguageStore);
+            responseDto.setForeign(comment.isForeign()); // 프론트에서 받은 foreign 값 그대로 설정
 
             responseDtos.add(responseDto);
         }

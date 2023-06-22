@@ -52,4 +52,10 @@ public class Comment extends Timestamped {
         this.member = null;
         this.nickname = "(알수없음)"; // 탈퇴한 회원의 경우 닉네임을 "탈퇴한 회원"으로 설정
     }
+
+   
+
+    public boolean isForeign() {
+        return store != null && store.isForeignLanguage();
+    }
 }
