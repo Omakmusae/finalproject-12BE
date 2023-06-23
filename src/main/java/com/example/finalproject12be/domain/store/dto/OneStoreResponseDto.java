@@ -22,8 +22,7 @@ public class OneStoreResponseDto {
     private boolean bookmark = false;
     private long totalBookmark = 0;
     private boolean nightBusiness = false;
-    // private List<Comment> comments = null; //comment 기능 구현 전으로 테스트를 위해 null로 하드코딩
-//TODO: comment 추가
+    private int totalCommentsNum = 0;
 
     public OneStoreResponseDto(Store store) {
         this.storeId = store.getId();
@@ -33,6 +32,9 @@ public class OneStoreResponseDto {
         this.weekdaysTime = store.getWeekdaysTime();
         this.longitude = store.getLongitude();
         this.latitude = store.getLatitude();
+        if(store.getCommentList() != null){
+            this.totalCommentsNum = store.getCommentList().size();
+        }
     }
 
     public void setBookmark(boolean bookmark){
