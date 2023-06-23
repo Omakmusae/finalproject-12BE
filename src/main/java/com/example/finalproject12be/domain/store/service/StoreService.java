@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -64,7 +65,9 @@ public class StoreService {
 			checkBookmark(stores, storeResponseDtos, member);
 
 		}else{
-			for(Store store : stores){
+			Iterator<Store> storeIterator = stores.iterator();
+			while (storeIterator.hasNext()) {
+				Store store = storeIterator.next();
 				storeResponseDtos.add(new StoreResponseDto(store));
 			}
 		}
@@ -135,12 +138,18 @@ public class StoreService {
 
 		int check = 0;
 
-		for(Store store : stores){
+		// for(Store store : stores){
+		Iterator<Store> storeIterator = stores.iterator();
+		while(storeIterator.hasNext()){
+			Store store = storeIterator.next();
 
 			if(store.getBookmarks().size() != 0){
 				List<Bookmark> bookmarks = store.getBookmarks();
 
-				for(Bookmark bookmark : bookmarks){
+				// for(Bookmark bookmark : bookmarks){
+				Iterator<Bookmark> bookmarkIterator = bookmarks.iterator();
+				while(bookmarkIterator.hasNext()){
+					Bookmark bookmark = bookmarkIterator.next();
 
 					if(bookmark.getMember().getId().equals(member.getId())){
 						check = 1;
@@ -330,7 +339,10 @@ public class StoreService {
 			if(store.getBookmarks().size() != 0){
 				List<Bookmark> bookmarks = store.getBookmarks();
 
-				for(Bookmark bookmark : bookmarks){
+				// for(Bookmark bookmark : bookmarks){
+				Iterator<Bookmark> bookmarkIterator = bookmarks.iterator();
+				while(bookmarkIterator.hasNext()){
+					Bookmark bookmark = bookmarkIterator.next();
 
 					if(bookmark.getMember().getId().equals(member.getId())){
 
@@ -701,7 +713,14 @@ public class StoreService {
 
 		foreignStoreResponses = checkForeignBookmark(stores, foreignStoreResponses, userDetails);
 
-		Pageable pageable = PageRequest.of(page, size);
+		Pageable pageable;
+
+		if(latitude.equals("")){
+			// pageable = PageRequest.of(page, size, Sort.by("name").ascending());
+			pageable = PageRequest.of(page, size, Sort.Direction.DESC, "name");
+		}else {
+			pageable = PageRequest.of(page, size);
+		}
 
 		final int start = (int)pageable.getOffset();
 		final int end = Math.min((start + pageable.getPageSize()), foreignStoreResponses.size());
@@ -741,8 +760,10 @@ public class StoreService {
 			if(store.getBookmarks().size() != 0){
 				List<Bookmark> bookmarks = store.getBookmarks();
 
-				for(Bookmark bookmark : bookmarks){
-
+				// for(Bookmark bookmark : bookmarks){
+				Iterator<Bookmark> bookmarkIterator = bookmarks.iterator();
+				while(bookmarkIterator.hasNext()){
+					Bookmark bookmark = bookmarkIterator.next();
 					if(bookmark.getMember().getId().equals(member.getId())){
 
 						foreignOneStoreResponse.setBookmark(true);
