@@ -22,6 +22,7 @@ public class ForeignOneStoreResponse {
 	private boolean english = false;
 	private boolean chinese = false;
 	private boolean japanese = false;
+	private int totalCommentsNum = 0;
 
 	public ForeignOneStoreResponse(Store store){
 		this.storeId = store.getId();
@@ -31,6 +32,9 @@ public class ForeignOneStoreResponse {
 		this.weekdaysTime = store.getWeekdaysTime();
 		this.longitude = store.getLongitude();
 		this.latitude = store.getLatitude();
+		if(store.getCommentList() != null){
+			this.totalCommentsNum = store.getCommentList().size();
+		}
 		// this.totalBookmark = store.getBookmarks().size();
 		// this.english = store.getEnglish();
 		// this.chinese = store.getChinese();
