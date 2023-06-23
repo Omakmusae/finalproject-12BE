@@ -43,14 +43,14 @@ public class Comment extends Timestamped {
     private String contents;
 
     @Column(name = "isForeign", nullable = false)
-    private boolean isForeign;
+    private boolean foreign;
 
     public Comment(CommentRequestDto commentRequestDto, Store store, Member member) {
         this.contents = commentRequestDto.getContents();
         this.member = member;
         this.store = store;
         this.nickname = member.getNickname();
-        this.isForeign = commentRequestDto.isForeign();
+        this.foreign = commentRequestDto.isForeign();
     }
     public void deleteMember() {
         this.member = null;
@@ -59,11 +59,11 @@ public class Comment extends Timestamped {
 
 
 
-    public boolean isForeign() {
-        return isForeign;
+    public void setIsForeign(boolean foreign) {
+        this.foreign = foreign;
     }
 
-    public void setForeign(boolean isForeign) {
-        this.isForeign = isForeign;
+    public boolean foreign() {
+        return foreign;
     }
 }

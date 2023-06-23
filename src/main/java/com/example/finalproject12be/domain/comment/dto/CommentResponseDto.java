@@ -5,6 +5,7 @@ import com.example.finalproject12be.domain.member.entity.Member;
 import com.example.finalproject12be.domain.store.entity.Store;
 import com.example.finalproject12be.domain.profile.entity.Profile;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,7 +23,9 @@ public class CommentResponseDto {
     private String nickname;
     private String contents;
     private boolean check;
-    private boolean isForeign = false;
+
+
+    private boolean foreign = false;
     private String createdAt;
     private String address;
     private String name;
@@ -72,7 +75,7 @@ public class CommentResponseDto {
         this.name = store.getName();
         this.callNumber = store.getCallNumber();
         this.weekdaysTime = store.getWeekdaysTime();
-        this.isForeign = comment.isForeign(); // 수정된 부분: Comment의 isForeign() 메서드를 사용하여 isForeign 값을 설정
+        this.foreign = comment.foreign(); // 수정된 부분: Comment의 isForeign() 메서드를 사용하여 isForeign 값을 설정
 
         if (profile.isPresent()) {
             this.imageUrl = profile.get().getImg();
@@ -81,7 +84,13 @@ public class CommentResponseDto {
         }
     }
 
-    public void setIsForeign(boolean isForeign) {
-        this.isForeign = isForeign;
+
+
+    public void setForeign(boolean foreign) {
+        this.foreign = foreign;
+    }
+
+    public boolean foreign() {
+        return this.foreign;
     }
 }
