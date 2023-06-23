@@ -14,10 +14,10 @@ public class CommentRequestDto {
     @Size(max = 100)
     private String contents;
 
-    private boolean isForeign;
+    private boolean foreign;
 
-    public CommentRequestDto(String contents, boolean isForeign) {
+    public CommentRequestDto(String contents, boolean foreign) {
         this.contents = contents;
-        this.isForeign = isForeign;
+        this.foreign = foreign;
     }
 }
