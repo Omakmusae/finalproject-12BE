@@ -42,14 +42,28 @@ public class Comment extends Timestamped {
     @Column(nullable = false)
     private String contents;
 
+    @Column(name = "isForeign", nullable = false)
+    private boolean foreign;
+
     public Comment(CommentRequestDto commentRequestDto, Store store, Member member) {
         this.contents = commentRequestDto.getContents();
         this.member = member;
         this.store = store;
         this.nickname = member.getNickname();
+        this.foreign = commentRequestDto.isForeign();
     }
     public void deleteMember() {
         this.member = null;
         this.nickname = "(알수없음)"; // 탈퇴한 회원의 경우 닉네임을 "탈퇴한 회원"으로 설정
+    }
+
+
+
+    public void setIsForeign(boolean foreign) {
+        this.foreign = foreign;
+    }
+
+    public boolean foreign() {
+        return foreign;
     }
 }

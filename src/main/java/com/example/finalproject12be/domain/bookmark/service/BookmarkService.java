@@ -1,6 +1,7 @@
 package com.example.finalproject12be.domain.bookmark.service;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,6 +14,8 @@ import com.example.finalproject12be.domain.bookmark.repository.BookmarkRepositor
 import com.example.finalproject12be.domain.member.entity.Member;
 import com.example.finalproject12be.domain.store.entity.Store;
 import com.example.finalproject12be.domain.store.repository.StoreRepository;
+import com.example.finalproject12be.exception.CommonErrorCode;
+import com.example.finalproject12be.exception.RestApiException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,7 +32,7 @@ public class BookmarkService {
 
 		//TODO: custom Exception 사용하기
 		Store store = storeRepository.findById(storeId)
-			.orElseThrow(() -> new IllegalArgumentException("해당 약국이 존재하지 않습니다."));
+			.orElseThrow(() -> new RestApiException(CommonErrorCode.RESOURCE_NOT_FOUND));
 
 		Optional<Bookmark> bookmarkOptional = bookmarkRepository.findByStoreAndMember(store, member);
 
@@ -59,7 +62,11 @@ public class BookmarkService {
 		// List<Bookmark> bookmarks = bookmarkRepository.findAllWithMember(member);
 		List<BookmarkResponseDto> bookmarkResponseDtos = new ArrayList<>();
 
-		for (Bookmark bookmark : bookmarks) {
+		// for (Bookmark bookmark : bookmarks) {
+		Iterator<Bookmark> bookmarkIterator = bookmarks.iterator();
+		while(bookmarkIterator.hasNext()){
+
+			Bookmark bookmark = bookmarkIterator.next();
 
 			Long storeId = bookmark.getStore().getId();
 			Optional<Store> storeOptional = storeRepository.findById(storeId);

@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -64,7 +65,6 @@ public class CommentService {
         return ResponseMsgDto.setSuccess(HttpStatus.CREATED.value(), "댓글이 등록되었습니다.", commentResponseDto);
     }
 
-    // 댓글 조회(store 기준)
     public ResponseEntity<List<CommentResponseDto>> getComments(Long storeId, UserDetailsImpl userDetails) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new RuntimeException("Store not found"));
@@ -72,16 +72,15 @@ public class CommentService {
         List<Comment> comments = commentRepository.findAllByStoreIdOrderByCreatedAtAsc(storeId);
 
         List<CommentResponseDto> responseDtos = new ArrayList<>();
-        for (Comment comment : comments) {
+        Iterator<Comment> commentIterator = comments.iterator();
+        while (commentIterator.hasNext()) {
+            Comment comment = commentIterator.next();
             boolean isCurrentUserComment = false;
             if (userDetails != null && userDetails.getMember() != null) {
                 isCurrentUserComment = comment.getMember() != null && comment.getMember().getId().equals(userDetails.getMember().getId());
             }
 
-            Optional<Profile> profileOptional = Optional.empty();
-            if (comment.getMember() != null) {
-                profileOptional = profileRepository.findByMemberId(comment.getMember().getId());
-            }
+            Optional<Profile> profileOptional = comment.getMember() != null ? profileRepository.findByMemberId(comment.getMember().getId()) : Optional.empty();
 
             Member member;
             String nickname;
@@ -97,22 +96,25 @@ public class CommentService {
 
             CommentResponseDto responseDto = new CommentResponseDto(comment, isCurrentUserComment, member, profileOptional);
             responseDto.setNickname(nickname);
+
+            responseDto.setForeign(comment.isForeign()); // 수정된 부분: isForeign() -> setIsForeign()
+
             responseDtos.add(responseDto);
         }
 
         return ResponseEntity.ok(responseDtos);
     }
 
-    // 마이페이지 댓글 조회
     public List<CommentResponseDto> getUserComments(UserDetailsImpl userDetails) {
         Long memberId = userDetails.getMember().getId();
         List<Comment> comments = commentRepository.findByMemberId(memberId);
 
         List<CommentResponseDto> responseDtos = new ArrayList<>();
-
-        for (Comment comment : comments) {
+        Iterator<Comment> commentIterator = comments.iterator();
+        while (commentIterator.hasNext()) {
+            Comment comment = commentIterator.next();
             boolean isCurrentUserComment = comment.getMember().getId().equals(userDetails.getMember().getId());
-            Store store = comment.getStore(); // 댓글이 속한 상점 객체 가져오기
+            Store store = comment.getStore();
             Optional<Profile> profileOptional = profileRepository.findByMemberId(userDetails.getMember().getId());
 
             Optional<Member> memberOptional = memberRepository.findNicknameById(comment.getMember().getId());
@@ -121,15 +123,13 @@ public class CommentService {
             CommentResponseDto responseDto = new CommentResponseDto(comment, isCurrentUserComment, store, profileOptional);
             responseDto.setNickname(nickname);
 
-            boolean isForeignLanguageStore = store.getForeignLanguage() != null && store.getForeignLanguage() == 1;
-            responseDto.setForeign(isForeignLanguageStore);
+            responseDto.setForeign(comment.isForeign()); // 수정된 부분: isForeign() -> setIsForeign()
 
             responseDtos.add(responseDto);
         }
 
         return responseDtos;
     }
-
     // 댓글 수정
     @Transactional
     public ResponseEntity<CommentResponseDto> updateComment(
