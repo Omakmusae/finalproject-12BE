@@ -82,57 +82,55 @@ public class StoreRepositoryCustom {
 	// 		.fetch();
 	// }
 
-	public Page<StoreResponseDto> searchStoreWithFilter(MappedSearchRequest request, UserDetailsImpl userDetails) {
-
-		int page = request.getPage();
-		int size = request.getSize();
-		NumberExpression<Double> distance = distance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude);
-
-		JPAQuery<StoreResponseDto> query = jpaQueryFactory
-			.select(Projections.constructor(
-				StoreResponseDto.class,
-				store.id, store.address, store.name, store.callNumber,
-				store.weekdaysTime, store.longitude, store.latitude))
-			.from(store)
-			.where(
-				eqAddress(request.getGu()),
-				eqStoreName(request.getStoreName()),
-				checkOpen(request.isOpen()),
-				checkHolidayOpen(request.isHolidayBusiness()),
-				checkNightdOpen(request.isNightBusiness())
-			);
-
-		if (distance != null) {
-			query = query.where(withinDistance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude));
-		}
-
-		List<StoreResponseDto> results = query
-			.orderBy(distance != null ? distance.asc() : store.name.asc())
-			.offset(page * size)
-			.limit(size)
-			.fetch();
-
-		// 로그인한 유저의 북마크 정보 가져오기
-		List<Long> bookmarkedStoreIds = new ArrayList<>();
-
-		if (userDetails != null) {
-
-			Member member = userDetails.getMember();
-			bookmarkedStoreIds = bookmarkRepository.findStoreIdsByMember(member);
-			// 북마크 여부 체크하여 StoreResponseDto에 설정
-			for (StoreResponseDto result : results) {
-				if (bookmarkedStoreIds.contains(result.getStoreId())) {
-					result.setBookmark(true);
-				}
-			}
-		}
-
-		long totalResults = query.fetchCount();
-		return new PageImpl<>(results, PageRequest.of(page, size), totalResults);
-	}
+	// public Page<StoreResponseDto> searchStoreWithFilter(MappedSearchRequest request, UserDetailsImpl userDetails) {
+	//
+	// 	int page = request.getPage();
+	// 	int size = request.getSize();
+	// 	NumberExpression<Double> distance = distance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude);
+	//
+	// 	JPAQuery<StoreResponseDto> query = jpaQueryFactory
+	// 		.select(Projections.constructor(
+	// 			StoreResponseDto.class,
+	// 			store.id, store.address, store.name, store.callNumber,
+	// 			store.weekdaysTime, store.longitude, store.latitude))
+	// 		.from(store)
+	// 		.where(
+	//
+	// 			eqAddress(request.getGu()),
+	// 			eqStoreName(request.getStoreName())
+	// 			//withinDistance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude)
+	// 			//checkOpen(request.isOpen()),
+	// 			//checkHolidayOpen(request.isHolidayBusiness()),
+	// 			//checkNightdOpen(request.isNightBusiness())
+	// 		);
+	//
+	// 	List<StoreResponseDto> results = query
+	// 		.orderBy(distance != null ? distance.asc() : store.name.asc())
+	// 		.offset(page * size)
+	// 		.limit(size)
+	// 		.fetch();
+	//
+	// 	// 로그인한 유저의 북마크 정보 가져오기
+	// 	List<Long> bookmarkedStoreIds = new ArrayList<>();
+	//
+	// 	if (userDetails != null) {
+	//
+	// 		Member member = userDetails.getMember();
+	// 		bookmarkedStoreIds = bookmarkRepository.findStoreIdsByMember(member);
+	// 		// 북마크 여부 체크하여 StoreResponseDto에 설정
+	// 		for (StoreResponseDto result : results) {
+	// 			if (bookmarkedStoreIds.contains(result.getStoreId())) {
+	// 				result.setBookmark(true);
+	// 			}
+	// 		}
+	// 	}
+	//
+	// 	long totalResults = query.fetchCount();
+	// 	return new PageImpl<>(results, PageRequest.of(page, size), totalResults);
+	// }
 
 
-	// public Page<StoreResponseDto> searchStoreWithFilter(MappedSearchRequest request,UserDetailsImpl userDetails) {
+	// public Page<StoreResponseDto> searchStoreWith1Filter(MappedSearchRequest request,UserDetailsImpl userDetails) {
 	// 	int page = request.getPage();
 	// 	int size = request.getSize();
 	// 	NumberExpression<Double> distance = distance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude);
@@ -164,197 +162,274 @@ public class StoreRepositoryCustom {
 	// 	return new PageImpl<>(result.getResults(), PageRequest.of(page, size), result.getTotal());
 	// }
 
-	// public Page<StoreResponseDto> searchStoreWithFilter(MappedSearchRequest request) {
-	//
-	// 	int page = request.getPage();
-	// 	int size = request.getSize();
-	// 	NumberExpression<Double> distance = distance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude);
-	//
-	// 	if (distance == null) {
-	// 		QueryResults<StoreResponseDto> result = jpaQueryFactory
-	// 			.select(Projections.constructor(StoreResponseDto.class,
-	// 				store.id, store.address, store.name, store.callNumber,
-	// 				store.weekdaysTime, store.longitude, store.latitude))
-	// 			.from(store)
-	// 			.where(
-	// 				eqAddress(request.getGu()),
-	// 				eqStoreName(request.getStoreName()),
-	// 				checkOpen(request.isOpen()),
-	// 				checkHolidayOpen(request.isHolidayBusiness()),
-	// 				checkNightdOpen(request.isNightBusiness())
-	// 			)
-	// 			.orderBy(store.name.asc())
-	// 			.offset(page * size)
-	// 			.limit(size)
-	// 			.fetchResults();
-	//
-	// 		return new PageImpl<>(result.getResults(), PageRequest.of(page, size), result.getTotal());
-	// 	}
-	// 	else {
-	// 		QueryResults<StoreResponseDto> result = jpaQueryFactory
-	// 			.select(Projections.constructor(StoreResponseDto.class,
-	// 				store.id, store.address, store.name, store.callNumber,
-	// 				store.weekdaysTime, store.longitude, store.latitude))
-	// 			.from(store)
-	// 			.where(
-	// 				withinDistance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude),
-	// 				eqAddress(request.getGu()),
-	// 				eqStoreName(request.getStoreName()),
-	// 				checkOpen(request.isOpen()),
-	// 				checkHolidayOpen(request.isHolidayBusiness()),
-	// 				checkNightdOpen(request.isNightBusiness())
-	// 			)
-	// 			.orderBy(distance.asc(), store.name.asc())
-	// 			.offset(page * size)
-	// 			.limit(size)
-	// 			.fetchResults();
-	//
-	// 		return new PageImpl<>(result.getResults(), PageRequest.of(page, size), result.getTotal());
-	// 	}
-	//
-	// }
-
-	public Page<ForeignStoreResponse> searchForeignStoreWithFilter(MappedSearchForeignRequest request, UserDetailsImpl userDetails) {
-
+	public Page<StoreResponseDto> searchStoreWithFilter(MappedSearchRequest request, UserDetailsImpl userDetails) {
 
 		int page = request.getPage();
 		int size = request.getSize();
-
 		NumberExpression<Double> distance = distance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude);
 
-		JPAQuery<ForeignStoreResponse> query = jpaQueryFactory
-			.select(Projections.constructor(
-				ForeignStoreResponse.class,
-				store.id, store.address, store.name, store.callNumber,
-				store.weekdaysTime, store.longitude, store.latitude,
-				store.english, store.chinese, store.japanese))
-			.from(store)
-			.where(
-				eqEnglish(request.getEnglish()),
-				eqChinese(request.getChinese()),
-				eqJapanese(request.getJapanese()),
-				withinDistance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude),
-				eqAddress(request.getGu()),
-				eqStoreName(request.getStoreName()),
-				checkOpen(request.isOpen()),
-				checkHolidayOpen(request.isHolidayBusiness()),
-				checkNightdOpen(request.isNightBusiness())
-			);
+		if (distance == null) {
 
-		if (distance != null) {
-			query = query.where(withinDistance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude));
+			QueryResults<StoreResponseDto> results = jpaQueryFactory
+				.select(Projections.constructor(StoreResponseDto.class,
+					store.id, store.address, store.name, store.callNumber,
+					store.weekdaysTime, store.longitude, store.latitude))
+				.from(store)
+				.where(
+					eqAddress(request.getGu()),
+					eqStoreName(request.getStoreName()),
+					checkOpen(request.isOpen()),
+					checkHolidayOpen(request.isHolidayBusiness()),
+					checkNightdOpen(request.isNightBusiness())
+				)
+				.orderBy(store.name.asc())
+				.offset(page * size)
+				.limit(size)
+				.fetchResults();
+
+				// 로그인한 유저의 북마크 정보 가져오기
+				List<Long> bookmarkedStoreIds = new ArrayList<>();
+
+				if (userDetails != null) {
+					Member member = userDetails.getMember();
+					bookmarkedStoreIds = bookmarkRepository.findStoreIdsByMember(member);
+				}
+
+				List<StoreResponseDto> storeResponseDtos = results.getResults();
+
+				// 북마크 여부 체크하여 StoreResponseDto에 설정
+				for (StoreResponseDto result : storeResponseDtos) {
+					if (bookmarkedStoreIds.contains(result.getStoreId())) {
+						result.setBookmark(true);
+					}
+				}
+
+
+			return new PageImpl<>(results.getResults(), PageRequest.of(page, size), results.getTotal());
 		}
+		else {
+			QueryResults<StoreResponseDto> results = jpaQueryFactory
+				.select(Projections.constructor(StoreResponseDto.class,
+					store.id, store.address, store.name, store.callNumber,
+					store.weekdaysTime, store.longitude, store.latitude))
+				.from(store)
+				.where(
+					withinDistance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude),
+					eqAddress(request.getGu()),
+					eqStoreName(request.getStoreName()),
+					checkOpen(request.isOpen()),
+					checkHolidayOpen(request.isHolidayBusiness()),
+					checkNightdOpen(request.isNightBusiness())
+				)
+				.orderBy(distance.asc(), store.name.asc())
+				.offset(page * size)
+				.limit(size)
+				.fetchResults();
 
-		List<ForeignStoreResponse> results = query
-			.orderBy(distance != null ? distance.asc() : store.name.asc())
-			.offset(page * size)
-			.limit(size)
-			.fetch();
+			// 로그인한 유저의 북마크 정보 가져오기
+			List<Long> bookmarkedStoreIds = new ArrayList<>();
 
-		// 로그인한 유저의 북마크 정보 가져오기
-		List<Long> bookmarkedStoreIds = new ArrayList<>();
+			if (userDetails != null) {
+				Member member = userDetails.getMember();
+				bookmarkedStoreIds = bookmarkRepository.findStoreIdsByMember(member);
+			}
 
-		if (userDetails != null) {
+			List<StoreResponseDto> storeResponseDtos = results.getResults();
 
-			Member member = userDetails.getMember();
-			bookmarkedStoreIds = bookmarkRepository.findStoreIdsByMember(member);
 			// 북마크 여부 체크하여 StoreResponseDto에 설정
-			for (ForeignStoreResponse result : results) {
+			for (StoreResponseDto result : storeResponseDtos) {
 				if (bookmarkedStoreIds.contains(result.getStoreId())) {
 					result.setBookmark(true);
 				}
 			}
+
+			return new PageImpl<>(results.getResults(), PageRequest.of(page, size), results.getTotal());
 		}
 
-		long totalResults = query.fetchCount();
-
-		return new PageImpl<>(results, PageRequest.of(page, size), totalResults);
 	}
 
-	// public Page<Store> searchForeignStoreWithFilter(MappedSearchForeignRequest request) {
+	// public Page<ForeignStoreResponse> searchForeignStoreWithFilter(MappedSearchForeignRequest request, UserDetailsImpl userDetails) {
 	//
 	// 	int page = request.getPage();
 	// 	int size = request.getSize();
+	//
 	// 	NumberExpression<Double> distance = distance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude);
-	// 	System.out.println(request.getEnglish());
-	// 	if (distance == null) {
-	// 		QueryResults<Store> result = jpaQueryFactory
-	// 			.select(store)
-	// 			.from(store)
-	// 			.where(
-	// 				eqAddress(request.getGu()),
-	// 				eqStoreName(request.getStoreName()),
-	// 				checkOpen(request.isOpen()),
-	// 				checkHolidayOpen(request.isHolidayBusiness()),
-	// 				checkNightdOpen(request.isNightBusiness()),
-	// 				eqEnglish(request.getEnglish()),
-	// 				eqChinese(request.getChinese()),
-	// 				eqJapanese(request.getJapanese())
-	// 			)
-	// 			.orderBy(store.name.asc())
-	// 			.offset(page * size)
-	// 			.limit(size)
-	// 			.fetchResults();
 	//
-	// 		return new PageImpl<>(result.getResults(), PageRequest.of(page, size), result.getTotal());
+	// 	JPAQuery<ForeignStoreResponse> query = jpaQueryFactory
+	// 		.select(Projections.constructor(
+	// 			ForeignStoreResponse.class,
+	// 			store.id, store.address, store.name, store.callNumber,
+	// 			store.weekdaysTime, store.longitude, store.latitude,
+	// 			store.english, store.chinese, store.japanese))
+	// 		.from(store)
+	// 		.where(
+	// 			withinDistance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude),
+	// 			eqAddress(request.getGu()),
+	// 			eqStoreName(request.getStoreName()),
+	// 			eqEnglish(request.getEnglish()),
+	// 			eqChinese(request.getChinese()),
+	// 			eqJapanese(request.getJapanese()),
+	// 			checkOpen(request.isOpen()),
+	// 			checkHolidayOpen(request.isHolidayBusiness()),
+	// 			checkNightdOpen(request.isNightBusiness())
+	// 		);
+	//
+	// 	// if (distance != null) {
+	// 	// 	query = query.where(withinDistance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude));
+	// 	// }
+	//
+	// 	List<ForeignStoreResponse> results = query
+	// 		.orderBy(distance != null ? distance.asc() : store.name.asc())
+	// 		.offset(page * size)
+	// 		.limit(size)
+	// 		.fetch();
+	//
+	// 	// 로그인한 유저의 북마크 정보 가져오기
+	// 	List<Long> bookmarkedStoreIds = new ArrayList<>();
+	//
+	// 	if (userDetails != null) {
+	//
+	// 		Member member = userDetails.getMember();
+	// 		bookmarkedStoreIds = bookmarkRepository.findStoreIdsByMember(member);
+	// 		// 북마크 여부 체크하여 StoreResponseDto에 설정
+	// 		for (ForeignStoreResponse result : results) {
+	// 			if (bookmarkedStoreIds.contains(result.getStoreId())) {
+	// 				result.setBookmark(true);
+	// 			}
+	// 		}
 	// 	}
-	// 	else {
-	// 		QueryResults<Store> result = jpaQueryFactory
-	// 			.select(store)
-	// 			.from(store)
-	// 			.where(
-	// 				withinDistance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude),
-	// 				eqAddress(request.getGu()),
-	// 				eqStoreName(request.getStoreName()),
-	// 				checkOpen(request.isOpen()),
-	// 				checkHolidayOpen(request.isHolidayBusiness()),
-	// 				checkNightdOpen(request.isNightBusiness()),
-	// 				eqEnglish(request.getEnglish()),
-	// 				eqChinese(request.getChinese()),
-	// 				eqJapanese(request.getJapanese())
-	// 			)
-	// 			.orderBy(distance.asc(), store.name.asc())
-	// 			.offset(page * size)
-	// 			.limit(size)
-	// 			.fetchResults();
 	//
-	// 		return new PageImpl<>(result.getResults(), PageRequest.of(page, size), result.getTotal());
-	// 	}
+	// 	long totalResults = query.fetchCount();
 	//
+	// 	return new PageImpl<>(results, PageRequest.of(page, size), totalResults);
 	// }
+
+	public Page<ForeignStoreResponse> searchForeignStoreWithFilter(MappedSearchForeignRequest request, UserDetailsImpl userDetails) {
+
+		int page = request.getPage();
+		int size = request.getSize();
+		NumberExpression<Double> distance = distance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude);
+
+		if (distance == null) {
+			QueryResults<ForeignStoreResponse> results = jpaQueryFactory
+				.select(Projections.constructor(
+					ForeignStoreResponse.class,
+					store.id, store.address, store.name, store.callNumber,
+					store.weekdaysTime, store.longitude, store.latitude,
+					store.english, store.chinese, store.japanese))
+				.from(store)
+				.where(
+					eqAddress(request.getGu()),
+					eqStoreName(request.getStoreName()),
+					checkOpen(request.isOpen()),
+					checkHolidayOpen(request.isHolidayBusiness()),
+					checkNightdOpen(request.isNightBusiness()),
+					eqEnglish(request.getEnglish()),
+					eqChinese(request.getChinese()),
+					eqJapanese(request.getJapanese())
+				)
+				.orderBy(store.name.asc())
+				.offset(page * size)
+				.limit(size)
+				.fetchResults();
+			// 로그인한 유저의 북마크 정보 가져오기
+			List<Long> bookmarkedStoreIds = new ArrayList<>();
+
+			if (userDetails != null) {
+				Member member = userDetails.getMember();
+				bookmarkedStoreIds = bookmarkRepository.findStoreIdsByMember(member);
+			}
+
+			List<ForeignStoreResponse> foreignStoreResponses = results.getResults();
+
+			// 북마크 여부 체크하여 StoreResponseDto에 설정
+			for (ForeignStoreResponse result : foreignStoreResponses) {
+				if (bookmarkedStoreIds.contains(result.getStoreId())) {
+					result.setBookmark(true);
+				}
+			}
+
+			return new PageImpl<>(results.getResults(), PageRequest.of(page, size), results.getTotal());
+		}
+		else {
+			QueryResults<ForeignStoreResponse> results = jpaQueryFactory
+				.select(Projections.constructor(
+					ForeignStoreResponse.class,
+					store.id, store.address, store.name, store.callNumber,
+					store.weekdaysTime, store.longitude, store.latitude,
+					store.english, store.chinese, store.japanese))
+				.from(store)
+				.where(
+					withinDistance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude),
+					eqAddress(request.getGu()),
+					eqStoreName(request.getStoreName()),
+					checkOpen(request.isOpen()),
+					checkHolidayOpen(request.isHolidayBusiness()),
+					checkNightdOpen(request.isNightBusiness()),
+					eqEnglish(request.getEnglish()),
+					eqChinese(request.getChinese()),
+					eqJapanese(request.getJapanese())
+				)
+				.orderBy(distance.asc(), store.name.asc())
+				.offset(page * size)
+				.limit(size)
+				.fetchResults();
+			// 로그인한 유저의 북마크 정보 가져오기
+			List<Long> bookmarkedStoreIds = new ArrayList<>();
+
+			if (userDetails != null) {
+				Member member = userDetails.getMember();
+				bookmarkedStoreIds = bookmarkRepository.findStoreIdsByMember(member);
+			}
+
+			List<ForeignStoreResponse> foreignStoreResponses = results.getResults();
+
+			// 북마크 여부 체크하여 StoreResponseDto에 설정
+			for (ForeignStoreResponse result : foreignStoreResponses) {
+				if (bookmarkedStoreIds.contains(result.getStoreId())) {
+					result.setBookmark(true);
+				}
+			}
+
+			return new PageImpl<>(results.getResults(), PageRequest.of(page, size), results.getTotal());
+		}
+
+	}
 
 
 
 	private BooleanExpression eqAddress(String address) {
-		return address == "" ? store.address.like("%" + address + "%") : null;
+
+		return address != null ? store.address.like("%" + address + "%") : null;
 	}
 
 	private BooleanExpression eqStoreName(String storeName) {
-		return storeName == "" ? store.name.like("%" + storeName + "%") : null;
+
+		return storeName != null ? store.name.like("%" + storeName + "%") : null;
 	}
 
 	private BooleanExpression checkOpen(boolean open) {
 		if (open) {
 			// 현재 시간이 주중 영업 시간 내에 있는지 체크
 			return Expressions.booleanTemplate(
-				"(WEEKDAY(CONVERT_TZ(NOW(), '+00:00', '+09:00')) BETWEEN 0 AND 4 " +
-				"AND TIME_FORMAT(CONVERT_TZ(NOW(), '+00:00', '+09:00'), '%H:%i') <= TIME_FORMAT(SUBSTRING_INDEX(weekdays_time, ' ', -1), '%H:%i') " +
-				"AND TIME_FORMAT(CONVERT_TZ(NOW(), '+00:00', '+09:00'), '%H:%i') >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(weekdays_time, ' ~', 1), ' ', -1), '%H:%i')) " +
+				// "(WEEKDAY(CONVERT_TZ(NOW(), '+00:00', '+09:00')) BETWEEN 0 AND 4 " +
+				// "AND TIME_FORMAT(CONVERT_TZ(NOW(), '+00:00', '+09:00'), '%H:%i') <= TIME_FORMAT(SUBSTRING_INDEX(weekdays_time, ' ', -1), '%H:%i') " +
+				// "AND TIME_FORMAT(CONVERT_TZ(NOW(), '+00:00', '+09:00'), '%H:%i') >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(weekdays_time, ' ~', 1), ' ', -1), '%H:%i')) " +
+				//
+				// "OR (WEEKDAY(CONVERT_TZ(NOW(), '+00:00', '+09:00')) = 5 " +
+				// "AND TIME_FORMAT(CONVERT_TZ(NOW(), '+00:00', '+09:00'), '%H:%i') <= TIME_FORMAT(SUBSTRING_INDEX(saturday_time, ' ', -1), '%H:%i') " +
+				// "AND TIME_FORMAT(CONVERT_TZ(NOW(), '+00:00', '+09:00'), '%H:%i') >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(saturday_time, ' ~', 1), ' ', -1), '%H:%i')) " +
+				//
+				// "OR (WEEKDAY(CONVERT_TZ(NOW(), '+00:00', '+09:00')) = 6 " +
+				// "AND TIME_FORMAT(CONVERT_TZ(NOW(), '+00:00', '+09:00'), '%H:%i') <= TIME_FORMAT(SUBSTRING_INDEX(sunday_time, ' ', -1), '%H:%i') " +
+				// "AND TIME_FORMAT(CONVERT_TZ(NOW(), '+00:00', '+09:00'), '%H:%i') >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(sunday_time, ' ~', 1), ' ', -1), '%H:%i'))"
 
-				"OR (WEEKDAY(CONVERT_TZ(NOW(), '+00:00', '+09:00')) = 5 " +
-				"AND TIME_FORMAT(CONVERT_TZ(NOW(), '+00:00', '+09:00'), '%H:%i') <= TIME_FORMAT(SUBSTRING_INDEX(saturday_time, ' ', -1), '%H:%i') " +
-				"AND TIME_FORMAT(CONVERT_TZ(NOW(), '+00:00', '+09:00'), '%H:%i') >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(saturday_time, ' ~', 1), ' ', -1), '%H:%i')) " +
-
-				"OR (WEEKDAY(CONVERT_TZ(NOW(), '+00:00', '+09:00')) = 6 " +
-				"AND TIME_FORMAT(CONVERT_TZ(NOW(), '+00:00', '+09:00'), '%H:%i') <= TIME_FORMAT(SUBSTRING_INDEX(sunday_time, ' ', -1), '%H:%i') " +
-				"AND TIME_FORMAT(CONVERT_TZ(NOW(), '+00:00', '+09:00'), '%H:%i') >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(sunday_time, ' ~', 1), ' ', -1), '%H:%i'))"
-
-			// "(WEEKDAY(NOW()) BETWEEN 0 AND 4 AND TIME(NOW()) <= TIME_FORMAT(SUBSTRING_INDEX(weekdays_time, ' ', -1), '%H:%i') " +
-			// 		"AND TIME(NOW()) >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(weekdays_time, ' ~', 1), ' ', -1), '%H:%i')) " +
-			// 		"OR (WEEKDAY(NOW()) = 5 AND TIME(NOW()) <= TIME_FORMAT(SUBSTRING_INDEX(saturday_time, ' ', -1), '%H:%i') " +
-			// 		"AND TIME(NOW()) >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(saturday_time, ' ~', 1), ' ', -1), '%H:%i')) " +
-			// 		"OR (WEEKDAY(NOW()) = 6 AND TIME(NOW()) <= TIME_FORMAT(SUBSTRING_INDEX(sunday_time, ' ', -1), '%H:%i') " +
-			// 		"AND TIME(NOW()) >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(sunday_time, ' ~', 1), ' ', -1), '%H:%i'))"
+			"(WEEKDAY(NOW()) BETWEEN 0 AND 4 AND TIME(NOW()) <= TIME_FORMAT(SUBSTRING_INDEX(weekdays_time, ' ', -1), '%H:%i') " +
+			"AND TIME(NOW()) >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(weekdays_time, ' ~', 1), ' ', -1), '%H:%i')) " +
+			"OR (WEEKDAY(NOW()) = 5 AND TIME(NOW()) <= TIME_FORMAT(SUBSTRING_INDEX(saturday_time, ' ', -1), '%H:%i') " +
+			"AND TIME(NOW()) >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(saturday_time, ' ~', 1), ' ', -1), '%H:%i')) " +
+			"OR (WEEKDAY(NOW()) = 6 AND TIME(NOW()) <= TIME_FORMAT(SUBSTRING_INDEX(sunday_time, ' ', -1), '%H:%i') " +
+			"AND TIME(NOW()) >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(sunday_time, ' ~', 1), ' ', -1), '%H:%i'))"
 			);
 		} else {
 			// 영업 시간과 관계없이 모든 가게 조회
@@ -411,7 +486,6 @@ public class StoreRepositoryCustom {
 				earthRadius, baseLatitudeRad, baseLongitudeRad, latitude, longitude);
 		}
 	}
-
 
 }
 
