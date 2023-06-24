@@ -51,10 +51,8 @@ public class StoreService {
 
 	private final StoreRepository storeRepository;
 	private final StoreRepositoryCustom storeRepositoryCustom;
-	private BookmarkRepository bookmarkRepository;
 
 	//약국 전체보기
-	@Transactional
 	public List<StoreResponseDto> getAllStores(UserDetailsImpl userDetails) {
 
 		List<Store> stores = storeRepository.findAll();
@@ -171,7 +169,6 @@ public class StoreService {
 	}
 
 	//일반 약국 검색하기
-	@Transactional
 	public Page<StoreResponseDto> searchStore(int page, int size, String storeName, String gu, boolean open, boolean holidayBusiness, boolean nightBusiness, String radius, String latitude, String longitude, UserDetailsImpl userDetails) {
 
 		int progress = 0; //stores 리스트가 null일 때 0, 반대는 1
@@ -313,7 +310,6 @@ public class StoreService {
 	}
 
 	//약국 상세보기
-	@Transactional
 	public OneStoreResponseDto getStore(Long storeId, UserDetailsImpl userDetails) {
 
 		Store store = storeRepository.findById(storeId)
@@ -470,7 +466,6 @@ public class StoreService {
 	}
 
 	//위치 불러오기
-	@Transactional
 	public List<Store> getLocation(Double baseRadius,Double baseLatitude, Double baseLongitude) {
 
 		List<Store> result = storeRepository.findByDistanceWithinRadius(baseLatitude, baseLongitude, baseRadius);
@@ -478,7 +473,6 @@ public class StoreService {
 	}
 
 	//외국어 가능 약국 검사
-	@Transactional
 	public Page<ForeignStoreResponse> searchForeignStore(int page, int size, String storeName, String gu, boolean open, boolean holidayBusiness, boolean nightBusiness, boolean english, boolean chinese, boolean japanese, String radius, String latitude, String longitude, UserDetailsImpl userDetails) {
 
 		if(gu.equals("gangnam-gu")){
@@ -730,7 +724,6 @@ public class StoreService {
 	}
 
 	//외국어 약국 상세보기
-	@Transactional
 	public ForeignOneStoreResponse getForeignStore(Long storeId, UserDetailsImpl userDetails) {
 
 		boolean english = false;
@@ -849,6 +842,11 @@ public class StoreService {
 	public Page<StoreResponseDto> searchStoreWithFilter(SearchOptionRequest request, UserDetailsImpl userDetails) {
 		MappedSearchRequest mappedRequest = request.toMappedSearchRequest();
 
+		if (request.getGu()=="" & request.getLongitude() =="" & request.getStoreName() =="") {
+			System.out.println("nullll!!!!!!!!!!!!!!!!!!");
+			return null;
+		}
+
 		Page<StoreResponseDto> result = storeRepositoryCustom.searchStoreWithFilter(mappedRequest, userDetails);
 
 
@@ -858,6 +856,11 @@ public class StoreService {
 	public Page<ForeignStoreResponse> searchForeignStoreWithFilter(SearchForeignOptionRequest request, UserDetailsImpl userDetails) {
 
 		MappedSearchForeignRequest mappedRequest = request.toMappedSearchRequest();
+
+		if (request.getGu()=="" & request.getLongitude() =="" & request.getStoreName() =="") {
+			System.out.println("nullll!!!!!!!!!!!!!!!!!!");
+			return null;
+		}
 		Page<ForeignStoreResponse> result = storeRepositoryCustom.searchForeignStoreWithFilter(mappedRequest, userDetails);
 
 		return result;
