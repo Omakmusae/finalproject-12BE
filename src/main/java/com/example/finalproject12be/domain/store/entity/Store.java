@@ -138,4 +138,11 @@ public class Store {
     public boolean isForeignLanguage() {
 		return foreignLanguage != null && foreignLanguage == 1;
     }
+
+	private int getBookmarkCount(Store store) {
+		// 북마크 개수를 조회하는 로직을 구현합니다.
+		// 예를 들어, 다음과 같이 적절한 코드로 대체해야 합니다:
+		return store.getBookmarks().size();
+	}
+
 }

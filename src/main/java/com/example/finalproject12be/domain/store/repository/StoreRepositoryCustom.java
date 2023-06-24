@@ -1,7 +1,9 @@
 package com.example.finalproject12be.domain.store.repository;
 
+import static com.example.finalproject12be.domain.bookmark.entity.QBookmark.*;
 import static com.example.finalproject12be.domain.store.entity.QStore.*;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -10,6 +12,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.example.finalproject12be.domain.bookmark.repository.BookmarkRepository;
+import com.example.finalproject12be.domain.comment.repository.CommentRepository;
 import com.example.finalproject12be.domain.member.entity.Member;
 import com.example.finalproject12be.domain.store.dto.ForeignStoreResponse;
 import com.example.finalproject12be.domain.store.dto.MappedSearchForeignRequest;
@@ -27,10 +30,12 @@ import org.springframework.stereotype.Repository;
 import com.example.finalproject12be.security.UserDetailsImpl;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.SubQueryExpression;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.core.types.dsl.NumberPath;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -170,10 +175,15 @@ public class StoreRepositoryCustom {
 
 		if (distance == null) {
 
+			SubQueryExpression<Long> bookmarkCountSubquery = JPAExpressions.select(bookmark.id.count())
+				.from(bookmark)
+				.where(bookmark.store.eq(store));
+
 			QueryResults<StoreResponseDto> results = jpaQueryFactory
 				.select(Projections.constructor(StoreResponseDto.class,
 					store.id, store.address, store.name, store.callNumber,
-					store.weekdaysTime, store.longitude, store.latitude))
+					store.weekdaysTime, store.longitude, store.latitude,
+					bookmarkCountSubquery))
 				.from(store)
 				.where(
 					eqAddress(request.getGu()),
@@ -208,10 +218,15 @@ public class StoreRepositoryCustom {
 			return new PageImpl<>(results.getResults(), PageRequest.of(page, size), results.getTotal());
 		}
 		else {
+			SubQueryExpression<Long> bookmarkCountSubquery = JPAExpressions.select(bookmark.id.count())
+				.from(bookmark)
+				.where(bookmark.store.eq(store));
+
 			QueryResults<StoreResponseDto> results = jpaQueryFactory
 				.select(Projections.constructor(StoreResponseDto.class,
 					store.id, store.address, store.name, store.callNumber,
-					store.weekdaysTime, store.longitude, store.latitude))
+					store.weekdaysTime, store.longitude, store.latitude,
+					bookmarkCountSubquery))
 				.from(store)
 				.where(
 					withinDistance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude),
@@ -240,8 +255,12 @@ public class StoreRepositoryCustom {
 			for (StoreResponseDto result : storeResponseDtos) {
 				if (bookmarkedStoreIds.contains(result.getStoreId())) {
 					result.setBookmark(true);
+
 				}
+
 			}
+
+
 
 			return new PageImpl<>(results.getResults(), PageRequest.of(page, size), results.getTotal());
 		}
@@ -311,12 +330,17 @@ public class StoreRepositoryCustom {
 		NumberExpression<Double> distance = distance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude);
 
 		if (distance == null) {
+			SubQueryExpression<Long> bookmarkCountSubquery = JPAExpressions.select(bookmark.id.count())
+				.from(bookmark)
+				.where(bookmark.store.eq(store));
+
 			QueryResults<ForeignStoreResponse> results = jpaQueryFactory
 				.select(Projections.constructor(
 					ForeignStoreResponse.class,
 					store.id, store.address, store.name, store.callNumber,
 					store.weekdaysTime, store.longitude, store.latitude,
-					store.english, store.chinese, store.japanese))
+					store.english, store.chinese, store.japanese,
+					bookmarkCountSubquery))
 				.from(store)
 				.where(
 					eqAddress(request.getGu()),
@@ -352,12 +376,17 @@ public class StoreRepositoryCustom {
 			return new PageImpl<>(results.getResults(), PageRequest.of(page, size), results.getTotal());
 		}
 		else {
+			SubQueryExpression<Long> bookmarkCountSubquery = JPAExpressions.select(bookmark.id.count())
+				.from(bookmark)
+				.where(bookmark.store.eq(store));
+
 			QueryResults<ForeignStoreResponse> results = jpaQueryFactory
 				.select(Projections.constructor(
 					ForeignStoreResponse.class,
 					store.id, store.address, store.name, store.callNumber,
 					store.weekdaysTime, store.longitude, store.latitude,
-					store.english, store.chinese, store.japanese))
+					store.english, store.chinese, store.japanese,
+					bookmarkCountSubquery))
 				.from(store)
 				.where(
 					withinDistance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude),
@@ -410,32 +439,35 @@ public class StoreRepositoryCustom {
 
 	private BooleanExpression checkOpen(boolean open) {
 		if (open) {
-			// 현재 시간이 주중 영업 시간 내에 있는지 체크
-			return Expressions.booleanTemplate(
-				// "(WEEKDAY(CONVERT_TZ(NOW(), '+00:00', '+09:00')) BETWEEN 0 AND 4 " +
-				// "AND TIME_FORMAT(CONVERT_TZ(NOW(), '+00:00', '+09:00'), '%H:%i') <= TIME_FORMAT(SUBSTRING_INDEX(weekdays_time, ' ', -1), '%H:%i') " +
-				// "AND TIME_FORMAT(CONVERT_TZ(NOW(), '+00:00', '+09:00'), '%H:%i') >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(weekdays_time, ' ~', 1), ' ', -1), '%H:%i')) " +
-				//
-				// "OR (WEEKDAY(CONVERT_TZ(NOW(), '+00:00', '+09:00')) = 5 " +
-				// "AND TIME_FORMAT(CONVERT_TZ(NOW(), '+00:00', '+09:00'), '%H:%i') <= TIME_FORMAT(SUBSTRING_INDEX(saturday_time, ' ', -1), '%H:%i') " +
-				// "AND TIME_FORMAT(CONVERT_TZ(NOW(), '+00:00', '+09:00'), '%H:%i') >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(saturday_time, ' ~', 1), ' ', -1), '%H:%i')) " +
-				//
-				// "OR (WEEKDAY(CONVERT_TZ(NOW(), '+00:00', '+09:00')) = 6 " +
-				// "AND TIME_FORMAT(CONVERT_TZ(NOW(), '+00:00', '+09:00'), '%H:%i') <= TIME_FORMAT(SUBSTRING_INDEX(sunday_time, ' ', -1), '%H:%i') " +
-				// "AND TIME_FORMAT(CONVERT_TZ(NOW(), '+00:00', '+09:00'), '%H:%i') >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(sunday_time, ' ~', 1), ' ', -1), '%H:%i'))"
+			LocalDate currentDate = LocalDate.now();
+			DayOfWeek dayOfWeek = currentDate.getDayOfWeek();
+			DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
-			"(WEEKDAY(NOW()) BETWEEN 0 AND 4 AND TIME(NOW()) <= TIME_FORMAT(SUBSTRING_INDEX(weekdays_time, ' ', -1), '%H:%i') " +
-			"AND TIME(NOW()) >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(weekdays_time, ' ~', 1), ' ', -1), '%H:%i')) " +
-			"OR (WEEKDAY(NOW()) = 5 AND TIME(NOW()) <= TIME_FORMAT(SUBSTRING_INDEX(saturday_time, ' ', -1), '%H:%i') " +
-			"AND TIME(NOW()) >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(saturday_time, ' ~', 1), ' ', -1), '%H:%i')) " +
-			"OR (WEEKDAY(NOW()) = 6 AND TIME(NOW()) <= TIME_FORMAT(SUBSTRING_INDEX(sunday_time, ' ', -1), '%H:%i') " +
-			"AND TIME(NOW()) >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(sunday_time, ' ~', 1), ' ', -1), '%H:%i'))"
-			);
-		} else {
-			// 영업 시간과 관계없이 모든 가게 조회
-			return null;
+			if (dayOfWeek != DayOfWeek.SATURDAY && dayOfWeek != DayOfWeek.SUNDAY) {
+				return Expressions.booleanTemplate(
+					"(TIME(NOW()) <= TIME_FORMAT(SUBSTRING_INDEX(weekdays_time, ' ', -1), '%H:%i') " +
+						"AND TIME(NOW()) >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(weekdays_time, ' ~', 1), ' ', -1), '%H:%i')) "
+				);
+			}
+			else if (dayOfWeek == DayOfWeek.SATURDAY) {
+
+				return Expressions.booleanTemplate(
+					"(TIME(NOW()) <= TIME_FORMAT(SUBSTRING_INDEX(saturday_time, ' ', -1), '%H:%i') " +
+						"AND TIME(NOW()) >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(saturday_time, ' ~', 1), ' ', -1), '%H:%i')) "
+				);
+			}
+			else if (dayOfWeek == DayOfWeek.SUNDAY) {
+
+				return Expressions.booleanTemplate(
+					"(TIME(NOW()) <= TIME_FORMAT(SUBSTRING_INDEX(sunday_time, ' ', -1), '%H:%i') " +
+						"AND TIME(NOW()) >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(sunday_time, ' ~', 1), ' ', -1), '%H:%i')) "
+				);
+			}
 		}
+
+		return null;
 	}
+
 
 	private BooleanExpression checkHolidayOpen(boolean holidayBusiness) {
 		return holidayBusiness == true ? store.holidayTime.isNotNull() : null;

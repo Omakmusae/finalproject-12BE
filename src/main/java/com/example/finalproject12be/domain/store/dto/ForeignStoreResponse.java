@@ -3,21 +3,24 @@ package com.example.finalproject12be.domain.store.dto;
 import com.example.finalproject12be.domain.store.entity.Store;
 
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 public class ForeignStoreResponse {
 
-	private final Long storeId;
-	private final String address;
-	private final String name;
-	private final String callNumber;
-	private final String weekdaysTime;
-	private final Double longitude;
-	private final Double latitude;
+	private Long storeId;
+	private String address;
+	private String name;
+	private String callNumber;
+	private String weekdaysTime;
+	private Double longitude;
+	private Double latitude;
 	private boolean bookmark = false;
 	private boolean english = false;
 	private boolean chinese = false;
 	private boolean japanese = false;
+	private Long bookmarkCount;
 
 	public ForeignStoreResponse(Store store){
 		this.storeId = store.getId();
@@ -30,7 +33,7 @@ public class ForeignStoreResponse {
 	}
 
 	public ForeignStoreResponse(Long storeId, String address, String name, String callNumber, String weekdaysTime,
-		Double longitude, Double latitude, Integer english, Integer chinese, Integer japanese) {
+		Double longitude, Double latitude, Integer english, Integer chinese, Integer japanese, Long bookmarkCount) {
 		this.storeId = storeId;
 		this.address = address;
 		this.name = name;
@@ -41,6 +44,7 @@ public class ForeignStoreResponse {
 		this.english = english != null && english == 1;
 		this.chinese = chinese != null && chinese == 1;
 		this.japanese = japanese != null && japanese == 1;
+		this.bookmarkCount = bookmarkCount;
 	}
 
 	public void setBookmark(boolean bookmark){
