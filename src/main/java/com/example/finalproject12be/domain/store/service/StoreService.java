@@ -843,8 +843,10 @@ public class StoreService {
 		MappedSearchRequest mappedRequest = request.toMappedSearchRequest();
 
 		if (request.getGu()=="" & request.getLongitude() =="" & request.getStoreName() =="") {
-			System.out.println("nullll!!!!!!!!!!!!!!!!!!");
-			return null;
+
+			int page = request.getPage();
+			int size = request.getSize();
+			return new PageImpl<>(null, PageRequest.of(page, size), 0);
 		}
 
 		Page<StoreResponseDto> result = storeRepositoryCustom.searchStoreWithFilter(mappedRequest, userDetails);
@@ -858,8 +860,10 @@ public class StoreService {
 		MappedSearchForeignRequest mappedRequest = request.toMappedSearchRequest();
 
 		if (request.getGu()=="" & request.getLongitude() =="" & request.getStoreName() =="") {
-			System.out.println("nullll!!!!!!!!!!!!!!!!!!");
-			return null;
+
+			int page = request.getPage();
+			int size = request.getSize();
+			return new PageImpl<>(null, PageRequest.of(page, size), 0);
 		}
 		Page<ForeignStoreResponse> result = storeRepositoryCustom.searchForeignStoreWithFilter(mappedRequest, userDetails);
 
