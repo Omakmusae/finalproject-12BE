@@ -2,9 +2,10 @@ package com.example.finalproject12be.domain.store.repository;
 
 import static com.example.finalproject12be.domain.bookmark.entity.QBookmark.*;
 import static com.example.finalproject12be.domain.store.entity.QStore.*;
-
+import org.springframework.data.jpa.repository.query.QueryUtils;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,6 +64,7 @@ public class StoreRepositoryCustom {
 
 		int page = request.getPage();
 		int size = request.getSize();
+
 		NumberExpression<Double> distance = distance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude);
 
 		if (distance == null) {
@@ -264,37 +266,75 @@ public class StoreRepositoryCustom {
 		return storeName != null ? store.name.like("%" + storeName + "%") : null;
 	}
 
+	// private BooleanExpression checkOpen(boolean open) {
+	// 	if (open) {
+	// 		LocalDate currentDate = LocalDate.now();
+	// 		DayOfWeek dayOfWeek = currentDate.getDayOfWeek();
+	// 		DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+	//
+	// 		if (dayOfWeek != DayOfWeek.SATURDAY && dayOfWeek != DayOfWeek.SUNDAY) {
+	// 			System.out.println("!!!!!!!!!!!!!!!!평일 조회!!!!!!!!!!!!!!");
+	// 			return Expressions.booleanTemplate(
+	// 				"TIME(NOW()) <= TIME_FORMAT(SUBSTRING_INDEX(saturday_time, ' ', -1), '%H:%i') " +
+	// 					"AND TIME(NOW()) >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(saturday_time, ' ~', 1), ' ', -1), '%H:%i')"
+	//
+	// 			);
+	// 		}
+	// 		else if (dayOfWeek == DayOfWeek.SATURDAY) {
+	// 			System.out.println("!!!!!!!!!!!!!!!!토요일 조회!!!!!!!!!!!!!!");
+	// 			return Expressions.booleanTemplate(
+	// 				"(TIME(NOW()) <= TIME_FORMAT(SUBSTRING_INDEX(saturday_time, ' ', -1), '%H:%i') " +
+	// 					"AND TIME(NOW()) >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(saturday_time, ' ~', 1), ' ', -1), '%H:%i')) "
+	// 			);
+	// 		}
+	// 		else if (dayOfWeek == DayOfWeek.SUNDAY) {
+	// 			System.out.println("!!!!!!!!!!!!!!!!일요일 조회!!!!!!!!!!!!!!");
+	// 			return Expressions.booleanTemplate(
+	// 				"(TIME(NOW()) <= TIME_FORMAT(SUBSTRING_INDEX(sunday_time, ' ', -1), '%H:%i') " +
+	// 					"AND TIME(NOW()) >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(sunday_time, ' ~', 1), ' ', -1), '%H:%i')) "
+	// 			);
+	// 		}
+	// 	}
+	//
+	// 	return null;
+	// }
+
+
 	private BooleanExpression checkOpen(boolean open) {
 		if (open) {
 			LocalDate currentDate = LocalDate.now();
 			DayOfWeek dayOfWeek = currentDate.getDayOfWeek();
 			DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+			System.out.println(LocalDateTime.now().format(timeFormatter) + "!!!!!!!!!!!!");
 
 			if (dayOfWeek != DayOfWeek.SATURDAY && dayOfWeek != DayOfWeek.SUNDAY) {
+				System.out.println("!!!!!!!!!!!!!!!!평일 조회!!!!!!!!!!!!!!");
 				return Expressions.booleanTemplate(
-					"(TIME(NOW()) <= TIME_FORMAT(SUBSTRING_INDEX(weekdays_time, ' ', -1), '%H:%i') " +
-						"AND TIME(NOW()) >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(weekdays_time, ' ~', 1), ' ', -1), '%H:%i')) "
+					"TIME({0}) <= TIME_FORMAT(SUBSTRING_INDEX(weekdays_time, ' ', -1), '%H:%i') " +
+						"AND TIME({0}) >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(weekdays_time, ' ~', 1), ' ', -1), '%H:%i')",
+					LocalDateTime.now().format(timeFormatter)
 				);
 			}
 			else if (dayOfWeek == DayOfWeek.SATURDAY) {
-
+				System.out.println("!!!!!!!!!!!!!!!!토요일 조회!!!!!!!!!!!!!!");
 				return Expressions.booleanTemplate(
-					"(TIME(NOW()) <= TIME_FORMAT(SUBSTRING_INDEX(saturday_time, ' ', -1), '%H:%i') " +
-						"AND TIME(NOW()) >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(saturday_time, ' ~', 1), ' ', -1), '%H:%i')) "
+					"TIME({0}) <= TIME_FORMAT(SUBSTRING_INDEX(saturday_time, ' ', -1), '%H:%i') " +
+						"AND TIME({0}) >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(saturday_time, ' ~', 1), ' ', -1), '%H:%i')",
+					LocalDateTime.now().format(timeFormatter)
 				);
 			}
 			else if (dayOfWeek == DayOfWeek.SUNDAY) {
-
+				System.out.println("!!!!!!!!!!!!!!!!일요일 조회!!!!!!!!!!!!!!");
 				return Expressions.booleanTemplate(
-					"(TIME(NOW()) <= TIME_FORMAT(SUBSTRING_INDEX(sunday_time, ' ', -1), '%H:%i') " +
-						"AND TIME(NOW()) >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(sunday_time, ' ~', 1), ' ', -1), '%H:%i')) "
+					"TIME({0}) <= TIME_FORMAT(SUBSTRING_INDEX(sunday_time, ' ', -1), '%H:%i') " +
+						"AND TIME({0}) >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(sunday_time, ' ~', 1), ' ', -1), '%H:%i')",
+					LocalDateTime.now().format(timeFormatter)
 				);
 			}
 		}
 
 		return null;
 	}
-
 
 	private BooleanExpression checkHolidayOpen(boolean holidayBusiness) {
 		return holidayBusiness == true ? store.holidayTime.isNotNull() : null;

@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -846,7 +847,7 @@ public class StoreService {
 
 			int page = request.getPage();
 			int size = request.getSize();
-			return new PageImpl<>(null, PageRequest.of(page, size), 0);
+			return new PageImpl<>(Collections.emptyList(), PageRequest.of(page, size), 0);
 		}
 
 		Page<StoreResponseDto> result = storeRepositoryCustom.searchStoreWithFilter(mappedRequest, userDetails);
@@ -863,7 +864,7 @@ public class StoreService {
 
 			int page = request.getPage();
 			int size = request.getSize();
-			return new PageImpl<>(null, PageRequest.of(page, size), 0);
+			return new PageImpl<>(Collections.emptyList(), PageRequest.of(page, size), 0);
 		}
 		Page<ForeignStoreResponse> result = storeRepositoryCustom.searchForeignStoreWithFilter(mappedRequest, userDetails);
 
