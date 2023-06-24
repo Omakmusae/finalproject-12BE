@@ -1,9 +1,18 @@
 package com.example.finalproject12be.domain.store.entity;
 
-import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 import com.example.finalproject12be.domain.bookmark.entity.Bookmark;
-
 import com.example.finalproject12be.domain.comment.entity.Comment;
 import com.example.finalproject12be.domain.store.dto.StoreRequest;
 
@@ -11,14 +20,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
-public class Store {
+public class Store_1Case {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -74,7 +80,7 @@ public class Store {
 	@OneToMany(mappedBy = "store", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
 	private List<Bookmark> bookmarks;
 
-	public Store(String address, String name, String callNumber, String weekdaysTime, String saturdayTime, String sundayTime, String holidayTime, Double longitude, Double latitude){
+	public Store_1Case(String address, String name, String callNumber, String weekdaysTime, String saturdayTime, String sundayTime, String holidayTime, Double longitude, Double latitude){
 		this.address = address;
 		this.name = name;
 		this.callNumber = callNumber;
@@ -86,7 +92,7 @@ public class Store {
 		this.latitude = latitude;
 	}
 
-	public Store(StoreRequest storeRequest) {
+	public Store_1Case(StoreRequest storeRequest) {
 		this.address = storeRequest.getAddress();
 		this.name = storeRequest.getName();
 		this.callNumber = storeRequest.getCallNumber();
@@ -135,14 +141,7 @@ public class Store {
 		this.nightPharmacy = storeRequest.getNightPharmacy();
 	}
 
-    public boolean isForeignLanguage() {
+	public boolean isForeignLanguage() {
 		return foreignLanguage != null && foreignLanguage == 1;
-    }
-
-	private int getBookmarkCount(Store store) {
-		// 북마크 개수를 조회하는 로직을 구현합니다.
-		// 예를 들어, 다음과 같이 적절한 코드로 대체해야 합니다:
-		return store.getBookmarks().size();
 	}
-
 }

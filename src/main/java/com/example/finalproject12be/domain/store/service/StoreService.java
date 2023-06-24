@@ -851,6 +851,7 @@ public class StoreService {
 
 		Page<StoreResponseDto> result = storeRepositoryCustom.searchStoreWithFilter(mappedRequest, userDetails);
 
+
 		return result;
 	}
 

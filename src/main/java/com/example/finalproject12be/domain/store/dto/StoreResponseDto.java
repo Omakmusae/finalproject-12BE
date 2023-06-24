@@ -3,8 +3,10 @@ package com.example.finalproject12be.domain.store.dto;
 import com.example.finalproject12be.domain.store.entity.Store;
 
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 public class StoreResponseDto {
 
 	private Long storeId;
@@ -23,6 +25,8 @@ public class StoreResponseDto {
 
 	private boolean bookmark = false;
 
+	private Long bookmarkCount;
+
 	public StoreResponseDto(Store store) {
 		this.storeId = store.getId();
 		this.address = store.getAddress();
@@ -34,7 +38,7 @@ public class StoreResponseDto {
 	}
 
 	public StoreResponseDto(Long storeId, String address, String name, String callNumber,
-		String weekdaysTime, Double longitude, Double latitude) {
+		String weekdaysTime, Double longitude, Double latitude, Long bookmarkCount) {
 		this.storeId = storeId;
 		this.address = address;
 		this.name = name;
@@ -42,8 +46,10 @@ public class StoreResponseDto {
 		this.weekdaysTime = weekdaysTime;
 		this.longitude = longitude;
 		this.latitude = latitude;
+		this.bookmarkCount = bookmarkCount;
 	}
 	public void setBookmark(boolean bookmark){
 		this.bookmark = bookmark;
 	}
+
 }
