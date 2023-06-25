@@ -13,7 +13,7 @@ public class OneStoreResponseDto {
     private final String address;
     private final String name;
     private final String callNumber;
-    private String weekdaysTime = "평일     ";
+    private final String weekdaysTime;
     private String saturdayTime = null;
     private String sundayTime = null;
     private String holidayTime = null;
@@ -29,7 +29,7 @@ public class OneStoreResponseDto {
         this.address = store.getAddress();
         this.name = store.getName();
         this.callNumber = store.getCallNumber();
-        this.weekdaysTime += store.getWeekdaysTime().substring(4);
+        this.weekdaysTime = store.getWeekdaysTime().substring(3);
         this.longitude = store.getLongitude();
         this.latitude = store.getLatitude();
         if(store.getCommentList() != null){
