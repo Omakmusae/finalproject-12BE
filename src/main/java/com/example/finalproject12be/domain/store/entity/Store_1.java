@@ -24,7 +24,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Store_1Case {
+public class Store_1 {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -32,7 +32,10 @@ public class Store_1Case {
 	private Long id;
 
 	@Column
-	private String address;
+	private String gu;
+
+	@Column
+	private String detailAddress;
 
 	@Column
 	private String name;
@@ -40,18 +43,8 @@ public class Store_1Case {
 	@Column
 	private String callNumber;
 
-	//평일 운영 시간
 	@Column
-	private String weekdaysTime;
-
-	@Column
-	private String saturdayTime;
-
-	@Column
-	private String sundayTime;
-
-	@Column
-	private String holidayTime;
+	private String businessHours;
 
 	@Column
 	private Double longitude;
@@ -61,6 +54,9 @@ public class Store_1Case {
 
 	@Column
 	private Integer foreignLanguage;
+
+	@Column
+	private String language;
 
 	@Column
 	private Integer english;
@@ -80,26 +76,26 @@ public class Store_1Case {
 	@OneToMany(mappedBy = "store", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
 	private List<Bookmark> bookmarks;
 
-	public Store_1Case(String address, String name, String callNumber, String weekdaysTime, String saturdayTime, String sundayTime, String holidayTime, Double longitude, Double latitude){
-		this.address = address;
+	public Store_1(String address, String name, String callNumber, String weekdaysTime, String saturdayTime, String sundayTime, String holidayTime, Double longitude, Double latitude){
+		//this.address = address;
 		this.name = name;
 		this.callNumber = callNumber;
-		this.weekdaysTime = weekdaysTime;
-		this.saturdayTime = saturdayTime;
-		this.sundayTime = sundayTime;
-		this.holidayTime = holidayTime;
+		//this.weekdaysTime = storeRequest.getWeekdaysTime();
+		//this.saturdayTime = storeRequest.getSaturdayTime();
+		//this.sundayTime = storeRequest.getSundayTime();
+		//this.holidayTime = storeRequest.getHolidayTime();
 		this.longitude = longitude;
 		this.latitude = latitude;
 	}
 
-	public Store_1Case(StoreRequest storeRequest) {
-		this.address = storeRequest.getAddress();
+	public Store_1(StoreRequest storeRequest) {
+		//this.address = storeRequest.getAddress();
 		this.name = storeRequest.getName();
 		this.callNumber = storeRequest.getCallNumber();
-		this.weekdaysTime = storeRequest.getWeekdaysTime();
-		this.saturdayTime = storeRequest.getSaturdayTime();
-		this.sundayTime = storeRequest.getSundayTime();
-		this.holidayTime = storeRequest.getHolidayTime();
+		//this.weekdaysTime = storeRequest.getWeekdaysTime();
+		//this.saturdayTime = storeRequest.getSaturdayTime();
+		//this.sundayTime = storeRequest.getSundayTime();
+		//this.holidayTime = storeRequest.getHolidayTime();
 		this.longitude = storeRequest.getLongitude();
 		this.latitude = storeRequest.getLatitude();
 		this.foreignLanguage = storeRequest.getForeignLanguage();
@@ -125,13 +121,13 @@ public class Store_1Case {
 	}
 
 	public void updateStore(StoreRequest storeRequest) {
-		this.address = storeRequest.getAddress();
+		//his.address = storeRequest.getAddress();
 		this.name = storeRequest.getName();
 		this.callNumber = storeRequest.getCallNumber();
-		this.weekdaysTime = storeRequest.getWeekdaysTime();
-		this.saturdayTime = storeRequest.getSaturdayTime();
-		this.sundayTime = storeRequest.getSundayTime();
-		this.holidayTime = storeRequest.getHolidayTime();
+		//this.weekdaysTime = storeRequest.getWeekdaysTime();
+		//this.saturdayTime = storeRequest.getSaturdayTime();
+		//this.sundayTime = storeRequest.getSundayTime();
+		//this.holidayTime = storeRequest.getHolidayTime();
 		this.longitude = storeRequest.getLongitude();
 		this.latitude = storeRequest.getLatitude();
 		this.foreignLanguage = storeRequest.getForeignLanguage();
@@ -145,3 +141,5 @@ public class Store_1Case {
 		return foreignLanguage != null && foreignLanguage == 1;
 	}
 }
+
+

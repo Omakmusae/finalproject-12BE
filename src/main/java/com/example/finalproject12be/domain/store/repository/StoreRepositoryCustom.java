@@ -259,6 +259,10 @@ public class StoreRepositoryCustom {
 
 	private BooleanExpression eqAddress(String gu) {
 
+		if (gu == null) {
+			return null;
+		}
+
 		if(gu.equals("gangnam-gu")){
 			gu = "강남구";
 		}else if(gu.equals("gangdong-gu")){
