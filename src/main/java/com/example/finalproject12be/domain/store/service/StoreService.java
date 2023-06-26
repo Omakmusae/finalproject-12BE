@@ -884,8 +884,6 @@ public class StoreService {
 		}
 		Page<ForeignStoreResponse> result = storeRepositoryCustom.searchForeignStoreWithFilter(mappedRequest, userDetails);
 
-		List<Store> test = storeRepositoryCustom_1Case.test(mappedRequest);
-
 		return result;
 	}
 	public Page<ForeignStoreResponse> fortest(SearchForeignOptionRequest request, UserDetailsImpl userDetails) {
@@ -900,7 +898,7 @@ public class StoreService {
 		}
 
 		Page<ForeignStoreResponse> test = storeRepositoryCustom_1Case.searchForeignStoreWithFiltertest(mappedRequest, userDetails);
-
+		//List<Store> test = storeRepositoryCustom_1Case.test(mappedRequest);
 		return test;
 	}
 

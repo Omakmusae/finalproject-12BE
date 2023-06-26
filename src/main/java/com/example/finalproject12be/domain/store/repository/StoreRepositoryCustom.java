@@ -335,7 +335,8 @@ public class StoreRepositoryCustom {
 
 				return Expressions.booleanTemplate(
 					"TIME({0}) <= TIME_FORMAT(SUBSTRING_INDEX(weekdays_time, ' ', -1), '%H:%i') " +
-						"AND TIME({0}) >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(weekdays_time, ' ~', 1), ' ', -1), '%H:%i')",
+						"AND TIME({0}) >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(weekdays_time, ' ~', 1), ' ', -1), '%H:%i')"+
+						"OR TIME_FORMAT(SUBSTRING_INDEX(weekdays_time, ' ', -1), '%H:%i') = TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(weekdays_time, ' ~', 1), ' ', -1), '%H:%i')",
 					LocalDateTime.now().format(timeFormatter)
 				);
 			}
@@ -343,7 +344,8 @@ public class StoreRepositoryCustom {
 
 				return Expressions.booleanTemplate(
 					"TIME({0}) <= TIME_FORMAT(SUBSTRING_INDEX(saturday_time, ' ', -1), '%H:%i') " +
-						"AND TIME({0}) >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(saturday_time, ' ~', 1), ' ', -1), '%H:%i')",
+						"AND TIME({0}) >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(saturday_time, ' ~', 1), ' ', -1), '%H:%i')"+
+						"OR TIME_FORMAT(SUBSTRING_INDEX(saturday_time, ' ', -1), '%H:%i') = TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(saturday_time, ' ~', 1), ' ', -1), '%H:%i')",
 					LocalDateTime.now().format(timeFormatter)
 				);
 			}
@@ -351,7 +353,8 @@ public class StoreRepositoryCustom {
 
 				return Expressions.booleanTemplate(
 					"TIME({0}) <= TIME_FORMAT(SUBSTRING_INDEX(sunday_time, ' ', -1), '%H:%i') " +
-						"AND TIME({0}) >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(sunday_time, ' ~', 1), ' ', -1), '%H:%i')",
+						"AND TIME({0}) >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(sunday_time, ' ~', 1), ' ', -1), '%H:%i')"+
+						"OR TIME_FORMAT(SUBSTRING_INDEX(sunday_time, ' ', -1), '%H:%i') = TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(sunday_time, ' ~', 1), ' ', -1), '%H:%i')",
 					LocalDateTime.now().format(timeFormatter)
 				);
 			}
