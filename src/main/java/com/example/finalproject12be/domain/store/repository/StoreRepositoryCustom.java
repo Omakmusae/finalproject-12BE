@@ -59,6 +59,23 @@ public class StoreRepositoryCustom {
 
 	}
 
+	public List<StoreResponseDto> searchStoreWithinDistancee(String baseRadius, String baseLatitude, String baseLongitude) {
+
+		NumberExpression<Double> distance = distance(baseLatitude, baseLongitude, store.latitude, store.longitude);
+
+		return  jpaQueryFactory
+			.select(Projections.constructor(StoreResponseDto.class,
+				store.id, store.address, store.name, store.callNumber,
+				store.weekdaysTime, store.longitude, store.latitude
+			))
+			.from(store)
+			.where(
+				withinDistance(baseLatitude, baseLongitude, store.latitude, store.longitude)
+			)
+			.orderBy(distance.asc())
+			.fetch();
+	}
+
 	public Page<StoreResponseDto> searchStoreWithFilter(MappedSearchRequest request, UserDetailsImpl userDetails) {
 
 		int page = request.getPage();
@@ -263,63 +280,62 @@ public class StoreRepositoryCustom {
 			return null;
 		}
 
-		if(gu.equals("gangnam-gu")){
-			gu = "강남구";
-		}else if(gu.equals("gangdong-gu")){
-			gu = "강동구";
-		}else if(gu.equals("gangbuk-gu")){
-			gu = "강북구";
-		}else if(gu.equals("gangseo-gu")){
-			gu = "강서구";
-		}else if(gu.equals("gwanak-gu")){
-			gu = "관악구";
-		}else if(gu.equals("gwangjin-gu")){
-			gu = "광진구";
-		}else if(gu.equals("guro-gu")){
-			gu = "구로구";
-		}else if(gu.equals("geumcheon-gu")){
-			gu = "금천구";
-		}else if(gu.equals("nowon-gu")){
-			gu = "노원구";
-		}else if(gu.equals("dobong-gu")){
-			gu = "도봉구";
-		}else if(gu.equals("dongdaemun-gu")){
-			gu = "동대문구";
-		}else if(gu.equals("dongjak-gu")){
-			gu = "동작구";
-		}else if(gu.equals("Mapo-gu")){
-			gu = "마포구";
-		}else if(gu.equals("seodaemun-gu")){
-			gu = "서대문구";
-		}else if(gu.equals("seocho-gu")){
-			gu = "서초구";
-		}else if(gu.equals("seongdong-gu")){
-			gu = "성동구";
-		}else if(gu.equals("seongbuk-gu")){
-			gu = "성북구";
-		}else if(gu.equals("songpa-gu")){
-			gu = "송파구";
-		}else if(gu.equals("yeongdeungpo-gu")){
-			gu = "영등포구";
-		}else if(gu.equals("yangcheon-gu")){
-			gu = "양천구";
-		}else if(gu.equals("yongsan-gu")){
-			gu = "용산구";
-		}else if(gu.equals("eunpyeong-gu")){
-			gu = "은평구";
-		}else if(gu.equals("jongno-gu")){
-			gu = "종로구";
-		}else if(gu.equals("jung-gu")){
-			gu = "중구";
-		}else if(gu.equals("jungnang-gu")){
-			gu = "중랑구";
-		}
+		// if(gu.equals("gangnam-gu")){
+		// 	gu = "강남구";
+		// }else if(gu.equals("gangdong-gu")){
+		// 	gu = "강동구";
+		// }else if(gu.equals("gangbuk-gu")){
+		// 	gu = "강북구";
+		// }else if(gu.equals("gangseo-gu")){
+		// 	gu = "강서구";
+		// }else if(gu.equals("gwanak-gu")){
+		// 	gu = "관악구";
+		// }else if(gu.equals("gwangjin-gu")){
+		// 	gu = "광진구";
+		// }else if(gu.equals("guro-gu")){
+		// 	gu = "구로구";
+		// }else if(gu.equals("geumcheon-gu")){
+		// 	gu = "금천구";
+		// }else if(gu.equals("nowon-gu")){
+		// 	gu = "노원구";
+		// }else if(gu.equals("dobong-gu")){
+		// 	gu = "도봉구";
+		// }else if(gu.equals("dongdaemun-gu")){
+		// 	gu = "동대문구";
+		// }else if(gu.equals("dongjak-gu")){
+		// 	gu = "동작구";
+		// }else if(gu.equals("Mapo-gu")){
+		// 	gu = "마포구";
+		// }else if(gu.equals("seodaemun-gu")){
+		// 	gu = "서대문구";
+		// }else if(gu.equals("seocho-gu")){
+		// 	gu = "서초구";
+		// }else if(gu.equals("seongdong-gu")){
+		// 	gu = "성동구";
+		// }else if(gu.equals("seongbuk-gu")){
+		// 	gu = "성북구";
+		// }else if(gu.equals("songpa-gu")){
+		// 	gu = "송파구";
+		// }else if(gu.equals("yeongdeungpo-gu")){
+		// 	gu = "영등포구";
+		// }else if(gu.equals("yangcheon-gu")){
+		// 	gu = "양천구";
+		// }else if(gu.equals("yongsan-gu")){
+		// 	gu = "용산구";
+		// }else if(gu.equals("eunpyeong-gu")){
+		// 	gu = "은평구";
+		// }else if(gu.equals("jongno-gu")){
+		// 	gu = "종로구";
+		// }else if(gu.equals("jung-gu")){
+		// 	gu = "중구";
+		// }else if(gu.equals("jungnang-gu")){
+		// 	gu = "중랑구";
+		// }
 
 		return gu != null ? store.address.like("%" + gu + "%") : null;
 	}
 
 	private BooleanExpression eqStoreName(String storeName) {
-
 		return storeName != null ? store.name.like("%" + storeName + "%") : null;
 	}
 
@@ -329,39 +345,67 @@ public class StoreRepositoryCustom {
 			LocalDate currentDate = LocalDate.now();
 			DayOfWeek dayOfWeek = currentDate.getDayOfWeek();
 			DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
-			System.out.println(LocalDateTime.now().format(timeFormatter) + "!!!!!!!!!!!!");
 
 			if (dayOfWeek != DayOfWeek.SATURDAY && dayOfWeek != DayOfWeek.SUNDAY) {
+				String currentDateTime = LocalDateTime.now().format(timeFormatter);
 
-				return Expressions.booleanTemplate(
-					"TIME({0}) <= TIME_FORMAT(SUBSTRING_INDEX(weekdays_time, ' ', -1), '%H:%i') " +
-						"AND TIME({0}) >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(weekdays_time, ' ~', 1), ' ', -1), '%H:%i')"+
-						"OR TIME_FORMAT(SUBSTRING_INDEX(weekdays_time, ' ', -1), '%H:%i') = TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(weekdays_time, ' ~', 1), ' ', -1), '%H:%i')",
+				BooleanExpression startCondition = Expressions.booleanTemplate(
+					"TIME({0}) <= TIME_FORMAT(SUBSTRING_INDEX(weekdays_time, ' ', -1), '%H:%i')",
 					LocalDateTime.now().format(timeFormatter)
 				);
-			}
-			else if (dayOfWeek == DayOfWeek.SATURDAY) {
 
-				return Expressions.booleanTemplate(
-					"TIME({0}) <= TIME_FORMAT(SUBSTRING_INDEX(saturday_time, ' ', -1), '%H:%i') " +
-						"AND TIME({0}) >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(saturday_time, ' ~', 1), ' ', -1), '%H:%i')"+
-						"OR TIME_FORMAT(SUBSTRING_INDEX(saturday_time, ' ', -1), '%H:%i') = TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(saturday_time, ' ~', 1), ' ', -1), '%H:%i')",
+				BooleanExpression endCondition = Expressions.booleanTemplate(
+					"TIME({0}) >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(weekdays_time, ' ~', 1), ' ', -1), '%H:%i')",
 					LocalDateTime.now().format(timeFormatter)
 				);
-			}
-			else if (dayOfWeek == DayOfWeek.SUNDAY) {
 
-				return Expressions.booleanTemplate(
-					"TIME({0}) <= TIME_FORMAT(SUBSTRING_INDEX(sunday_time, ' ', -1), '%H:%i') " +
-						"AND TIME({0}) >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(sunday_time, ' ~', 1), ' ', -1), '%H:%i')"+
-						"OR TIME_FORMAT(SUBSTRING_INDEX(sunday_time, ' ', -1), '%H:%i') = TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(sunday_time, ' ~', 1), ' ', -1), '%H:%i')",
+				BooleanExpression equalCondition = Expressions.booleanTemplate(
+					"TIME_FORMAT(SUBSTRING_INDEX(weekdays_time, ' ', -1), '%H:%i') = TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(weekdays_time, ' ~', 1), ' ', -1), '%H:%i')"
+				);
+
+				return startCondition.and(endCondition).or(equalCondition);
+			} else if (dayOfWeek == DayOfWeek.SATURDAY) {
+				String currentDateTime = LocalDateTime.now().format(timeFormatter);
+
+				BooleanExpression startCondition = Expressions.booleanTemplate(
+					"TIME({0}) <= TIME_FORMAT(SUBSTRING_INDEX(saturday_time, ' ', -1), '%H:%i')",
 					LocalDateTime.now().format(timeFormatter)
 				);
+
+				BooleanExpression endCondition = Expressions.booleanTemplate(
+					"TIME({0}) >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(saturday_time, ' ~', 1), ' ', -1), '%H:%i')",
+					LocalDateTime.now().format(timeFormatter)
+				);
+
+				BooleanExpression equalCondition = Expressions.booleanTemplate(
+					"TIME_FORMAT(SUBSTRING_INDEX(saturday_time, ' ', -1), '%H:%i') = TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(saturday_time, ' ~', 1), ' ', -1), '%H:%i')"
+				);
+
+				return startCondition.and(endCondition).or(equalCondition);
+			} else if (dayOfWeek == DayOfWeek.SUNDAY) {
+				String currentDateTime = LocalDateTime.now().format(timeFormatter);
+
+				BooleanExpression startCondition = Expressions.booleanTemplate(
+					"TIME({0}) <= TIME_FORMAT(SUBSTRING_INDEX(sunday_time, ' ', -1), '%H:%i')",
+					LocalDateTime.now().format(timeFormatter)
+				);
+
+				BooleanExpression endCondition = Expressions.booleanTemplate(
+					"TIME({0}) >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(sunday_time, ' ~', 1), ' ', -1), '%H:%i')",
+					LocalDateTime.now().format(timeFormatter)
+				);
+
+				BooleanExpression equalCondition = Expressions.booleanTemplate(
+					"TIME_FORMAT(SUBSTRING_INDEX(sunday_time, ' ', -1), '%H:%i') = TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(sunday_time, ' ~', 1), ' ', -1), '%H:%i')"
+				);
+
+				return startCondition.and(endCondition).or(equalCondition);
 			}
 		}
 
 		return null;
 	}
+
 
 	private BooleanExpression checkHolidayOpen(boolean holidayBusiness) {
 		return holidayBusiness == true ? store.holidayTime.isNotNull() : null;

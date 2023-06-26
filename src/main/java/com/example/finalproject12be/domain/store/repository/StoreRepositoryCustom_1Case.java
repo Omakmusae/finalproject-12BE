@@ -1,7 +1,7 @@
 package com.example.finalproject12be.domain.store.repository;
 
-import static com.example.finalproject12be.domain.bookmark.entity.QBookmark.*;
 import static com.example.finalproject12be.domain.store.entity.QStore.*;
+import static com.example.finalproject12be.domain.store.entity.QStore_2.*;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -22,6 +22,7 @@ import com.example.finalproject12be.domain.store.dto.MappedSearchRequest;
 import com.example.finalproject12be.domain.store.dto.StoreResponseDto;
 import com.example.finalproject12be.domain.store.entity.Store;
 import com.example.finalproject12be.domain.member.entity.Member;
+import com.example.finalproject12be.domain.store.entity.Store_2;
 import com.example.finalproject12be.security.UserDetailsImpl;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Projections;
@@ -40,7 +41,6 @@ import lombok.RequiredArgsConstructor;
 public class StoreRepositoryCustom_1Case {
 
 	private final JPAQueryFactory jpaQueryFactory;
-	private final BookmarkRepository bookmarkRepository;
 
 	public List<Store> searchStoreWithinDistance(String baseRadius, String baseLatitude, String baseLongitude) {
 
@@ -51,284 +51,125 @@ public class StoreRepositoryCustom_1Case {
 			.from(store)
 			.where(
 				withinDistance(baseLatitude, baseLongitude, store.latitude, store.longitude)
-
 			)
 			.orderBy(distance.asc())
 			.fetch();
 
 	}
 
-	public List<Store> test(MappedSearchForeignRequest request) {
-
-		NumberExpression<Double> distance = distance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude);
-
-		return jpaQueryFactory
-			.select(store)
-			.from(store)
-			.where(
-				withinDistance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude),
-				eqAddress(request.getGu()),
-				eqStoreName(request.getStoreName()),
-				checkOpen(request.isOpen()),
-				checkHolidayOpen(request.isHolidayBusiness()),
-				checkNightdOpen(request.isNightBusiness()),
-				eqEnglish(request.getEnglish()),
-				eqChinese(request.getChinese()),
-				eqJapanese(request.getJapanese())
-
-			)
-			.orderBy(distance.asc())
-			.fetch();
-
-	}
-
-	public Page<StoreResponseDto> searchStoreWithFilter(MappedSearchRequest request, UserDetailsImpl userDetails) {
+	public Page<Store_2> searchForeignStoreWithFiltertest(MappedSearchForeignRequest request, UserDetailsImpl userDetails) {
 
 		int page = request.getPage();
 		int size = request.getSize();
 
-		NumberExpression<Double> distance = distance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude);
-
-		if (distance == null) {
-
-			QueryResults<StoreResponseDto> results = jpaQueryFactory
-				.select(Projections.constructor(StoreResponseDto.class,
-					store.id, store.address, store.name, store.callNumber,
-					store.weekdaysTime, store.longitude, store.latitude
-					))
-				.from(store)
+			QueryResults<Store_2> results = jpaQueryFactory
+				.selectFrom(store_2)
 				.where(
-					eqAddress(request.getGu()),
-					eqStoreName(request.getStoreName()),
-					checkOpen(request.isOpen()),
-					checkHolidayOpen(request.isHolidayBusiness()),
-					checkNightdOpen(request.isNightBusiness())
-				)
-				.orderBy(store.name.asc())
-				.offset(page * size)
-				.limit(size)
-				.fetchResults();
-
-			// 로그인한 유저의 북마크 정보 가져오기
-			List<Long> bookmarkedStoreIds = new ArrayList<>();
-
-			if (userDetails != null) {
-				Member member = userDetails.getMember();
-				bookmarkedStoreIds = bookmarkRepository.findStoreIdsByMember(member);
-			}
-
-			List<StoreResponseDto> storeResponseDtos = results.getResults();
-
-			// 북마크 여부 체크하여 StoreResponseDto에 설정
-			for (StoreResponseDto result : storeResponseDtos) {
-				if (bookmarkedStoreIds.contains(result.getStoreId())) {
-					result.setBookmark(true);
-				}
-			}
-
-			return new PageImpl<>(results.getResults(), PageRequest.of(page, size), results.getTotal());
-		}
-		else {
-			SubQueryExpression<Long> bookmarkCountSubquery = JPAExpressions.select(bookmark.id.count())
-				.from(bookmark)
-				.where(bookmark.store.eq(store));
-
-			QueryResults<StoreResponseDto> results = jpaQueryFactory
-				.select(Projections.constructor(StoreResponseDto.class,
-					store.id, store.address, store.name, store.callNumber,
-					store.weekdaysTime, store.longitude, store.latitude,
-					bookmarkCountSubquery))
-				.from(store)
-				.where(
-					withinDistance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude),
-					eqAddress(request.getGu()),
-					eqStoreName(request.getStoreName()),
-					checkOpen(request.isOpen()),
-					checkHolidayOpen(request.isHolidayBusiness()),
-					checkNightdOpen(request.isNightBusiness())
-				)
-				.orderBy(distance.asc(), store.name.asc())
-				.offset(page * size)
-				.limit(size)
-				.fetchResults();
-
-			// 로그인한 유저의 북마크 정보 가져오기
-			List<Long> bookmarkedStoreIds = new ArrayList<>();
-
-			if (userDetails != null) {
-				Member member = userDetails.getMember();
-				bookmarkedStoreIds = bookmarkRepository.findStoreIdsByMember(member);
-			}
-
-			List<StoreResponseDto> storeResponseDtos = results.getResults();
-			// 북마크 여부 체크하여 StoreResponseDto에 설정
-			for (StoreResponseDto result : storeResponseDtos) {
-				if (bookmarkedStoreIds.contains(result.getStoreId())) {
-					result.setBookmark(true);
-
-				}
-			}
-
-			return new PageImpl<>(results.getResults(), PageRequest.of(page, size), results.getTotal());
-		}
-
-	}
-
-	public Page<ForeignStoreResponse> searchForeignStoreWithFiltertest(MappedSearchForeignRequest request, UserDetailsImpl userDetails) {
-
-		int page = request.getPage();
-		int size = request.getSize();
-		NumberExpression<Double> distance = distance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude);
-
-			SubQueryExpression<Long> bookmarkCountSubquery = JPAExpressions.select(bookmark.id.count())
-				.from(bookmark)
-				.where(bookmark.store.eq(store));
-
-			QueryResults<ForeignStoreResponse> results = jpaQueryFactory
-				.select(Projections.constructor(
-					ForeignStoreResponse.class,
-					store.id, store.address, store.name, store.callNumber,
-					store.weekdaysTime, store.longitude, store.latitude,
-					store.english, store.chinese, store.japanese,
-					bookmarkCountSubquery))
-				.from(store)
-				.where(
-					withinDistance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude),
+					withinDistance(request.getLatitude(), request.getLongitude(), store_2.latitude, store_2.longitude),
 					eqAddress(request.getGu()),
 					eqStoreName(request.getStoreName()),
 					checkOpen(request.isOpen()),
 					checkHolidayOpen(request.isHolidayBusiness()),
 					checkNightdOpen(request.isNightBusiness()),
-					eqEnglish(request.getEnglish()),
-					eqChinese(request.getChinese()),
-					eqJapanese(request.getJapanese())
+					checkEnglish(request.getEnglish()),
+					checkChinese(request.getChinese()),
+					checkJapanese(request.getJapanese())
 				)
-				.orderBy(distance.asc(), store.name.asc())
 				.offset(page * size)
 				.limit(size)
 				.fetchResults();
 
 			return new PageImpl<>(results.getResults(), PageRequest.of(page, size), results.getTotal());
-
 	}
 
 	private BooleanExpression eqAddress(String gu) {
-
-		if(gu.equals("gangnam-gu")){
-			gu = "강남구";
-		}else if(gu.equals("gangdong-gu")){
-			gu = "강동구";
-		}else if(gu.equals("gangbuk-gu")){
-			gu = "강북구";
-		}else if(gu.equals("gangseo-gu")){
-			gu = "강서구";
-		}else if(gu.equals("gwanak-gu")){
-			gu = "관악구";
-		}else if(gu.equals("gwangjin-gu")){
-			gu = "광진구";
-		}else if(gu.equals("guro-gu")){
-			gu = "구로구";
-		}else if(gu.equals("geumcheon-gu")){
-			gu = "금천구";
-		}else if(gu.equals("nowon-gu")){
-			gu = "노원구";
-		}else if(gu.equals("dobong-gu")){
-			gu = "도봉구";
-		}else if(gu.equals("dongdaemun-gu")){
-			gu = "동대문구";
-		}else if(gu.equals("dongjak-gu")){
-			gu = "동작구";
-		}else if(gu.equals("Mapo-gu")){
-			gu = "마포구";
-		}else if(gu.equals("seodaemun-gu")){
-			gu = "서대문구";
-		}else if(gu.equals("seocho-gu")){
-			gu = "서초구";
-		}else if(gu.equals("seongdong-gu")){
-			gu = "성동구";
-		}else if(gu.equals("seongbuk-gu")){
-			gu = "성북구";
-		}else if(gu.equals("songpa-gu")){
-			gu = "송파구";
-		}else if(gu.equals("yeongdeungpo-gu")){
-			gu = "영등포구";
-		}else if(gu.equals("yangcheon-gu")){
-			gu = "양천구";
-		}else if(gu.equals("yongsan-gu")){
-			gu = "용산구";
-		}else if(gu.equals("eunpyeong-gu")){
-			gu = "은평구";
-		}else if(gu.equals("jongno-gu")){
-			gu = "종로구";
-		}else if(gu.equals("jung-gu")){
-			gu = "중구";
-		}else if(gu.equals("jungnang-gu")){
-			gu = "중랑구";
-		}
-
-		return gu != null ? store.address.like("%" + gu + "%") : null;
+		return gu != null ? store_2.gu.eq(gu) : null;
 	}
 
 	private BooleanExpression eqStoreName(String storeName) {
-
-		return storeName != null ? store.name.like("%" + storeName + "%") : null;
+		return storeName != null ? store_2.name.like("%" + storeName + "%") : null;
 	}
-
 
 	private BooleanExpression checkOpen(boolean open) {
 		if (open) {
 			LocalDate currentDate = LocalDate.now();
 			DayOfWeek dayOfWeek = currentDate.getDayOfWeek();
 			DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
-			System.out.println(LocalDateTime.now().format(timeFormatter) + "!!!!!!!!!!!!");
 
 			if (dayOfWeek != DayOfWeek.SATURDAY && dayOfWeek != DayOfWeek.SUNDAY) {
+				String currentDateTime = LocalDateTime.now().format(timeFormatter);
 
-				return Expressions.booleanTemplate(
-					"TIME({0}) <= TIME_FORMAT(SUBSTRING_INDEX(weekdays_time, ' ', -1), '%H:%i') " +
-						"AND TIME({0}) >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(weekdays_time, ' ~', 1), ' ', -1), '%H:%i')",
+				BooleanExpression startCondition = Expressions.booleanTemplate(
+					"TIME({0}) <= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(business_hours, '|', 1), ' ', -1), '%H:%i')",
 					LocalDateTime.now().format(timeFormatter)
 				);
-			}
-			else if (dayOfWeek == DayOfWeek.SATURDAY) {
 
-				return Expressions.booleanTemplate(
-					"TIME({0}) <= TIME_FORMAT(SUBSTRING_INDEX(saturday_time, ' ', -1), '%H:%i') " +
-						"AND TIME({0}) >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(saturday_time, ' ~', 1), ' ', -1), '%H:%i')",
+				BooleanExpression endCondition = Expressions.booleanTemplate(
+					"TIME({0}) >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(SUBSTRING_INDEX(business_hours, '|', 1), ' ~', 1), ' ', -1), '%H:%i')",
 					LocalDateTime.now().format(timeFormatter)
 				);
-			}
-			else if (dayOfWeek == DayOfWeek.SUNDAY) {
 
-				return Expressions.booleanTemplate(
-					"TIME({0}) <= TIME_FORMAT(SUBSTRING_INDEX(sunday_time, ' ', -1), '%H:%i') " +
-						"AND TIME({0}) >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(sunday_time, ' ~', 1), ' ', -1), '%H:%i')",
-					LocalDateTime.now().format(timeFormatter)
+				BooleanExpression equalCondition = Expressions.booleanTemplate(
+					"TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(SUBSTRING_INDEX(business_hours, '|', 1), ' ~', 1), ' ', -1), '%H:%i') = TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(business_hours, '|', 1), ' ', -1), '%H:%i')"
 				);
+
+				return startCondition.and(endCondition).or(equalCondition);
+			} else {
+				return null;
 			}
 		}
-
 		return null;
 	}
 
 	private BooleanExpression checkHolidayOpen(boolean holidayBusiness) {
-		return holidayBusiness == true ? store.holidayTime.isNotNull() : null;
+
+		if (holidayBusiness == true) {
+			return Expressions.booleanTemplate(
+				" '' <> SUBSTRING_INDEX(SUBSTRING_INDEX(business_hours, '|', 4), '|', -1)"
+			);
+		}
+
+		else  {
+			return null;
+		}
 	}
 
 	private BooleanExpression checkNightdOpen(boolean nightBusiness) {
-		return nightBusiness == true ? store.nightPharmacy.eq(1) : null;
+		return nightBusiness == true ? store_2.nightPharmacy.eq(1) : null;
 	}
 
-	private BooleanExpression eqEnglish(int english) { return english == 1 ? store.english.eq(1) : null;
+	private BooleanExpression checkEnglish(int english) {
+
+		if (english == 1) {
+			System.out.println("!!!!!!!!!!!!!잉글리쉬!!!!!!!!!!!!!!!!!!!!!!!!");
+			return Expressions.booleanTemplate(
+				"SUBSTRING(language, 1, 1) = '1'"
+			);
+		} else {
+			return null;
+		}
 	}
 
-	private BooleanExpression eqChinese(Integer chinese) {
-		return chinese == 1 ? store.chinese.eq(1) : null;
+	private BooleanExpression checkChinese(int chinese) {
+		if (chinese == 1) {
+			return Expressions.booleanTemplate(
+				"SUBSTRING(language, 2, 1) = '1'"
+			);
+		}else {
+			return null;
+		}
 	}
 
-	private BooleanExpression eqJapanese(Integer japanese) {
-		return japanese == 1 ? store.japanese.eq(1) : null;
+	private BooleanExpression checkJapanese(int japanese) {
+		if (japanese == 1) {
+			return Expressions.booleanTemplate(
+				"SUBSTRING(store_2.language, 3, 1) = '1'"
+			);
+		} else {
+			return null;
+		}
 	}
+
 
 	private BooleanExpression withinDistance(String baseLatitude, String baseLongitude, NumberPath<Double> latitude, NumberPath<Double> longitude) {
 		if (baseLatitude == null) {

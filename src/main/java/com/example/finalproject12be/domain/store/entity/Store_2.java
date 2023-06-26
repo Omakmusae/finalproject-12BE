@@ -16,7 +16,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Store_1 {
+public class Store_2 {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -45,25 +45,13 @@ public class Store_1 {
 	private Double latitude;
 
 	@Column
-	private Integer foreignLanguage;
-
-	@Column
 	private String language;
-
-	@Column
-	private Integer english;
-
-	@Column
-	private Integer chinese;
-
-	@Column
-	private Integer japanese;
 
 	@Column
 	private Integer nightPharmacy;
 
 
-	public Store_1(String address, String name, String callNumber, String weekdaysTime, String saturdayTime, String sundayTime, String holidayTime, Double longitude, Double latitude){
+	public Store_2(String address, String name, String callNumber, String weekdaysTime, String saturdayTime, String sundayTime, String holidayTime, Double longitude, Double latitude){
 		//this.address = address;
 		this.name = name;
 		this.callNumber = callNumber;
@@ -75,7 +63,7 @@ public class Store_1 {
 		this.latitude = latitude;
 	}
 
-	public Store_1(StoreRequest storeRequest) {
+	public Store_2(StoreRequest storeRequest) {
 		//this.address = storeRequest.getAddress();
 		this.name = storeRequest.getName();
 		this.callNumber = storeRequest.getCallNumber();
@@ -85,19 +73,19 @@ public class Store_1 {
 		//this.holidayTime = storeRequest.getHolidayTime();
 		this.longitude = storeRequest.getLongitude();
 		this.latitude = storeRequest.getLatitude();
-		this.foreignLanguage = storeRequest.getForeignLanguage();
-		this.english = storeRequest.getEnglish();
-		this.chinese =storeRequest.getChinese();
-		this.japanese = storeRequest.getJapanese();
+		// this.foreignLanguage = storeRequest.getForeignLanguage();
+		// this.english = storeRequest.getEnglish();
+		// this.chinese =storeRequest.getChinese();
+		// this.japanese = storeRequest.getJapanese();
 		this.nightPharmacy = storeRequest.getNightPharmacy();
 	}
 
-	public void setForeign(int foreignLanguage, int english, int chinese, int japanese){
-		this.foreignLanguage = foreignLanguage;
-		this.english = english;
-		this.japanese = japanese;
-		this.chinese = chinese;
-	}
+	// public void setForeign(int foreignLanguage, int english, int chinese, int japanese){
+	// 	this.foreignLanguage = foreignLanguage;
+	// 	this.english = english;
+	// 	this.japanese = japanese;
+	// 	this.chinese = chinese;
+	// }
 
 	public void updateStore(StoreRequest storeRequest) {
 		//his.address = storeRequest.getAddress();
@@ -109,16 +97,16 @@ public class Store_1 {
 		//this.holidayTime = storeRequest.getHolidayTime();
 		this.longitude = storeRequest.getLongitude();
 		this.latitude = storeRequest.getLatitude();
-		this.foreignLanguage = storeRequest.getForeignLanguage();
-		this.english = storeRequest.getEnglish();
-		this.chinese =storeRequest.getChinese();
-		this.japanese = storeRequest.getJapanese();
+		// this.foreignLanguage = storeRequest.getForeignLanguage();
+		// this.english = storeRequest.getEnglish();
+		// this.chinese =storeRequest.getChinese();
+		// this.japanese = storeRequest.getJapanese();
 		this.nightPharmacy = storeRequest.getNightPharmacy();
 	}
 
-	public boolean isForeignLanguage() {
-		return foreignLanguage != null && foreignLanguage == 1;
-	}
+	// public boolean isForeignLanguage() {
+	// 	return foreignLanguage != null && foreignLanguage == 1;
+	// }
 }
 
 
