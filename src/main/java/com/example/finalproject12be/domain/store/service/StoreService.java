@@ -29,6 +29,7 @@ import com.example.finalproject12be.domain.store.dto.SearchOptionRequest;
 import com.example.finalproject12be.domain.store.dto.StoreRequest;
 import com.example.finalproject12be.domain.store.dto.StoreResponseDto;
 import com.example.finalproject12be.domain.store.entity.Store;
+import com.example.finalproject12be.domain.store.entity.Store_2;
 import com.example.finalproject12be.domain.store.repository.StoreRepository;
 import com.example.finalproject12be.domain.store.repository.StoreRepositoryCustom;
 import com.example.finalproject12be.domain.store.repository.StoreRepositoryCustom_1Case;
@@ -886,18 +887,20 @@ public class StoreService {
 
 		return result;
 	}
-	public Page<ForeignStoreResponse> fortest(SearchForeignOptionRequest request, UserDetailsImpl userDetails) {
+	public Page<Store_2> fortes_1(SearchForeignOptionRequest request, UserDetailsImpl userDetails) {
 
 		MappedSearchForeignRequest mappedRequest = request.toMappedSearchRequest();
 
-		if (request.getGu()=="" & request.getLongitude() =="" & request.getStoreName() =="") {
+		Page<Store_2> test = storeRepositoryCustom_1Case.searchForeignStoreWithFiltertest(mappedRequest, userDetails);
 
-			int page = request.getPage();
-			int size = request.getSize();
-			return new PageImpl<>(Collections.emptyList(), PageRequest.of(page, size), 0);
-		}
+		return test;
+	}
 
-		Page<ForeignStoreResponse> test = storeRepositoryCustom_1Case.searchForeignStoreWithFiltertest(mappedRequest, userDetails);
+	public Page<Store_2> fortes_2(SearchForeignOptionRequest request, UserDetailsImpl userDetails) {
+
+		MappedSearchForeignRequest mappedRequest = request.toMappedSearchRequest();
+
+		Page<Store_2> test = storeRepositoryCustom_1Case.searchForeignStoreWithFiltertest(mappedRequest, userDetails);
 		//List<Store> test = storeRepositoryCustom_1Case.test(mappedRequest);
 		return test;
 	}
