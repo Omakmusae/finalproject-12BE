@@ -57,22 +57,22 @@ public class StoreController {
 	}
 
 	//일반 약국 검색하기
-	// @GetMapping("/api/store/search")
-	// public ResponseEntity<Page<StoreResponseDto>> searchStore(
-	// 	@RequestParam("page") int page,
-	// 	@RequestParam("size") int size,
-	// 	@RequestParam("storeName") String storeName,
-	// 	@RequestParam("gu") String gu,
-	// 	@RequestParam("open") boolean open,
-	// 	@RequestParam("holidayBusiness") boolean holidayBusiness,
-	// 	@RequestParam("nightBusiness") boolean nightBusiness,
-	// 	@RequestParam("radius") String radius,
-	// 	@RequestParam("latitude") String latitude, @RequestParam("longitude") String longitude,
-	// 	@AuthenticationPrincipal UserDetailsImpl userDetails){
-	//
-	// 	Page<StoreResponseDto> storeResponseDtos = storeService.searchStore(page, size, storeName, gu, open, holidayBusiness, nightBusiness, radius, latitude, longitude,userDetails);
-	// 	return ResponseEntity.status(HttpStatus.OK).body(storeResponseDtos);
-	// }
+	//@GetMapping("/api/store/search")
+	public ResponseEntity<Page<StoreResponseDto>> searchStore(
+		@RequestParam("page") int page,
+		@RequestParam("size") int size,
+		@RequestParam("storeName") String storeName,
+		@RequestParam("gu") String gu,
+		@RequestParam("open") boolean open,
+		@RequestParam("holidayBusiness") boolean holidayBusiness,
+		@RequestParam("nightBusiness") boolean nightBusiness,
+		@RequestParam("radius") String radius,
+		@RequestParam("latitude") String latitude, @RequestParam("longitude") String longitude,
+		@AuthenticationPrincipal UserDetailsImpl userDetails){
+
+		Page<StoreResponseDto> storeResponseDtos = storeService.searchStore(page, size, storeName, gu, open, holidayBusiness, nightBusiness, radius, latitude, longitude,userDetails);
+		return ResponseEntity.status(HttpStatus.OK).body(storeResponseDtos);
+	}
 
 	//외국어 가능 약국 상세보기
 	@GetMapping("/api/store/foreign/{store-id}")
@@ -86,24 +86,24 @@ public class StoreController {
 
 	//외국어 가능 약국 검색하기
 	//@GetMapping("/api/store/foreign/search")
-	// public ResponseEntity<Page<ForeignStoreResponse>> searchForeignStore(
-	// 	@RequestParam("page") int page,
-	// 	@RequestParam("size") int size,
-	// 	@RequestParam("storeName") String storeName,
-	// 	@RequestParam("gu") String gu,
-	// 	@RequestParam("open") boolean open,
-	// 	@RequestParam("holidayBusiness") boolean holidayBusiness,
-	// 	@RequestParam("nightBusiness") boolean nightBusiness,
-	// 	@RequestParam("english") boolean english,
-	// 	@RequestParam("chinese") boolean chinese,
-	// 	@RequestParam("japanese") boolean japanese,
-	// 	@RequestParam("radius") String radius,
-	// 	@RequestParam("latitude") String latitude, @RequestParam("longitude") String longitude,
-	// 	@AuthenticationPrincipal UserDetailsImpl userDetails){
-	//
-	// 	Page<ForeignStoreResponse> foreignStoreResponses = storeService.searchForeignStore(page, size, storeName, gu, open, holidayBusiness, nightBusiness, english, chinese, japanese, radius, latitude, longitude, userDetails);
-	// 	return ResponseEntity.status(HttpStatus.OK).body(foreignStoreResponses);
-	// }
+	public ResponseEntity<Page<ForeignStoreResponse>> searchForeignStore(
+		@RequestParam("page") int page,
+		@RequestParam("size") int size,
+		@RequestParam("storeName") String storeName,
+		@RequestParam("gu") String gu,
+		@RequestParam("open") boolean open,
+		@RequestParam("holidayBusiness") boolean holidayBusiness,
+		@RequestParam("nightBusiness") boolean nightBusiness,
+		@RequestParam("english") boolean english,
+		@RequestParam("chinese") boolean chinese,
+		@RequestParam("japanese") boolean japanese,
+		@RequestParam("radius") String radius,
+		@RequestParam("latitude") String latitude, @RequestParam("longitude") String longitude,
+		@AuthenticationPrincipal UserDetailsImpl userDetails){
+
+		Page<ForeignStoreResponse> foreignStoreResponses = storeService.searchForeignStore(page, size, storeName, gu, open, holidayBusiness, nightBusiness, english, chinese, japanese, radius, latitude, longitude, userDetails);
+		return ResponseEntity.status(HttpStatus.OK).body(foreignStoreResponses);
+	}
 
 	//위치 불러오기
 	@GetMapping("/api/store/location")
@@ -174,20 +174,27 @@ public class StoreController {
 		return ResponseEntity.status(HttpStatus.OK).body(result);
 	}
 
+	@GetMapping("/test1")
+	//@GetMapping("/api/store/foreign/search")
+	public ResponseEntity<Page<ForeignStoreResponse>> fortes_1(SearchForeignOptionRequest request,
+		@AuthenticationPrincipal UserDetailsImpl userDetails){
+		Page<ForeignStoreResponse> result = storeService.fortes_1(request,userDetails);
+		return ResponseEntity.status(HttpStatus.OK).body(result);
+	}
 
 	//일반 약국 검색 test
 	@GetMapping("/test2")
-	public ResponseEntity<Page<Store_2>> searchStoreWithFilterqtest(SearchForeignOptionRequest request,
+	public ResponseEntity<Page<Store_2>> fortes_2(SearchForeignOptionRequest request,
 		@AuthenticationPrincipal UserDetailsImpl userDetails){
 
-		Page<Store_2> result =  storeService.fortes_1(request,userDetails);
+		Page<Store_2> result =  storeService.fortes_2(request,userDetails);
 		return ResponseEntity.status(HttpStatus.OK).body(result);
 	}
 
 	@GetMapping("/test3")
-	public ResponseEntity<Page<Store_2>> searchForeignStoreWithFiltqertest(SearchForeignOptionRequest request,
+	public ResponseEntity<Page<Store_2>> fortes_3(SearchForeignOptionRequest request,
 		@AuthenticationPrincipal UserDetailsImpl userDetails){
-		Page<Store_2> result = storeService.fortes_2(request,userDetails);
+		Page<Store_2> result = storeService.fortes_3(request,userDetails);
 		return ResponseEntity.status(HttpStatus.OK).body(result);
 	}
 

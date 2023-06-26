@@ -47,6 +47,20 @@ public class ForeignStoreResponse {
 		this.bookmarkCount = bookmarkCount;
 	}
 
+	public ForeignStoreResponse(Long storeId, String address, String name, String callNumber, String weekdaysTime,
+		Double longitude, Double latitude, Integer english, Integer chinese, Integer japanese) {
+		this.storeId = storeId;
+		this.address = address;
+		this.name = name;
+		this.callNumber = callNumber;
+		this.weekdaysTime = weekdaysTime;
+		this.longitude = longitude;
+		this.latitude = latitude;
+		this.english = english != null && english == 1;
+		this.chinese = chinese != null && chinese == 1;
+		this.japanese = japanese != null && japanese == 1;
+	}
+
 	public void setBookmark(boolean bookmark){
 		this.bookmark = bookmark;
 	}
