@@ -1,19 +1,11 @@
 package com.example.finalproject12be.domain.store.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 
-import com.example.finalproject12be.domain.bookmark.entity.Bookmark;
-import com.example.finalproject12be.domain.comment.entity.Comment;
 import com.example.finalproject12be.domain.store.dto.StoreRequest;
 
 import lombok.Getter;
@@ -70,11 +62,6 @@ public class Store_1 {
 	@Column
 	private Integer nightPharmacy;
 
-	@OneToMany(mappedBy = "store", cascade = CascadeType.REMOVE)
-	private List<Comment> commentList = new ArrayList<>();
-
-	@OneToMany(mappedBy = "store", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-	private List<Bookmark> bookmarks;
 
 	public Store_1(String address, String name, String callNumber, String weekdaysTime, String saturdayTime, String sundayTime, String holidayTime, Double longitude, Double latitude){
 		//this.address = address;
@@ -110,14 +97,6 @@ public class Store_1 {
 		this.english = english;
 		this.japanese = japanese;
 		this.chinese = chinese;
-	}
-
-	public void deleteBookmark(Bookmark bookmark){
-		this.bookmarks.remove(bookmark);
-	}
-
-	public void addBookmark(Bookmark bookmark){
-		this.bookmarks.add(bookmark);
 	}
 
 	public void updateStore(StoreRequest storeRequest) {

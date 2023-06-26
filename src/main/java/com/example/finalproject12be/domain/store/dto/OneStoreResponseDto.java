@@ -1,8 +1,5 @@
 package com.example.finalproject12be.domain.store.dto;
 
-import java.util.List;
-
-import com.example.finalproject12be.domain.comment.entity.Comment;
 import com.example.finalproject12be.domain.store.entity.Store;
 
 import lombok.Getter;

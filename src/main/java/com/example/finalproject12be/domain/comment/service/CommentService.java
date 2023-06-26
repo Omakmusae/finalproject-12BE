@@ -1,8 +1,5 @@
 package com.example.finalproject12be.domain.comment.service;
 
-import static com.example.finalproject12be.domain.bookmark.entity.QBookmark.*;
-import static com.example.finalproject12be.domain.store.entity.QStore.*;
-
 import com.example.finalproject12be.common.ResponseMsgDto;
 import com.example.finalproject12be.domain.comment.dto.CommentRequestDto;
 import com.example.finalproject12be.domain.comment.dto.CommentResponseDto;
@@ -12,14 +9,9 @@ import com.example.finalproject12be.domain.member.entity.Member;
 import com.example.finalproject12be.domain.member.repository.MemberRepository;
 import com.example.finalproject12be.domain.profile.entity.Profile;
 import com.example.finalproject12be.domain.profile.repository.ProfileRepository;
-import com.example.finalproject12be.domain.store.dto.StoreResponseDto;
 import com.example.finalproject12be.domain.store.entity.Store;
 import com.example.finalproject12be.domain.store.repository.StoreRepository;
 import com.example.finalproject12be.security.UserDetailsImpl;
-import com.querydsl.core.QueryResults;
-import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.SubQueryExpression;
-import com.querydsl.jpa.JPAExpressions;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

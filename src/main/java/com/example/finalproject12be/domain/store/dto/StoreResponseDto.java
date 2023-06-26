@@ -10,21 +10,13 @@ import lombok.Setter;
 public class StoreResponseDto {
 
 	private Long storeId;
-
 	private String address;
-
 	private String name;
-
 	private String callNumber;
-
 	private String weekdaysTime;
-
 	private Double longitude;
-
 	private Double latitude;
-
 	private boolean bookmark = false;
-
 	private Long bookmarkCount;
 
 	public StoreResponseDto(Store store) {

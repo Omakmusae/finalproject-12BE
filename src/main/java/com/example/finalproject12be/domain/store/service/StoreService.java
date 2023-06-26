@@ -1,7 +1,5 @@
 package com.example.finalproject12be.domain.store.service;
 
-import static java.util.Optional.*;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -9,20 +7,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.finalproject12be.domain.board.entity.Board;
 import com.example.finalproject12be.domain.bookmark.entity.Bookmark;
-import com.example.finalproject12be.domain.bookmark.repository.BookmarkRepository;
 import com.example.finalproject12be.domain.member.entity.Member;
 import com.example.finalproject12be.domain.member.entity.MemberRoleEnum;
 import com.example.finalproject12be.domain.store.dto.ForeignOneStoreResponse;
@@ -37,6 +31,7 @@ import com.example.finalproject12be.domain.store.dto.StoreResponseDto;
 import com.example.finalproject12be.domain.store.entity.Store;
 import com.example.finalproject12be.domain.store.repository.StoreRepository;
 import com.example.finalproject12be.domain.store.repository.StoreRepositoryCustom;
+import com.example.finalproject12be.domain.store.repository.StoreRepositoryCustom_1Case;
 import com.example.finalproject12be.exception.CommonErrorCode;
 import com.example.finalproject12be.exception.MemberErrorCode;
 import com.example.finalproject12be.exception.RestApiException;
@@ -52,6 +47,7 @@ public class StoreService {
 
 	private final StoreRepository storeRepository;
 	private final StoreRepositoryCustom storeRepositoryCustom;
+	private final StoreRepositoryCustom_1Case storeRepositoryCustom_1Case;
 
 	//약국 전체보기
 	public List<StoreResponseDto> getAllStores(UserDetailsImpl userDetails) {
@@ -889,6 +885,21 @@ public class StoreService {
 		Page<ForeignStoreResponse> result = storeRepositoryCustom.searchForeignStoreWithFilter(mappedRequest, userDetails);
 
 		return result;
+	}
+	public Page<ForeignStoreResponse> fortest(SearchForeignOptionRequest request, UserDetailsImpl userDetails) {
+
+		MappedSearchForeignRequest mappedRequest = request.toMappedSearchRequest();
+
+		if (request.getGu()=="" & request.getLongitude() =="" & request.getStoreName() =="") {
+
+			int page = request.getPage();
+			int size = request.getSize();
+			return new PageImpl<>(Collections.emptyList(), PageRequest.of(page, size), 0);
+		}
+
+		Page<ForeignStoreResponse> test = storeRepositoryCustom_1Case.searchForeignStoreWithFiltertest(mappedRequest, userDetails);
+		//List<Store> test = storeRepositoryCustom_1Case.test(mappedRequest);
+		return test;
 	}
 
 }
