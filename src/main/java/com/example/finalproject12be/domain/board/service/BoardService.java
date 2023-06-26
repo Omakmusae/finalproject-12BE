@@ -1,6 +1,5 @@
 package com.example.finalproject12be.domain.board.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -22,9 +21,7 @@ import com.example.finalproject12be.domain.board.entity.Board;
 import com.example.finalproject12be.domain.board.repository.BoardRepository;
 import com.example.finalproject12be.domain.member.entity.Member;
 import com.example.finalproject12be.domain.member.entity.MemberRoleEnum;
-import com.example.finalproject12be.domain.store.dto.StoreResponseDto;
 import com.example.finalproject12be.exception.BoardErrorCode;
-import com.example.finalproject12be.exception.CommonErrorCode;
 import com.example.finalproject12be.exception.MemberErrorCode;
 import com.example.finalproject12be.exception.RestApiException;
 

@@ -16,12 +16,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 
 import com.example.finalproject12be.domain.bookmark.repository.BookmarkRepository;
-import com.example.finalproject12be.domain.member.entity.Member;
 import com.example.finalproject12be.domain.store.dto.ForeignStoreResponse;
 import com.example.finalproject12be.domain.store.dto.MappedSearchForeignRequest;
 import com.example.finalproject12be.domain.store.dto.MappedSearchRequest;
 import com.example.finalproject12be.domain.store.dto.StoreResponseDto;
 import com.example.finalproject12be.domain.store.entity.Store;
+import com.example.finalproject12be.domain.member.entity.Member;
 import com.example.finalproject12be.security.UserDetailsImpl;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Projections;
@@ -54,7 +54,30 @@ public class StoreRepositoryCustom_1Case {
 
 			)
 			.orderBy(distance.asc())
-			.limit(30)
+			.fetch();
+
+	}
+
+	public List<Store> test(MappedSearchForeignRequest request) {
+
+		NumberExpression<Double> distance = distance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude);
+
+		return jpaQueryFactory
+			.select(store)
+			.from(store)
+			.where(
+				withinDistance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude),
+				eqAddress(request.getGu()),
+				eqStoreName(request.getStoreName()),
+				checkOpen(request.isOpen()),
+				checkHolidayOpen(request.isHolidayBusiness()),
+				checkNightdOpen(request.isNightBusiness()),
+				eqEnglish(request.getEnglish()),
+				eqChinese(request.getChinese()),
+				eqJapanese(request.getJapanese())
+
+			)
+			.orderBy(distance.asc())
 			.fetch();
 
 	}
@@ -68,15 +91,11 @@ public class StoreRepositoryCustom_1Case {
 
 		if (distance == null) {
 
-			SubQueryExpression<Long> bookmarkCountSubquery = JPAExpressions.select(bookmark.id.count())
-				.from(bookmark)
-				.where(bookmark.store.eq(store));
-
 			QueryResults<StoreResponseDto> results = jpaQueryFactory
 				.select(Projections.constructor(StoreResponseDto.class,
 					store.id, store.address, store.name, store.callNumber,
-					store.weekdaysTime, store.longitude, store.latitude,
-					bookmarkCountSubquery))
+					store.weekdaysTime, store.longitude, store.latitude
+					))
 				.from(store)
 				.where(
 					eqAddress(request.getGu()),
@@ -155,59 +174,12 @@ public class StoreRepositoryCustom_1Case {
 
 	}
 
-	public Page<ForeignStoreResponse> searchForeignStoreWithFilter(MappedSearchForeignRequest request, UserDetailsImpl userDetails) {
+	public Page<ForeignStoreResponse> searchForeignStoreWithFiltertest(MappedSearchForeignRequest request, UserDetailsImpl userDetails) {
 
 		int page = request.getPage();
 		int size = request.getSize();
 		NumberExpression<Double> distance = distance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude);
 
-		if (distance == null) {
-			SubQueryExpression<Long> bookmarkCountSubquery = JPAExpressions.select(bookmark.id.count())
-				.from(bookmark)
-				.where(bookmark.store.eq(store));
-
-			QueryResults<ForeignStoreResponse> results = jpaQueryFactory
-				.select(Projections.constructor(
-					ForeignStoreResponse.class,
-					store.id, store.address, store.name, store.callNumber,
-					store.weekdaysTime, store.longitude, store.latitude,
-					store.english, store.chinese, store.japanese,
-					bookmarkCountSubquery))
-				.from(store)
-				.where(
-					eqAddress(request.getGu()),
-					eqStoreName(request.getStoreName()),
-					checkOpen(request.isOpen()),
-					checkHolidayOpen(request.isHolidayBusiness()),
-					checkNightdOpen(request.isNightBusiness()),
-					eqEnglish(request.getEnglish()),
-					eqChinese(request.getChinese()),
-					eqJapanese(request.getJapanese())
-				)
-				.orderBy(store.name.asc())
-				.offset(page * size)
-				.limit(size)
-				.fetchResults();
-			// 로그인한 유저의 북마크 정보 가져오기
-			List<Long> bookmarkedStoreIds = new ArrayList<>();
-
-			if (userDetails != null) {
-				Member member = userDetails.getMember();
-				bookmarkedStoreIds = bookmarkRepository.findStoreIdsByMember(member);
-			}
-
-			List<ForeignStoreResponse> foreignStoreResponses = results.getResults();
-
-			// 북마크 여부 체크하여 StoreResponseDto에 설정
-			for (ForeignStoreResponse result : foreignStoreResponses) {
-				if (bookmarkedStoreIds.contains(result.getStoreId())) {
-					result.setBookmark(true);
-				}
-			}
-
-			return new PageImpl<>(results.getResults(), PageRequest.of(page, size), results.getTotal());
-		}
-		else {
 			SubQueryExpression<Long> bookmarkCountSubquery = JPAExpressions.select(bookmark.id.count())
 				.from(bookmark)
 				.where(bookmark.store.eq(store));
@@ -235,25 +207,9 @@ public class StoreRepositoryCustom_1Case {
 				.offset(page * size)
 				.limit(size)
 				.fetchResults();
-			// 로그인한 유저의 북마크 정보 가져오기
-			List<Long> bookmarkedStoreIds = new ArrayList<>();
-
-			if (userDetails != null) {
-				Member member = userDetails.getMember();
-				bookmarkedStoreIds = bookmarkRepository.findStoreIdsByMember(member);
-			}
-
-			List<ForeignStoreResponse> foreignStoreResponses = results.getResults();
-
-			// 북마크 여부 체크하여 StoreResponseDto에 설정
-			for (ForeignStoreResponse result : foreignStoreResponses) {
-				if (bookmarkedStoreIds.contains(result.getStoreId())) {
-					result.setBookmark(true);
-				}
-			}
 
 			return new PageImpl<>(results.getResults(), PageRequest.of(page, size), results.getTotal());
-		}
+
 	}
 
 	private BooleanExpression eqAddress(String gu) {

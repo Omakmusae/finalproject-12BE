@@ -4,13 +4,11 @@ import com.example.finalproject12be.domain.comment.entity.Comment;
 import com.example.finalproject12be.domain.member.entity.Member;
 import com.example.finalproject12be.domain.store.entity.Store;
 import com.example.finalproject12be.domain.profile.entity.Profile;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Getter

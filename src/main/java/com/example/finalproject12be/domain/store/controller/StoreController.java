@@ -15,17 +15,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.amazonaws.Response;
+import com.example.finalproject12be.domain.store.dto.SearchOptionRequest;
+import com.example.finalproject12be.domain.store.service.StoreService;
 import com.example.finalproject12be.domain.store.dto.ForeignOneStoreResponse;
 import com.example.finalproject12be.domain.store.dto.ForeignStoreResponse;
 import com.example.finalproject12be.domain.store.dto.OneStoreResponseDto;
 import com.example.finalproject12be.domain.store.dto.SearchForeignOptionRequest;
-import com.example.finalproject12be.domain.store.dto.SearchOptionRequest;
 import com.example.finalproject12be.domain.store.dto.StoreRequest;
 import com.example.finalproject12be.domain.store.dto.StoreResponseDto;
 import com.example.finalproject12be.domain.store.entity.Store;
 
-import com.example.finalproject12be.domain.store.service.StoreService;
 import com.example.finalproject12be.security.UserDetailsImpl;
 
 import lombok.RequiredArgsConstructor;
@@ -57,7 +56,7 @@ public class StoreController {
 	}
 
 	//일반 약국 검색하기
-	//@GetMapping("/api/store/search")
+	@GetMapping("/api/store/search")
 	public ResponseEntity<Page<StoreResponseDto>> searchStore(
 		@RequestParam("page") int page,
 		@RequestParam("size") int size,
@@ -85,7 +84,7 @@ public class StoreController {
 	}
 
 	//외국어 가능 약국 검색하기
-	//@GetMapping("/api/store/foreign/search")
+	@GetMapping("/api/store/foreign/search")
 	public ResponseEntity<Page<ForeignStoreResponse>> searchForeignStore(
 		@RequestParam("page") int page,
 		@RequestParam("size") int size,
@@ -156,9 +155,9 @@ public class StoreController {
 	// 	openApiManager.fetch();
 	// }
 
-	//일반 약국 검색 test
-	@GetMapping("/api/store/search")
-	//@GetMapping("/test")
+	//일반 약국 검색 QueryDSL
+	//@GetMapping("/api/store/search")
+	@GetMapping("/test")
 	public ResponseEntity<Page<StoreResponseDto>> searchStoreWithFilter(SearchOptionRequest request,
 		@AuthenticationPrincipal UserDetailsImpl userDetails){
 
@@ -166,9 +165,26 @@ public class StoreController {
 		return ResponseEntity.status(HttpStatus.OK).body(result);
 	}
 
-	//@GetMapping("/testFor")
-	@GetMapping("/api/store/foreign/search")
+	@GetMapping("/testFor")
+	//@GetMapping("/api/store/foreign/search")
 	public ResponseEntity<Page<ForeignStoreResponse>> searchForeignStoreWithFilter(SearchForeignOptionRequest request,
+		@AuthenticationPrincipal UserDetailsImpl userDetails){
+		Page<ForeignStoreResponse> result = storeService.searchForeignStoreWithFilter(request,userDetails);
+		return ResponseEntity.status(HttpStatus.OK).body(result);
+	}
+
+
+	//일반 약국 검색 test
+	@GetMapping("/test1")
+	public ResponseEntity<Page<StoreResponseDto>> searchStoreWithFilterqtest(SearchOptionRequest request,
+		@AuthenticationPrincipal UserDetailsImpl userDetails){
+
+		Page<StoreResponseDto> result =  storeService.searchStoreWithFilter(request,userDetails);
+		return ResponseEntity.status(HttpStatus.OK).body(result);
+	}
+
+	@GetMapping("/testFor2")
+	public ResponseEntity<Page<ForeignStoreResponse>> searchForeignStoreWithFiltqertest(SearchForeignOptionRequest request,
 		@AuthenticationPrincipal UserDetailsImpl userDetails){
 		Page<ForeignStoreResponse> result = storeService.searchForeignStoreWithFilter(request,userDetails);
 		return ResponseEntity.status(HttpStatus.OK).body(result);

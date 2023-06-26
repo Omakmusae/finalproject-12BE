@@ -2,7 +2,7 @@ package com.example.finalproject12be.domain.store.repository;
 
 import static com.example.finalproject12be.domain.bookmark.entity.QBookmark.*;
 import static com.example.finalproject12be.domain.store.entity.QStore.*;
-import org.springframework.data.jpa.repository.query.QueryUtils;
+
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -11,10 +11,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.example.finalproject12be.domain.bookmark.repository.BookmarkRepository;
+import com.example.finalproject12be.domain.store.dto.MappedSearchRequest;
 import com.example.finalproject12be.domain.member.entity.Member;
 import com.example.finalproject12be.domain.store.dto.ForeignStoreResponse;
 import com.example.finalproject12be.domain.store.dto.MappedSearchForeignRequest;
-import com.example.finalproject12be.domain.store.dto.MappedSearchRequest;
 import com.example.finalproject12be.domain.store.dto.StoreResponseDto;
 import com.example.finalproject12be.domain.store.entity.Store;
 
@@ -55,7 +55,6 @@ public class StoreRepositoryCustom {
 
 				)
 				.orderBy(distance.asc())
-				.limit(30)
 				.fetch();
 
 	}
@@ -256,6 +255,7 @@ public class StoreRepositoryCustom {
 			return new PageImpl<>(results.getResults(), PageRequest.of(page, size), results.getTotal());
 		}
 	}
+
 
 	private BooleanExpression eqAddress(String gu) {
 

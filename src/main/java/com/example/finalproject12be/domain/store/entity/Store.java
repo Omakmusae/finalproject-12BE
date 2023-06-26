@@ -19,9 +19,9 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class Store {
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
+
 	@Column(name = "STORE_ID")
 	private Long id;
 
@@ -34,7 +34,6 @@ public class Store {
 	@Column
 	private String callNumber;
 
-	//평일 운영 시간
 	@Column
 	private String weekdaysTime;
 
