@@ -32,7 +32,7 @@ import com.example.finalproject12be.domain.store.entity.Store;
 import com.example.finalproject12be.domain.store.entity.Store_2;
 import com.example.finalproject12be.domain.store.repository.StoreRepository;
 import com.example.finalproject12be.domain.store.repository.StoreRepositoryCustom;
-import com.example.finalproject12be.domain.store.repository.StoreRepositoryCustom_1Case;
+import com.example.finalproject12be.domain.store.repository.StoreRepositoryCustom_2Case;
 import com.example.finalproject12be.exception.CommonErrorCode;
 import com.example.finalproject12be.exception.MemberErrorCode;
 import com.example.finalproject12be.exception.RestApiException;
@@ -48,7 +48,7 @@ public class StoreService {
 
 	private final StoreRepository storeRepository;
 	private final StoreRepositoryCustom storeRepositoryCustom;
-	private final StoreRepositoryCustom_1Case storeRepositoryCustom_1Case;
+	private final StoreRepositoryCustom_2Case storeRepositoryCustom_2Case;
 
 	//약국 전체보기
 	public List<StoreResponseDto> getAllStores(UserDetailsImpl userDetails) {
@@ -887,21 +887,35 @@ public class StoreService {
 
 		return result;
 	}
-	public Page<Store_2> fortes_1(SearchForeignOptionRequest request, UserDetailsImpl userDetails) {
+
+
+	@Transactional(readOnly = true)
+	public Page<ForeignStoreResponse> fortes_1(SearchForeignOptionRequest request, UserDetailsImpl userDetails) {
 
 		MappedSearchForeignRequest mappedRequest = request.toMappedSearchRequest();
 
-		Page<Store_2> test = storeRepositoryCustom_1Case.searchForeignStoreWithFiltertest(mappedRequest, userDetails);
+		Page<ForeignStoreResponse> result = storeRepositoryCustom.fortes_1(mappedRequest, userDetails);
 
-		return test;
+		return result;
 	}
 
+	@Transactional(readOnly = true)
 	public Page<Store_2> fortes_2(SearchForeignOptionRequest request, UserDetailsImpl userDetails) {
 
 		MappedSearchForeignRequest mappedRequest = request.toMappedSearchRequest();
 
-		Page<Store_2> test = storeRepositoryCustom_1Case.searchForeignStoreWithFiltertest(mappedRequest, userDetails);
-		//List<Store> test = storeRepositoryCustom_1Case.test(mappedRequest);
+		Page<Store_2> test = storeRepositoryCustom_2Case.searchForeignStoreWithFiltertest(mappedRequest, userDetails);
+
+		return test;
+	}
+
+	@Transactional(readOnly = true)
+	public Page<Store_2> fortes_3(SearchForeignOptionRequest request, UserDetailsImpl userDetails) {
+
+		MappedSearchForeignRequest mappedRequest = request.toMappedSearchRequest();
+
+		Page<Store_2> test = storeRepositoryCustom_2Case.searchForeignStoreWithFiltertest(mappedRequest, userDetails);
+
 		return test;
 	}
 

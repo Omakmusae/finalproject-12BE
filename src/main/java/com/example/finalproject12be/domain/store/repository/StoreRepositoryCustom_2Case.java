@@ -7,7 +7,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -15,30 +14,22 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 
-import com.example.finalproject12be.domain.bookmark.repository.BookmarkRepository;
-import com.example.finalproject12be.domain.store.dto.ForeignStoreResponse;
 import com.example.finalproject12be.domain.store.dto.MappedSearchForeignRequest;
-import com.example.finalproject12be.domain.store.dto.MappedSearchRequest;
-import com.example.finalproject12be.domain.store.dto.StoreResponseDto;
 import com.example.finalproject12be.domain.store.entity.Store;
-import com.example.finalproject12be.domain.member.entity.Member;
 import com.example.finalproject12be.domain.store.entity.Store_2;
 import com.example.finalproject12be.security.UserDetailsImpl;
 import com.querydsl.core.QueryResults;
-import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.SubQueryExpression;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.core.types.dsl.NumberPath;
-import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
-public class StoreRepositoryCustom_1Case {
+public class StoreRepositoryCustom_2Case {
 
 	private final JPAQueryFactory jpaQueryFactory;
 
@@ -62,24 +53,24 @@ public class StoreRepositoryCustom_1Case {
 		int page = request.getPage();
 		int size = request.getSize();
 
-			QueryResults<Store_2> results = jpaQueryFactory
-				.selectFrom(store_2)
-				.where(
-					withinDistance(request.getLatitude(), request.getLongitude(), store_2.latitude, store_2.longitude),
-					eqAddress(request.getGu()),
-					eqStoreName(request.getStoreName()),
-					checkOpen(request.isOpen()),
-					checkHolidayOpen(request.isHolidayBusiness()),
-					checkNightdOpen(request.isNightBusiness()),
-					checkEnglish(request.getEnglish()),
-					checkChinese(request.getChinese()),
-					checkJapanese(request.getJapanese())
-				)
-				.offset(page * size)
-				.limit(size)
-				.fetchResults();
+		QueryResults<Store_2> results = jpaQueryFactory
+			.selectFrom(store_2)
+			.where(
+				withinDistance(request.getLatitude(), request.getLongitude(), store_2.latitude, store_2.longitude),
+				eqAddress(request.getGu()),
+				eqStoreName(request.getStoreName()),
+				checkOpen(request.isOpen()),
+				checkHolidayOpen(request.isHolidayBusiness()),
+				checkNightdOpen(request.isNightBusiness()),
+				checkEnglish(request.getEnglish()),
+				checkChinese(request.getChinese()),
+				checkJapanese(request.getJapanese())
+			)
+			.offset(page * size)
+			.limit(size)
+			.fetchResults();
 
-			return new PageImpl<>(results.getResults(), PageRequest.of(page, size), results.getTotal());
+		return new PageImpl<>(results.getResults(), PageRequest.of(page, size), results.getTotal());
 	}
 
 	private BooleanExpression eqAddress(String gu) {
@@ -128,7 +119,6 @@ public class StoreRepositoryCustom_1Case {
 				" '' <> SUBSTRING_INDEX(SUBSTRING_INDEX(business_hours, '|', 4), '|', -1)"
 			);
 		}
-
 		else  {
 			return null;
 		}

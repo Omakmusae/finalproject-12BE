@@ -273,13 +273,43 @@ public class StoreRepositoryCustom {
 		}
 	}
 
+	public Page<ForeignStoreResponse> fortes_1(MappedSearchForeignRequest request, UserDetailsImpl userDetails) {
+
+		int page = request.getPage();
+		int size = request.getSize();
+
+			QueryResults<ForeignStoreResponse> results = jpaQueryFactory
+				.select(Projections.constructor(
+					ForeignStoreResponse.class,
+					store.id, store.address, store.name, store.callNumber,
+					store.weekdaysTime, store.longitude, store.latitude,
+					store.english, store.chinese, store.japanese))
+				.from(store)
+				.where(
+					withinDistance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude),
+					eqAddressTest(request.getGu()),
+					eqStoreName(request.getStoreName()),
+					checkOpen(request.isOpen()),
+					checkHolidayOpen(request.isHolidayBusiness()),
+					checkNightdOpen(request.isNightBusiness()),
+					eqEnglish(request.getEnglish()),
+					eqChinese(request.getChinese()),
+					eqJapanese(request.getJapanese())
+				)
+				.offset(page * size)
+				.limit(size)
+				.fetchResults();
+
+			return new PageImpl<>(results.getResults(), PageRequest.of(page, size), results.getTotal());
+
+	}
+
 
 	private BooleanExpression eqAddress(String gu) {
 
 		if (gu == null) {
 			return null;
 		}
-
 		if(gu.equals("gangnam-gu")){
 			gu = "강남구";
 		}else if(gu.equals("gangdong-gu")){
@@ -335,6 +365,15 @@ public class StoreRepositoryCustom {
 		return gu != null ? store.address.like("%" + gu + "%") : null;
 	}
 
+	private BooleanExpression eqAddressTest(String gu) {
+
+		if (gu == null) {
+			return null;
+		}
+
+		return gu != null ? store.address.like("%" + gu + "%") : null;
+	}
+
 	private BooleanExpression eqStoreName(String storeName) {
 		return storeName != null ? store.name.like("%" + storeName + "%") : null;
 	}
@@ -345,18 +384,18 @@ public class StoreRepositoryCustom {
 			LocalDate currentDate = LocalDate.now();
 			DayOfWeek dayOfWeek = currentDate.getDayOfWeek();
 			DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
-
+			//String currentDateTime = LocalDateTime.now().format(timeFormatter);
+			String currentDateTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("17:00"));
 			if (dayOfWeek != DayOfWeek.SATURDAY && dayOfWeek != DayOfWeek.SUNDAY) {
-				String currentDateTime = LocalDateTime.now().format(timeFormatter);
 
 				BooleanExpression startCondition = Expressions.booleanTemplate(
 					"TIME({0}) <= TIME_FORMAT(SUBSTRING_INDEX(weekdays_time, ' ', -1), '%H:%i')",
-					LocalDateTime.now().format(timeFormatter)
+					currentDateTime
 				);
 
 				BooleanExpression endCondition = Expressions.booleanTemplate(
 					"TIME({0}) >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(weekdays_time, ' ~', 1), ' ', -1), '%H:%i')",
-					LocalDateTime.now().format(timeFormatter)
+					currentDateTime
 				);
 
 				BooleanExpression equalCondition = Expressions.booleanTemplate(
@@ -365,16 +404,15 @@ public class StoreRepositoryCustom {
 
 				return startCondition.and(endCondition).or(equalCondition);
 			} else if (dayOfWeek == DayOfWeek.SATURDAY) {
-				String currentDateTime = LocalDateTime.now().format(timeFormatter);
 
 				BooleanExpression startCondition = Expressions.booleanTemplate(
 					"TIME({0}) <= TIME_FORMAT(SUBSTRING_INDEX(saturday_time, ' ', -1), '%H:%i')",
-					LocalDateTime.now().format(timeFormatter)
+					currentDateTime
 				);
 
 				BooleanExpression endCondition = Expressions.booleanTemplate(
 					"TIME({0}) >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(saturday_time, ' ~', 1), ' ', -1), '%H:%i')",
-					LocalDateTime.now().format(timeFormatter)
+					currentDateTime
 				);
 
 				BooleanExpression equalCondition = Expressions.booleanTemplate(
@@ -383,16 +421,16 @@ public class StoreRepositoryCustom {
 
 				return startCondition.and(endCondition).or(equalCondition);
 			} else if (dayOfWeek == DayOfWeek.SUNDAY) {
-				String currentDateTime = LocalDateTime.now().format(timeFormatter);
+
 
 				BooleanExpression startCondition = Expressions.booleanTemplate(
 					"TIME({0}) <= TIME_FORMAT(SUBSTRING_INDEX(sunday_time, ' ', -1), '%H:%i')",
-					LocalDateTime.now().format(timeFormatter)
+					currentDateTime
 				);
 
 				BooleanExpression endCondition = Expressions.booleanTemplate(
 					"TIME({0}) >= TIME_FORMAT(SUBSTRING_INDEX(SUBSTRING_INDEX(sunday_time, ' ~', 1), ' ', -1), '%H:%i')",
-					LocalDateTime.now().format(timeFormatter)
+					currentDateTime
 				);
 
 				BooleanExpression equalCondition = Expressions.booleanTemplate(
