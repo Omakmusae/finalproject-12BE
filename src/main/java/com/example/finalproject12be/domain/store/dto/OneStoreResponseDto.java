@@ -26,7 +26,7 @@ public class OneStoreResponseDto {
         this.address = store.getAddress();
         this.name = store.getName();
         this.callNumber = store.getCallNumber();
-        this.weekdaysTime = store.getWeekdaysTime();
+        this.weekdaysTime = store.getWeekdaysTime().substring(3);
         this.longitude = store.getLongitude();
         this.latitude = store.getLatitude();
         if(store.getCommentList() != null){

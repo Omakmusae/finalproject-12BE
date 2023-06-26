@@ -6,6 +6,7 @@ import com.example.finalproject12be.domain.bookmark.entity.Bookmark;
 
 import com.example.finalproject12be.domain.comment.entity.Comment;
 import com.example.finalproject12be.domain.store.dto.StoreRequest;
+import com.example.finalproject12be.domain.store.repository.StoreRepository;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,6 +14,8 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Entity
 @Getter
@@ -67,7 +70,7 @@ public class Store {
 	@Column
 	private Integer nightPharmacy;
 
-	@OneToMany(mappedBy = "store", cascade = CascadeType.REMOVE)
+	@OneToMany(mappedBy = "store", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
 	private List<Comment> commentList = new ArrayList<>();
 
 	@OneToMany(mappedBy = "store", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)

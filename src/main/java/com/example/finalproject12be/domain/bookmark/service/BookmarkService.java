@@ -36,14 +36,14 @@ public class BookmarkService {
 
 		Optional<Bookmark> bookmarkOptional = bookmarkRepository.findByStoreAndMember(store, member);
 
-		if(bookmarkOptional.isPresent()){
+		if (bookmarkOptional.isPresent()) {
 			Bookmark bookmark = bookmarkOptional.get();
 
 			//(북마크 포함) 연관된 entity에서 북마크 삭제 로직
 			bookmarkRepository.delete(bookmark);
 			member.deleteBookmark(bookmark);
 			store.deleteBookmark(bookmark);
-		}else{
+		} else {
 			Bookmark bookmark = new Bookmark(store, member);
 
 			//(북마크 포함) 연관된 entity에서 북마크 저장 로직
@@ -58,40 +58,28 @@ public class BookmarkService {
 	//TODO n+1 잡기
 	public List<BookmarkResponseDto> getBookmark(Member member) {
 
-		List<Bookmark> bookmarks = bookmarkRepository.findAllByMember(member);
-		// List<Bookmark> bookmarks = bookmarkRepository.findAllWithMember(member);
+		List<Bookmark> bookmarks = bookmarkRepository.findAllWithStore(member);
 		List<BookmarkResponseDto> bookmarkResponseDtos = new ArrayList<>();
 
-		// for (Bookmark bookmark : bookmarks) {
 		Iterator<Bookmark> bookmarkIterator = bookmarks.iterator();
-		while(bookmarkIterator.hasNext()){
+		while (bookmarkIterator.hasNext()) {
 
 			Bookmark bookmark = bookmarkIterator.next();
-
-			Long storeId = bookmark.getStore().getId();
-			Optional<Store> storeOptional = storeRepository.findById(storeId);
-			Store store = storeOptional.get();
+			Store store = bookmark.getStore();
 			BookmarkResponseDto bookmarkResponseDto = new BookmarkResponseDto(store);
+			bookmarkResponseDtos.add(bookmarkResponseDto);
 
-			//공휴일 영업 확인하기
 			if (store.getHolidayTime() != null) {
 				bookmarkResponseDto.setHolidayBusiness(true);
 			}
 
-			//야간 영업 확인하기
-			if(store.getNightPharmacy() == 1){
+			if (store.getNightPharmacy() != 0) {
 				bookmarkResponseDto.setNightBusiness(true);
 			}
 
-			if(store.getForeignLanguage() != null){
-				if(store.getForeignLanguage() == 1){
-					bookmarkResponseDto.setForeign(true);
-				}
+			if (store.getForeignLanguage() != null) {
+				bookmarkResponseDto.setForeign(true);
 			}
-
-
-			//검사 끝난 dto, 리스트에 추가하기
-			bookmarkResponseDtos.add(bookmarkResponseDto);
 		}
 
 		return bookmarkResponseDtos;

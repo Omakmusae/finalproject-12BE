@@ -1,5 +1,6 @@
 package com.example.finalproject12be.domain.bookmark.dto;
 
+import com.example.finalproject12be.domain.bookmark.entity.Bookmark;
 import com.example.finalproject12be.domain.store.entity.Store;
 
 import lombok.Getter;
@@ -7,13 +8,13 @@ import lombok.Getter;
 @Getter
 public class BookmarkResponseDto {
 
-	private Long storeId;
-	private String address;
-	private String name;
-	private String callNumber;
-	private String weekdaysTime;
+	private final Long storeId;
+	private final String address;
+	private final String name;
+	private final String callNumber;
+	private final String weekdaysTime;
 	private boolean bookmark = true; //이걸 줄 필요가 있나 ?
-	private long totalBookmark;
+	private final long totalBookmark;
 	private boolean holidayBusiness = false;
 	private boolean nightBusiness = false;
 	private boolean foreign = false;

@@ -194,7 +194,11 @@ public class StoreService {
 					testStores.add(store);
 				}
 
-				for(Store testStore : testStores){
+				// for(Store testStore : testStores){
+				Iterator<Store> testStoreIterator = testStores.iterator();
+				while (testStoreIterator.hasNext()){
+
+					Store testStore = testStoreIterator.next();
 
 					if(!testStore.getName().contains(storeName)){
 						stores.remove(testStore);
@@ -212,16 +216,23 @@ public class StoreService {
 				stores = storeRepository.findAllByAddressContaining(gu);
 
 			} else { //저장된 stores가 있을 때
-				List<Store> testStores = new ArrayList<>();
+				// List<Store> testStores = new ArrayList<>();
+				//
+				// for (Store store : stores) {
+				// 	testStores.add(store);
+				// }
 
-				for (Store store : stores) {
-					testStores.add(store);
-				}
+				// for (Store testStore : testStores) {
+				// Iterator<Store> testStoreIterator = testStores.iterator();
 
-				for (Store testStore : testStores) {
+				// while (testStoreIterator.hasNext()){
+
+				for(Iterator<Store> storeIterator = stores.iterator(); storeIterator.hasNext();){
+					Store testStore = storeIterator.next();
 
 					if (!testStore.getAddress().contains(gu)) {
-						stores.remove(testStore);
+						// stores.remove(testStore);
+						storeIterator.remove();
 					}
 				}
 			}
@@ -360,10 +371,10 @@ public class StoreService {
 	//영업중 필터 검사 로직
 	private List<Store> openCheck(List<Store> stores){
 
-		List<Store> restStores = new ArrayList<>();
-		for(Store store: stores){
-			restStores.add(store);
-		}
+		// List<Store> restStores = new ArrayList<>();
+		// for(Store store: stores){
+		// 	restStores.add(store);
+		// }
 
 		LocalDate now = LocalDate.now();
 		int dayOfWeek = now.getDayOfWeek().getValue();
@@ -381,13 +392,15 @@ public class StoreService {
 		int closeHour = 0;
 		int closeMin = 0;
 
-		for (Store restStore : restStores) {
+		// for (Store restStore : restStores) {
+		for(Iterator<Store> storeIterator = stores.iterator(); storeIterator.hasNext();){
+			Store store = storeIterator.next();
 
 			int status = 0; //시간 null이면 1, 아니면 0
 
 			if (dayOfWeek > 0 && dayOfWeek < 6) { //평일
 
-				String storeTime = restStore.getWeekdaysTime();
+				String storeTime = store.getWeekdaysTime();
 
 				if(storeTime != null && !storeTime.contains("nu")){ //TODO: nu:ll 로 시간 들어가 있는 객체 골라서 작업하기
 
@@ -401,12 +414,13 @@ public class StoreService {
 
 				}else {
 					status = 1;
-					stores.remove(restStore);
+					// stores.remove(restStore);
+					storeIterator.remove();
 				}
 
 			}else if (dayOfWeek == 6){ // 토요일 TODO: 일요일이랑 합치기
 
-				String storeTime = restStore.getSaturdayTime();
+				String storeTime = store.getSaturdayTime();
 
 				if (storeTime != null && !storeTime.contains("nu")){
 
@@ -420,12 +434,13 @@ public class StoreService {
 
 				}else{
 					status = 1;
-					stores.remove(restStore);
+					// stores.remove(restStore);
+					storeIterator.remove();
 				}
 
 			}else if( dayOfWeek == 7){ // 일요일
 
-				String storeTime = restStore.getSundayTime();
+				String storeTime = store.getSundayTime();
 
 				if(storeTime != null && !storeTime.contains("nu")){
 
@@ -439,7 +454,8 @@ public class StoreService {
 
 				}else {
 					status = 1;
-					stores.remove(restStore);
+					// stores.remove(restStore);
+					storeIterator.remove();
 				}
 			}
 
@@ -454,7 +470,8 @@ public class StoreService {
 				}else if((closeHour == openHour)){
 					continue;
 				}else{
-					stores.remove(restStore);
+					// stores.remove(restStore);
+					storeIterator.remove();
 				}
 			}
 		}
@@ -645,16 +662,19 @@ public class StoreService {
 				stores = storeRepository.findAllByEnglish(1);
 
 			} else{
-				List<Store> restStores = new ArrayList<>();
+				// List<Store> restStores = new ArrayList<>();
+				//
+				// for(Store store: stores){
+				// 	restStores.add(store);
+				// }
 
-				for(Store store: stores){
-					restStores.add(store);
-				}
+				// for(Store restStore : restStores){
+				for(Iterator<Store> storeIterator = stores.iterator(); storeIterator.hasNext();){
+					Store store = storeIterator.next();
 
-				for(Store restStore : restStores){
-
-					if(restStore.getEnglish() == null || restStore.getEnglish() == 0){
-						stores.remove(restStore);
+					if(store.getEnglish() == null || store.getEnglish() == 0){
+						// stores.remove(restStore);
+						storeIterator.remove();
 					}
 				}
 			}
