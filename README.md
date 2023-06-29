@@ -128,10 +128,10 @@
 
 ## 🧨트러블 슈팅
 <details>
-> <br/>
-> 카카오 REST API 사용 문제 <br/>
+<summary>카카오 REST API 사용 문제</summary>
   <div markdown="1">
-> ### 오류 내역
+    <br/>
+### 오류 내역
 
 **`org.springframework.web.client.HttpClientErrorException$Unauthorized: 401 Unauthorized`**
 
@@ -188,23 +188,394 @@ Controller부터 받은 매개변수들을 Service의 마지막 로직까지 @Sl
  kakaoAccessToken 토큰을 만들 때, 붙여주는 ‘Bearer ‘ 이 잘못 작성되어 있어서 수정함
  </div>
 </details>
-> <br/>
-> <br/>
-> ci/cd 상 codedeploy-agent 의 권한 문제 <br/>
-> . <br/>
-> <br/>
-> EC2 Ubuntu의 서버시간 문제 <br/>
-> . <br/>
-> <br/>
-> 불필요한 데이터 조회 문제 <br/>
-> . <br/>
-> <br/>
-> api 요청 시, 빈 문자열 처리 문제 <br/>
-> . <br/>
-> <br/>
-> N+1 <br/>
-> . <br/>
-> <br/>
+<br/>
+<br/>
+<details>
+<summary>ci/cd 상 codedeploy-agent 의 권한 문제</summary>
+  <div markdown="1">
+<br/>
+    ### 오류 내역
+
+ci/cd를 구축하는 과정에서, codedeploy에 배포가 성공한 것 까지 확인을 했음에도
+쉘스크립트([deploy.sh](http://deploy.sh/))가 구동을 하지 않는 문제가 생겼다. 
+원인을 찾아보니, 소유자의 문제였다.
+appspec.yml을 보면, 나는 권한을 ubuntu 로 주었지만
+codedeploy-agent는 설치당시부터 root의 권한을 가지고 설치가 된 것이 문제였다.
+
+---
+
+### 오류가 발생한 경로
+
+(어떻게 하다가 오류가 발생했는지 해당 과정)
+
+- 오류 코드
+    
+    아래 명령어를 사용하여
+    codedeploy-agent의 상태를 확인하니 아래 사진과 같은 상태로 되어
+    active(running)이어야 하는 상태가 active(exited)로 되어있었다.
+    
+    ```jsx
+    service codedeploy-agent status
+    ```
+    
+
+---
+
+### 오류를 해결하기 위해 시도해본 것들
+
+시도1 codedeploy의 권한을 ubuntu가 아닌 root로 변경해봤다.
+
+시도2 원래 root의 권한을 가지고 있던 codedeploy-agent의 권한을 ubuntu로 바꾸게 시도.
+
+---
+
+### 오류 해결 방법
+
+`sudo service codedeploy-agent stop` 명령어를 사용하여 가동을 멈추고,
+`sudo sed -i 's/""/"ubuntu"/g' /etc/init.d/codedeploy-agent` 명령어를 사용해
+// /etc/init.d/codedeploy/agent에 있는 ""를 "ubuntu"으로 변경. (CodeDeploy agent를 수행할 non-root 계정)
+vi /etc/init.d/codedeploy-agent 명령어를 사용해 변경 여부를 확인 후
+// /opt/codedeploy/agent에 있는 모든 파일들의 소유자/그룹을 ubuntu:ubuntu으로 변경한다.
+
+> `sudo chown ubuntu:ubuntu -R /opt/codedeploy-agent
+    sudo chown ubuntu:ubuntu -R /var/log/aws/`
+
+그리고 /etc/init.d의 codedeploy-agent.service 또한 User를 ubuntu로 입력하고
+sudo service codedeploy-agent start를 실행하여 바뀐것을 최종적으로 확인하였다.
+
+그 후 재배포를 하니, 정상적으로 cicd가 구축된 것을 확인하였다.
+  </div>
+  </details>
+<br/>
+<details>
+<summary>EC2 Ubuntu의 서버시간 문제</summary>
+  <div markdown="1">
+    <br/>
+    ### 오류 해결 방법
+
+### 오류 내역
+
+우리 조에서 만든 사이트에서 영업 시간을 기준으로 검색을 하는 기능이 있는데,
+로직 상으로 문제가 없는 것을 확인하여도 배포한 서버에서 전부 영업이 종료된 곳으로 표시되는 문제가 발생하였다.
+
+---
+
+### 오류가 발생한 경로
+
+배포를 해놓은 EC2의 Ubuntu의 서버시간이 UTC 타임존으로 설정되어 있던 것이다.
+구현해야 하는 기능이 시간에 따라 달라지는 결과를 가지고 있었으므로
+한국 표준시(KST)로 변경하여야 했다.
+
+- 오류 코드
+    
+    ```jsx
+    timedatectl
+    ```
+    
+
+---
+
+### 오류를 해결하기 위해 시도해본 것들
+
+시도1 codedeploy의 권한을 ubuntu가 아닌 root로 변경해봤다.
+
+시도2 원래 root의 권한을 가지고 있던 codedeploy-agent의 권한을 ubuntu로 바꾸게 시도.
+
+---
+
+### 오류 해결 방법
+
+한국 표준시(KST)로 변경하기 위해 /etc/localtime을 지우고 새로 생성해주어야 한다.
+먼저 현재 심볼릭 링크를 삭제하기 위해 
+`sudo rm -rf /etc/localtime` 명령어 사용,
+그리고 심볼릭 링크를 한국 표준시(/usr/share/zoneinfo/Asia/Seoul)로 다시 생성해준다.		
+`sudo ln -s /usr/share/zoneinfo/Asia/Seoul /etc/localtime` 명령어 사용
+`timedatectl` 명령어를 사용하여 타임존을 확인하고,
+Local time이 KST로 변경된 것을 확인할 수 있다.
+  </div>
+  </details>
+<br/>
+<details>
+<summary>불필요한 데이터 조회 문제</summary>
+  <div markdown="1">
+<br/>
+    ### 오류 내역
+
+엔티티 기반 데이터 조회로 인해 불필요한 필드들도 조회하여 데이터 조회 성능을 악화시키는 문제 발생
+
+### 오류가 발생한 경로
+
+- 오류 코드
+    
+    Store 엔티티 전체를 기반으로 조회하는 쿼리문이 실행됨
+    
+    ```java
+    public List<Store> searchStoreWithinDistance(String baseRadius, String baseLatitude, String baseLongitude) {
+    
+    			NumberExpression<Double> distance = distance(baseLatitude, baseLongitude, store.latitude, store.longitude);
+    
+    			return jpaQueryFactory
+    				.select(store)
+    				.from(store)
+    				.where(
+    					withinDistance(baseLatitude, baseLongitude, store.latitude, store.longitude)
+    
+    				)
+    				.orderBy(distance.asc())
+    				.fetch();
+    
+    	}
+    ```
+    
+
+### 오류를 해결하기 위해 시도해본 것들
+
+시도1 : Store 엔티티를 StoreResponseDto로 변경
+
+```java
+public List<StoreResponseDto> searchStoreWithinDistance(String baseRadius, String baseLatitude, String baseLongitude) {
+
+			NumberExpression<Double> distance = distance(baseLatitude, baseLongitude, store.latitude, store.longitude);
+
+			return QueryResults<StoreResponseDto> results = jpaQueryFactory
+				.select(Projections.constructor(StoreResponseDto.class,
+					store.id, store.address, store.name, store.callNumber,
+					store.weekdaysTime, store.longitude, store.latitude
+					))
+				.from(store)
+				.where(
+					withinDistance(baseLatitude, baseLongitude, store.latitude, store.longitude)
+
+				)
+				.orderBy(distance.asc())
+				.fetch();
+```
+
+### 오류 해결 방법
+
+비즈니스 로직에 필요한 데이터만 조회하기 위해 Dto 기반으로 데이터를 조회하는 코드를 작성
+
+QueryDSL의 Projections.constructor 메소드를 이용하면 편리하게 Dto 클래스의 생성자를 호출 할 수 있음
+  </div>
+  </details>
+<br/>
+<details>
+<summary>api 요청 시, 빈 문자열 처리 문제</summary>
+  <div markdown="1">
+<br/>
+    ### 오류 내역
+
+REST API 요청 시, 클라이언트에게 전달 받은 빈 문자열을 Null로 혼동하여 비즈니스 로직 설계에 어려움 발생
+
+### 오류가 발생한 경로
+
+클라이언트의 api 요청을 통해 매개 변수들을 Controller에서 받고
+이를 처리할 때, null과 혼동
+
+```java
+//Controller
+@GetMapping("/api/store/foreign/search")
+	public ResponseEntity<Page<ForeignStoreResponse>> searchForeignStore(
+		@RequestParam("page") int page,
+		@RequestParam("size") int size,
+		@RequestParam("storeName") String storeName,
+		@RequestParam("gu") String gu,
+		@RequestParam("open") boolean open,
+		@RequestParam("holidayBusiness") boolean holidayBusiness,
+		@RequestParam("nightBusiness") boolean nightBusiness,
+		@RequestParam("english") boolean english,
+		@RequestParam("chinese") boolean chinese,
+		@RequestParam("japanese") boolean japanese,
+		@RequestParam("radius") String radius,
+		@RequestParam("latitude") String latitude, @RequestParam("longitude") String longitude,
+		@AuthenticationPrincipal UserDetailsImpl userDetails){
+
+		Page<ForeignStoreResponse> foreignStoreResponses = storeService.searchForeignStore(page, size, storeName, gu, open, holidayBusiness, nightBusiness, english, chinese, japanese, radius, latitude, longitude, userDetails);
+		return ResponseEntity.status(HttpStatus.OK).body(foreignStoreResponses);
+	}
+
+```
+
+### 오류를 해결하기 위해 시도해본 것들
+
+시도 1 - 삼항 연산자를 이용하여 빈문자열 처리
+
+```java
+@Data
+public class SearchForeignOptionRequest {
+	private Integer page;
+	private Integer size;
+	private String storeName;
+	private String gu;
+	private boolean open;
+	private boolean holidayBusiness;
+	private boolean nightBusiness;
+
+	private boolean english;
+	private boolean chinese;
+	private boolean japanese;
+
+	private String radius;
+	private String latitude;
+	private String longitude;
+
+	public MappedSearchForeignRequest toMappedSearchRequest() {
+		return MappedSearchForeignRequest.builder()
+			.page(page == null ? null : page.intValue())
+			.size(size == null ? null : size.intValue())
+			.storeName(storeName == "" ? null : storeName)
+			.gu(gu == "" ? null : gu)
+			.open(open == true ? true : false)
+			.holidayBusiness(holidayBusiness == true ? true : false)
+			.nightBusiness(nightBusiness == true ? true : false)
+
+			.english(english == true? 1 : 0)
+			.chinese(chinese  == true? 1 : 0)
+			.japanese(japanese == true? 1 : 0)
+
+			.baseRadius(radius == "" ? null : radius)
+			.baseLatitude(latitude == "" ? null : latitude)
+			.baseLongitude(longitude == "" ? null : longitude)
+			.build();
+
+	}
+}
+```
+
+### 오류 해결 방법
+
+객체로 데이터를 받아 삼항 연산자를 이용하여 빈문자열을 null 처리
+  </div>
+  </details>
+<br/>
+<details>
+<summary>N+1</summary>
+  <div markdown="1">
+<br/>
+    ### 오류 내역
+
+마이페이지에서 북마크 확인하는 로직 실행 시 n+1 문제 발생
+
+---
+
+### 오류가 발생한 경로
+
+- 오류 코드
+    
+    ```java
+    public List<BookmarkResponseDto> getBookmark(Member member) {
+    
+    		List<Bookmark> bookmarks = bookmarkRepository.findAllByMember(member);
+    		List<BookmarkResponseDto> bookmarkResponseDtos = new ArrayList<>();
+    
+    		for (Bookmark bookmark : bookmarks) {
+    
+    			Long storeId = bookmark.getStore().getId();
+    			Optional<Store> storeOptional = **storeRepository.findById(storeId);**
+    			Store store = storeOptional.get();
+    			BookmarkResponseDto bookmarkResponseDto = new BookmarkResponseDto(store);
+    
+    			//공휴일 영업 확인하기
+    			if (store.getHolidayTime() != null) {
+    				bookmarkResponseDto.setHolidayBusiness(true);
+    			}
+    
+    			//야간 영업 확인하기
+    			if(store.getNightPharmacy() == 1){
+    				bookmarkResponseDto.setNightBusiness(true);
+    			}
+    
+    			if(store.getForeignLanguage() != null){
+    				if(store.getForeignLanguage() == 1){
+    					bookmarkResponseDto.setForeign(true);
+    				}
+    			}
+    
+    			//검사 끝난 dto, 리스트에 추가하기
+    			bookmarkResponseDtos.add(bookmarkResponseDto);
+    		}
+    
+    		return bookmarkResponseDtos;
+    	}
+    ```
+    
+    storeRepository.findById(storeId); (해당 코드에서 굵고 밑줄 있는 부분)에서 n+1 문제 발생
+    
+
+---
+
+### 오류를 해결하기 위해 시도해본 것들
+
+- 시도1
+    
+    ```java
+    @Query("select b from Bookmark b left join fetch b.member m where m = :member")
+    	List<Bookmark> findAllWithMember(@Param("member") Member member);
+    ```
+    
+    BookmarkRepository에서 해당 메소드를 만들어 findAllByMember 대신 사용
+    
+    ⇒ 해결되지 않음
+    
+- 시도2
+    
+    Bookmark와 연관 관계 맺고 있는 엔티티들의 fetchType을 모두 지연 로딩으로 바꿈.
+    
+    ⇒ 처음에는 해결된 듯 보이지만 연관관계를 가져와야 할 때는 n+1이 해결되지 않음.
+    
+
+---
+
+### 오류 해결 방법
+
+```java
+@Query("SELECT b " +
+		"FROM Bookmark b " +
+		"LEFT JOIN FETCH b.store " +
+		"LEFT JOIN FETCH b.member " +
+		"m WHERE m = :member")// m WHERE m = :member")
+	List<Bookmark> findAllWithStore(@Param("member") Member member);
+```
+
+영속성 컨테스트에 Store 정보가 없다는 것이 문제임을 알아내어 findAllByMember 대신 직접 쿼리로 생성한 해당 메서드를 사용하였다.
+
+- 해결 전체 코드
+    
+    ```
+    public List<BookmarkResponseDto> getBookmark(Member member) {
+    
+    		List<Bookmark> bookmarks = bookmarkRepository.findAllWithStore(member);
+    		List<BookmarkResponseDto> bookmarkResponseDtos = new ArrayList<>();
+    
+    		Iterator<Bookmark> bookmarkIterator = bookmarks.iterator();
+    		while (bookmarkIterator.hasNext()) {
+    
+    			Bookmark bookmark = bookmarkIterator.next();
+    			Store store = bookmark.getStore();
+    			BookmarkResponseDto bookmarkResponseDto = new BookmarkResponseDto(store);
+    			bookmarkResponseDtos.add(bookmarkResponseDto);
+    
+    			if (store.getHolidayTime() != null) {
+    				bookmarkResponseDto.setHolidayBusiness(true);
+    			}
+    
+    			if (store.getNightPharmacy() != 0) {
+    				bookmarkResponseDto.setNightBusiness(true);
+    			}
+    
+    			if (store.getForeignLanguage() != null) {
+    				bookmarkResponseDto.setForeign(true);
+    			}
+    		}
+    
+    		return bookmarkResponseDtos;
+    	}
+    
+    ```
+    
+  </div>
+</details>
+<br/>
 
 <br/>
 <br/>
