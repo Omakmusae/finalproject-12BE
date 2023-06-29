@@ -129,7 +129,61 @@
 ## 🧨트러블 슈팅
 > <br/> 
 > 카카오 REST API 사용 문제 <br/>
-> .
+> ### 오류 내역
+
+**`org.springframework.web.client.HttpClientErrorException$Unauthorized: 401 Unauthorized`**
+
+- HTTP 401 상태 코드인 "Unauthorized" 에러를 의미
+- 이 오류는 클라이언트가 인증되지 않았거나 인증이 유효하지 않은 경우에 발생
+
+---
+
+### 오류가 발생한 경로
+
+(어떻게 하다가 오류가 발생했는지 해당 과정)
+
+카카오 계정 연결 해제를 위해 아래 토큰을 
+
+- 오류 코드
+    
+    ```java
+    //토큰
+    kakaoAccessToken = "Bearer  " + kakaoAccessToken;
+    
+    private void disconnectKakaoAccount(String kakaoAccessToken) {
+    	
+    		HttpHeaders headers = new HttpHeaders();
+    		headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
+    		headers.add("Authorization", kakaoAccessToken);
+    
+    		MultiValueMap<String,String> body = new LinkedMultiValueMap<>();
+    		body.add("message", "탈퇴 완료");
+    		HttpEntity<MultiValueMap<String, String>> kakaoTokenDisconnect =
+    			new HttpEntity<>(body, headers);
+    		RestTemplate rt = new RestTemplate();
+    		System.out.println("HTTP!!!!!!!!!!~");
+    
+    		ResponseEntity<String> signOut = rt.exchange(
+    			"https://kapi.kakao.com/v1/user/unlink",
+    			HttpMethod.POST,
+    			kakaoTokenDisconnect,
+    			String.class
+    		);
+    	}
+    ```
+    
+
+---
+
+### 오류를 해결하기 위해 시도해본 것들
+
+Controller부터 받은 매개변수들을 Service의 마지막 로직까지 @Slf4j의 [log.info](http://log.info) 메소드를 활용해서 출력 여부를 확인 
+
+---
+
+### 오류 해결 방법
+
+ kakaoAccessToken 토큰을 만들 때, 붙여주는 ‘Bearer ‘ 이 잘못 작성되어 있어서 수정함
 > <br/>
 > <br/>
 > ci/cd 상 codedeploy-agent 의 권한 문제 <br/>
