@@ -127,8 +127,8 @@
 <br/>
 
 ## 🧨트러블 슈팅
+<details>
 > <br/>
-> <details>
 > 카카오 REST API 사용 문제 <br/>
   <div markdown="1">
 > ### 오류 내역
