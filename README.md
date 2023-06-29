@@ -127,8 +127,10 @@
 <br/>
 
 ## 🧨트러블 슈팅
-> <br/> 
+> <br/>
+> <details>
 > 카카오 REST API 사용 문제 <br/>
+  <div markdown="1">
 > ### 오류 내역
 
 **`org.springframework.web.client.HttpClientErrorException$Unauthorized: 401 Unauthorized`**
@@ -184,6 +186,8 @@ Controller부터 받은 매개변수들을 Service의 마지막 로직까지 @Sl
 ### 오류 해결 방법
 
  kakaoAccessToken 토큰을 만들 때, 붙여주는 ‘Bearer ‘ 이 잘못 작성되어 있어서 수정함
+ </div>
+</details>
 > <br/>
 > <br/>
 > ci/cd 상 codedeploy-agent 의 권한 문제 <br/>
