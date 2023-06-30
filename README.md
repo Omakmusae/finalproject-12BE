@@ -575,10 +575,23 @@ public class SearchForeignOptionRequest {
     
   </div>
 </details>
+
+<br/>
+<details>
+<summary>DB 최적화</summary>
+  <div markdown="1">
+<br/>
+![image](https://github.com/finalProject-12/finalproject-12BE/assets/106947027/12381202-f5d7-47ec-b294-2a02712798ba)
+
+
 <br/>
 
 <br/>
 <br/>
+
+
+
+
 
 ## 👩‍👩‍👦‍👦 팀원 소개
 
