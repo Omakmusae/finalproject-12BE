@@ -584,14 +584,11 @@ public class SearchForeignOptionRequest {
 	  
 ![image](https://github.com/finalProject-12/finalproject-12BE/assets/106947027/12381202-f5d7-47ec-b294-2a02712798ba)
 
+  </div>
+</details>
 
 <br/>
-
 <br/>
-<br/>
-
-
-
 
 
 ## 👩‍👩‍👦‍👦 팀원 소개
