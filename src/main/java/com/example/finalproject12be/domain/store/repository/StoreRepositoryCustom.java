@@ -306,63 +306,91 @@ public class StoreRepositoryCustom {
 
 
 	private BooleanExpression eqAddress(String gu) {
-
 		if (gu == null) {
 			return null;
 		}
-		if(gu.equals("gangnam-gu")){
-			gu = "강남구";
-		}else if(gu.equals("gangdong-gu")){
-			gu = "강동구";
-		}else if(gu.equals("gangbuk-gu")){
-			gu = "강북구";
-		}else if(gu.equals("gangseo-gu")){
-			gu = "강서구";
-		}else if(gu.equals("gwanak-gu")){
-			gu = "관악구";
-		}else if(gu.equals("gwangjin-gu")){
-			gu = "광진구";
-		}else if(gu.equals("guro-gu")){
-			gu = "구로구";
-		}else if(gu.equals("geumcheon-gu")){
-			gu = "금천구";
-		}else if(gu.equals("nowon-gu")){
-			gu = "노원구";
-		}else if(gu.equals("dobong-gu")){
-			gu = "도봉구";
-		}else if(gu.equals("dongdaemun-gu")){
-			gu = "동대문구";
-		}else if(gu.equals("dongjak-gu")){
-			gu = "동작구";
-		}else if(gu.equals("Mapo-gu")){
-			gu = "마포구";
-		}else if(gu.equals("seodaemun-gu")){
-			gu = "서대문구";
-		}else if(gu.equals("seocho-gu")){
-			gu = "서초구";
-		}else if(gu.equals("seongdong-gu")){
-			gu = "성동구";
-		}else if(gu.equals("seongbuk-gu")){
-			gu = "성북구";
-		}else if(gu.equals("songpa-gu")){
-			gu = "송파구";
-		}else if(gu.equals("yeongdeungpo-gu")){
-			gu = "영등포구";
-		}else if(gu.equals("yangcheon-gu")){
-			gu = "양천구";
-		}else if(gu.equals("yongsan-gu")){
-			gu = "용산구";
-		}else if(gu.equals("eunpyeong-gu")){
-			gu = "은평구";
-		}else if(gu.equals("jongno-gu")){
-			gu = "종로구";
-		}else if(gu.equals("jung-gu")){
-			gu = "중구";
-		}else if(gu.equals("jungnang-gu")){
-			gu = "중랑구";
+
+		switch (gu) {
+			case "gangnam-gu":
+				gu = "강남구";
+				break;
+			case "gangdong-gu":
+				gu = "강동구";
+				break;
+			case "gangbuk-gu":
+				gu = "강북구";
+				break;
+			case "gangseo-gu":
+				gu = "강서구";
+				break;
+			case "gwanak-gu":
+				gu = "관악구";
+				break;
+			case "gwangjin-gu":
+				gu = "광진구";
+				break;
+			case "guro-gu":
+				gu = "구로구";
+				break;
+			case "geumcheon-gu":
+				gu = "금천구";
+				break;
+			case "nowon-gu":
+				gu = "노원구";
+				break;
+			case "dobong-gu":
+				gu = "도봉구";
+				break;
+			case "dongdaemun-gu":
+				gu = "동대문구";
+				break;
+			case "dongjak-gu":
+				gu = "동작구";
+				break;
+			case "Mapo-gu":
+				gu = "마포구";
+				break;
+			case "seodaemun-gu":
+				gu = "서대문구";
+				break;
+			case "seocho-gu":
+				gu = "서초구";
+				break;
+			case "seongdong-gu":
+				gu = "성동구";
+				break;
+			case "seongbuk-gu":
+				gu = "성북구";
+				break;
+			case "songpa-gu":
+				gu = "송파구";
+				break;
+			case "yeongdeungpo-gu":
+				gu = "영등포구";
+				break;
+			case "yangcheon-gu":
+				gu = "양천구";
+				break;
+			case "yongsan-gu":
+				gu = "용산구";
+				break;
+			case "eunpyeong-gu":
+				gu = "은평구";
+				break;
+			case "jongno-gu":
+				gu = "종로구";
+				break;
+			case "jung-gu":
+				gu = "중구";
+				break;
+			case "jungnang-gu":
+				gu = "중랑구";
+				break;
+			default:
+				return null;
 		}
 
-		return gu != null ? store.address.like("%" + gu + "%") : null;
+		return store.address.like("%" + gu + "%");
 	}
 
 	private BooleanExpression eqAddressTest(String gu) {
