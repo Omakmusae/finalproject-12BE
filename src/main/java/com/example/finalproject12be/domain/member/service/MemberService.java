@@ -541,7 +541,7 @@ public class MemberService {
 	private String[] renewalToken (String kakaoAccessToken, String kakaoRefreshToken) {
 
 		String reqURL = "https://kauth.kakao.com/oauth/token";
-		System.out.println(kakaoRefreshToken + "갱신 시작 !!!!!!!!! ");
+
 		String[] tokenArray = new String[2];
 		try {
 			// HTTP Header 생성
@@ -566,16 +566,16 @@ public class MemberService {
 				new HttpEntity<>(body, headers),
 				String.class
 			);
-			System.out.println( "HTTP 보내기 시작 !!!!!!!!! ");
+
 			// HTTP 응답 (JSON) -> 액세스 토큰 파싱
 			String responseBody = response.getBody();
 			ObjectMapper objectMapper = new ObjectMapper();
 			JsonNode jsonNode = objectMapper.readTree(responseBody);
-			System.out.println( "HTTP 받기 시작 !!!!!!!!! ");
+
 
 			tokenArray[0] = jsonNode.get("access_token").asText();
 			tokenArray[1] = jsonNode.get("refresh_token").asText();
-			System.out.println(tokenArray[0] + "갱신 마무리 !!!!!!!!! ");
+
 
 		} catch (Exception e) {
 			e.printStackTrace();

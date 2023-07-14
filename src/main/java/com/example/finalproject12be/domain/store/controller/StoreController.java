@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.finalproject12be.domain.store.dto.Name;
 import com.example.finalproject12be.domain.store.dto.SearchOptionRequest;
 import com.example.finalproject12be.domain.store.entity.Second;
 import com.example.finalproject12be.domain.store.entity.Store_2;
@@ -179,9 +180,9 @@ public class StoreController {
 
 	@GetMapping("/test1")
 	//@GetMapping("/api/store/foreign/search")
-	public ResponseEntity<Page<ForeignStoreResponse>> fortes_1(SearchForeignOptionRequest request,
+	public ResponseEntity<Page<Name>> fortes_1(SearchForeignOptionRequest request,
 		@AuthenticationPrincipal UserDetailsImpl userDetails){
-		Page<ForeignStoreResponse> result = storeService.fortes_1(request,userDetails);
+		Page<Name> result = storeService.fortes_1(request,userDetails);
 		return ResponseEntity.status(HttpStatus.OK).body(result);
 	}
 

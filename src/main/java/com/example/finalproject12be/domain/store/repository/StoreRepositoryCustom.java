@@ -15,6 +15,7 @@ import com.example.finalproject12be.domain.store.dto.MappedSearchRequest;
 import com.example.finalproject12be.domain.member.entity.Member;
 import com.example.finalproject12be.domain.store.dto.ForeignStoreResponse;
 import com.example.finalproject12be.domain.store.dto.MappedSearchForeignRequest;
+import com.example.finalproject12be.domain.store.dto.Name;
 import com.example.finalproject12be.domain.store.dto.StoreResponseDto;
 import com.example.finalproject12be.domain.store.entity.Store;
 
@@ -179,7 +180,8 @@ public class StoreRepositoryCustom {
 		NumberExpression<Double> distance = distance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude);
 
 		if (distance == null) {
-			SubQueryExpression<Long> bookmarkCountSubquery = JPAExpressions.select(bookmark.id.count())
+			SubQueryExpression<Long> bookmarkCountSubquery = JPAExpressions
+				.select(bookmark.id.count())
 				.from(bookmark)
 				.where(bookmark.store.eq(store));
 
@@ -273,17 +275,15 @@ public class StoreRepositoryCustom {
 		}
 	}
 
-	public Page<ForeignStoreResponse> fortes_1(MappedSearchForeignRequest request, UserDetailsImpl userDetails) {
+	public Page<Name> fortes_1(MappedSearchForeignRequest request, UserDetailsImpl userDetails) {
 
 		int page = request.getPage();
 		int size = request.getSize();
 
-			QueryResults<ForeignStoreResponse> results = jpaQueryFactory
+			QueryResults<Name> results = jpaQueryFactory
 				.select(Projections.constructor(
-					ForeignStoreResponse.class,
-					store.id, store.address, store.name, store.callNumber,
-					store.weekdaysTime, store.longitude, store.latitude,
-					store.english, store.chinese, store.japanese))
+					Name.class,
+					store.name))
 				.from(store)
 				.where(
 					withinDistance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude),
@@ -303,6 +303,37 @@ public class StoreRepositoryCustom {
 			return new PageImpl<>(results.getResults(), PageRequest.of(page, size), results.getTotal());
 
 	}
+
+	// public Page<ForeignStoreResponse> fortes_1(MappedSearchForeignRequest request, UserDetailsImpl userDetails) {
+	//
+	// 	int page = request.getPage();
+	// 	int size = request.getSize();
+	//
+	// 	QueryResults<ForeignStoreResponse> results = jpaQueryFactory
+	// 		.select(Projections.constructor(
+	// 			ForeignStoreResponse.class,
+	// 			store.id, store.address, store.name, store.callNumber,
+	// 			store.weekdaysTime, store.longitude, store.latitude,
+	// 			store.english, store.chinese, store.japanese))
+	// 		.from(store)
+	// 		.where(
+	// 			withinDistance(request.getLatitude(), request.getLongitude(), store.latitude, store.longitude),
+	// 			eqAddressTest(request.getGu()),
+	// 			eqStoreName(request.getStoreName()),
+	// 			checkOpen(request.isOpen()),
+	// 			checkHolidayOpen(request.isHolidayBusiness()),
+	// 			checkNightdOpen(request.isNightBusiness()),
+	// 			eqEnglish(request.getEnglish()),
+	// 			eqChinese(request.getChinese()),
+	// 			eqJapanese(request.getJapanese())
+	// 		)
+	// 		.offset(page * size)
+	// 		.limit(size)
+	// 		.fetchResults();
+	//
+	// 	return new PageImpl<>(results.getResults(), PageRequest.of(page, size), results.getTotal());
+	//
+	// }
 
 
 	private BooleanExpression eqAddress(String gu) {

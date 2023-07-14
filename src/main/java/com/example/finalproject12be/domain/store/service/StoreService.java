@@ -23,6 +23,7 @@ import com.example.finalproject12be.domain.store.dto.ForeignOneStoreResponse;
 import com.example.finalproject12be.domain.store.dto.ForeignStoreResponse;
 import com.example.finalproject12be.domain.store.dto.MappedSearchForeignRequest;
 import com.example.finalproject12be.domain.store.dto.MappedSearchRequest;
+import com.example.finalproject12be.domain.store.dto.Name;
 import com.example.finalproject12be.domain.store.dto.OneStoreResponseDto;
 import com.example.finalproject12be.domain.store.dto.SearchForeignOptionRequest;
 import com.example.finalproject12be.domain.store.dto.SearchOptionRequest;
@@ -895,11 +896,11 @@ public class StoreService {
 
 
 	@Transactional(readOnly = true)
-	public Page<ForeignStoreResponse> fortes_1(SearchForeignOptionRequest request, UserDetailsImpl userDetails) {
+	public Page<Name> fortes_1(SearchForeignOptionRequest request, UserDetailsImpl userDetails) {
 
 		MappedSearchForeignRequest mappedRequest = request.toMappedSearchRequest();
 
-		Page<ForeignStoreResponse> result = storeRepositoryCustom.fortes_1(mappedRequest, userDetails);
+		Page<Name> result = storeRepositoryCustom.fortes_1(mappedRequest, userDetails);
 
 		return result;
 	}
