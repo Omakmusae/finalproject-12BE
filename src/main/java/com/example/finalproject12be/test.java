@@ -1,46 +1,79 @@
 package com.example.finalproject12be;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 import java.util.*;
 
 public class test {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-		int[] array = {1, 5, 2, 6, 3, 7, 4};
+		int N = Integer.parseInt(br.readLine());
+		int[] arr = new int[N];
 
-		int[][] commands = {{2, 5, 3}, {4, 4, 1}, {1, 7, 3}};
+		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
+		for(int i = 0; i < N; i++) {
+			arr[i] = Integer.parseInt(st.nextToken());
+		}
+
+		Arrays.sort(arr);
+
+		int M = Integer.parseInt(br.readLine());
+
+		st = new StringTokenizer(br.readLine()," ");
+		StringBuilder sb = new StringBuilder();
+
+		for(int i = 0; i < M; i++) {
+			int key = Integer.parseInt(st.nextToken());
+
+			// upperBound와 lowerBound의 차이 값을 구한다.
+			sb.append(upperBound(arr, key) - lowerBound(arr, key)).append(' ');
+		}
+		System.out.println(sb);
+
+	}
 
 
-		int[] answer = new int[commands.length];
+	private static int lowerBound(int[] arr, int key) {
+		int lo = 0;
+		int hi = arr.length;
+		while (lo<hi) {
+			int mid = (lo+hi) / 2;
 
-		for (int i=0; i<commands.length; i++) {
-			List<Integer> arrInt = new ArrayList<>();
-
-			for (int j=commands[i][0]-1; j<commands[i][1]; j++) {
-				arrInt.add(array[j]);
+			if (key <= arr[mid]) {
+				hi=mid;
 			}
-			Collections.sort(arrInt);
-			answer[i] = arrInt.get(commands[i][2]-1);
-
+			else {
+				lo = mid+1;
+			}
 		}
-
+		return lo;
 	}
 
 
-	public int solution(int[][] sizes) {
-		int answer = 0;
-		int max_v=0;
-		int max_h=0;
-		for(int i=0;i<sizes.length;i++){
-			int v=Math.max(sizes[i][0],sizes[i][1]);
-			int h=Math.min(sizes[i][0],sizes[i][1]);
-			max_v=Math.max(max_v,v);
-			max_h=Math.max(max_h,h);
+
+	private static int upperBound(int[] arr, int key) {
+		int lo = 0;
+		int hi = arr.length;
+
+		// lo가 hi랑 같아질 때 까지 반복
+		while (lo < hi) {
+
+			int mid = (lo + hi) / 2; // 중간위치를 구한다.
+
+			// key값이 중간 위치의 값보다 작을 경우
+			if (key < arr[mid]) {
+				hi = mid;
+			}
+			// 중복원소의 경우 else에서 처리된다.
+			else {
+				lo = mid + 1;
+			}
 		}
-		return answer=max_v*max_h;
+		return lo;
 	}
-
-
 
 
 

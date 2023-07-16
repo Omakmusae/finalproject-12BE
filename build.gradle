@@ -85,6 +85,9 @@ dependencies {
     //s3
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 
+    //aws elasticache redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
 }
 
 def querydslDir = "$buildDir/generated/querydsl"
