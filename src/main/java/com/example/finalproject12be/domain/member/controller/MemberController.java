@@ -36,13 +36,13 @@ public class MemberController {
 
 	private final MemberService memberService;
 
-	@PostMapping("/user/signup")
+	@PostMapping("/api/user/signup")
 	public ResponseEntity<String> signup(@RequestBody @Valid final MemberSignupRequest memberSignupRequest) {
 		memberService.signup(memberSignupRequest);
 		return ResponseEntity.status(HttpStatus.OK).body("회원가입 완료");
 	}
 
-	@PostMapping("/user/login")
+	@PostMapping("/api/user/login")
 	public ResponseEntity<MemberLoginResponse> login(
 		@RequestBody final MemberLoginRequest memberLoginRequest,
 		final HttpServletResponse response) {
@@ -50,7 +50,7 @@ public class MemberController {
 		return ResponseEntity.status(HttpStatus.OK).body(loginResult);
 	}
 
-	@PostMapping("/user/logout")
+	@PostMapping("/api/user/logout")
 	public ResponseEntity<String> logout(HttpServletRequest request,
 		final HttpServletResponse response,
 		@AuthenticationPrincipal UserDetailsImpl userDetails
@@ -59,7 +59,7 @@ public class MemberController {
 		return ResponseEntity.ok("로그아웃되었습니다.");
 	}
 
-	@PostMapping("/user/change/nickname")
+	@PostMapping("/api/user/change/nickname")
 	public ResponseEntity<MemberNewNameResponse> changeNickname(
 		@RequestBody @Valid MemberNameRequest memberNameRequest,
 		@AuthenticationPrincipal UserDetailsImpl userDetails
@@ -69,7 +69,7 @@ public class MemberController {
 		return ResponseEntity.status(HttpStatus.OK).body(changeResult);
 	}
 
-	@DeleteMapping("/user/signout")
+	@DeleteMapping("/api/user/signout")
 	public ResponseEntity<String> signout(
 		@AuthenticationPrincipal UserDetailsImpl userDetails,
 		final HttpServletRequest request) {
@@ -77,7 +77,7 @@ public class MemberController {
 		return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
 	}
 
-	@PostMapping("/user/find/password")
+	@PostMapping("/api/user/find/password")
 	public ResponseEntity<Void> findPassword(
 		@RequestBody @Valid MemberEmailRequest memberEmailRequest
 	) {
@@ -85,7 +85,7 @@ public class MemberController {
 		return ResponseEntity.status(HttpStatus.OK).body(null);
 	}
 
-	@PostMapping("/user/change/password")
+	@PostMapping("/api/user/change/password")
 	public ResponseEntity<Void> changePassword(
 		@RequestBody @Valid MemberPasswordRequest memberPasswordRequest,
 		@AuthenticationPrincipal UserDetailsImpl userDetails
@@ -94,7 +94,7 @@ public class MemberController {
 		return ResponseEntity.status(HttpStatus.OK).body(null);
 	}
 
-	@PutMapping("/user/change/nickname/admin")
+	@PutMapping("/api/user/change/nickname/admin")
 	public ResponseEntity<MemberNewNameResponse> changeNicknameAdmin(
 		@RequestBody @Valid MemberNameRequestAdmin memberNameRequest,
 		@AuthenticationPrincipal UserDetailsImpl userDetails
@@ -104,7 +104,7 @@ public class MemberController {
 		return ResponseEntity.status(HttpStatus.OK).body(changeResult);
 	}
 
-	@DeleteMapping("/user/signout/admin")
+	@DeleteMapping("/api/user/signout/admin")
 	public ResponseEntity<String> signOutAdmin(
 		@RequestBody @Valid MemberNameRequest memberNameRequest, @AuthenticationPrincipal UserDetailsImpl userDetails,
 		final HttpServletRequest request) {
@@ -112,7 +112,7 @@ public class MemberController {
 		return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
 	}
 
-	@PostMapping("/user/change/profile")
+	@PostMapping("/api/user/change/profile")
 	public ResponseEntity<ProfileResponse> uploadProfile(
 		@RequestPart(value = "file") final MultipartFile file,
 		@AuthenticationPrincipal UserDetailsImpl userDetails
@@ -121,14 +121,14 @@ public class MemberController {
 		return ResponseEntity.status(HttpStatus.OK).body(profileResponse);
 	}
 
-	@PostMapping("/user/signup/email")
+	@PostMapping("/api/user/signup/email")
 	public ResponseEntity<Void> checkEmail(
 		@RequestBody @Valid MemberEmailRequest memberEmailRequest){
 		memberService.checkEmail(memberEmailRequest.getEmail());
 		return ResponseEntity.status(HttpStatus.OK).body(null);
 	}
 
-	@PostMapping("/user/signup/email/valid")
+	@PostMapping("/api/user/signup/email/valid")
 	public ResponseEntity<Boolean> checkValidNumber(
 		@RequestBody MemberValidNumberRequest memberValidNumberRequest
 	){

@@ -12,10 +12,10 @@ import lombok.Value;
 @Configuration
 public class RedisConfig {
 
-	@Value("${spring.redis.host}")
+	//@Value("${spring.redis.host}")
 	private String redisHost;
 
-	@Value("${spring.redis.port}")
+	//@Value("${spring.redis.port}")
 	private int redisPort;
 
 	@Bean

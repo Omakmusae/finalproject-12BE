@@ -46,11 +46,10 @@ public class WebSecurityConfig {
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
 		http.authorizeRequests()
-				.antMatchers("/user/**").permitAll()
+				.antMatchers("/api/user/**").permitAll()
 				.antMatchers("/api/store/**").permitAll()
-				.antMatchers("/user/signin/**").permitAll()
-				.antMatchers("/user/signin/**").permitAll()
-				.antMatchers("/**").permitAll()
+				.antMatchers("/api/user/signin/**").permitAll()
+				.antMatchers("/api/user/signin/**").permitAll()
 				.antMatchers("/api/comment/{store-id}").permitAll()
 				.antMatchers(HttpMethod.GET, "/api/board").permitAll()
 				.antMatchers(HttpMethod.GET, "/api/board/**").permitAll()

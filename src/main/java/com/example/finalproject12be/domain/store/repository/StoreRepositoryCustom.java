@@ -304,7 +304,7 @@ public class StoreRepositoryCustom {
 
 	}
 
-	// public Page<ForeignStoreResponse> fortes_1(MappedSearchForeignRequest request, UserDetailsImpl userDetails) {
+	// public Page<ForeignStoreResponse> searchForeignStoreWithFilter(MappedSearchForeignRequest request, UserDetailsImpl userDetails) {
 	//
 	// 	int page = request.getPage();
 	// 	int size = request.getSize();
