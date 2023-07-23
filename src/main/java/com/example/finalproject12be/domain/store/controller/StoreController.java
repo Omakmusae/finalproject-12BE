@@ -162,7 +162,6 @@ public class StoreController {
 
 	//일반 약국 검색 QueryDSL
 	@GetMapping("/api/store/search")
-	//@GetMapping("/test")
 	public ResponseEntity<Page<StoreResponseDto>> searchStoreWithFilter(SearchOptionRequest request,
 		@AuthenticationPrincipal UserDetailsImpl userDetails){
 
